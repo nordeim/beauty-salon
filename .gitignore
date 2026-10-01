@@ -49,3 +49,6 @@ tests/e2e/.auth/
 # playwright
 test-results/
 playwright-report/
+
+# survey scratch (probe screenshots/json — session artifacts, not docs)
+research/
