@@ -1,0 +1,93 @@
+// Maison Luminaire — data model.
+// The marketing site (services, stylists, gallery, testimonials) is DB-driven so
+// the seed mirrors the reference app's content exactly; bookings and newsletter
+// signups persist here too. Auth uses a dedicated User table (bcrypt password
+// hashes, HMAC-signed session cookies — see src/lib/auth.ts).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  category    String // hair | skin | nails
+  tagline     String
+  description String // card copy (one line)
+  longDescription String // detail-page paragraph
+  priceCents  Int
+  durationMin Int
+  prep        String // JSON array of "before your visit" items
+  image       String
+  sortOrder   Int
+  createdAt   DateTime @default(now())
+}
+
+model Stylist {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  title       String
+  years       Int
+  eyebrow     String // "01 / 14 yrs"
+  bio1        String
+  bio2        String
+  imageGray   String
+  imageColor  String
+  sortOrder   Int
+  createdAt   DateTime @default(now())
+}
+
+model GalleryItem {
+  id          String   @id @default(cuid())
+  title       String
+  category    String // skin | bridal | cuts | color | nails
+  description String
+  image       String // grid thumbnail
+  fullImage   String // lightbox variant (may equal image)
+  sortOrder   Int
+  createdAt   DateTime @default(now())
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  quote       String
+  attribution String
+  sortOrder   Int
+  createdAt   DateTime @default(now())
+}
+
+model Appointment {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  stylistSlug String? // nullable: "No preference"
+  serviceSlug String
+  date        String // YYYY-MM-DD (preferred date)
+  time        String // HH:MM (preferred time)
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+}

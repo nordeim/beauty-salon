@@ -1,18 +1,26 @@
 import { expect, test } from "@playwright/test";
 
-// Mobile navigation (390×844 — the reference's mobile chrome, v1.7–v2.7):
-// the full-bleed app bar, the bottom tab bar with the ACTIVE tab's
-// inset-well chip, the MORE bottom sheet, and the 768 middle state's
-// floating pill nav. This is the highest-regression-risk chrome — the
-// active-tab well was added in v2.3 after re-measuring the live app, and
-// v2.4 pinned the chip's FULL-TAB WIDTH (the live's chips stretch across
-// the whole tab; the More button renders 8px wider via its flex basis).
-// v2.7 (measured live): the four view tabs are now real <a href> links
-// (the MORE button stays a button); the Home icon is layout-dashboard.
-// Contexts arrive AUTHENTICATED (setup-project storageState).
+// Mobile navigation (390×844) — THE highest-regression-risk chrome and the
+// exact surface the Tailwind v3→v4 port traps target
+// (docs/Tailwind-V4-Validation-Report.md, traps 1/2/4/5):
+//
+//   * trap 1 (bare-HSL transparent theme) — the drawer's bg must be the
+//     opaque cream rgb(250, 248, 245), never rgba(0, 0, 0, 0);
+//   * trap 2 (oklch palette drift) — link ink and CTA colors are pinned to
+//     the reference's exact rgb values;
+//   * trap 4 (space-y :where() rewrite) — the reference drawer's links
+//     column is flex `gap-2` (8px) with the CTA wrapper carrying `mt-10`
+//     (40px): 48px total. Under v3 a space-y container would have overridden
+//     a child's mt-*; under v4 it would not — gap + margin sidesteps the
+//     engine difference entirely, and this spec PINS the computed result;
+//   * trap 5 (shadow-scale shift) — shadow tokens are pinned in globals.css.
+//
+// Reference measurements (extracted live, research/target-app-spec.md):
+//   drawer bg rgb(250,248,245) · gap 8px · padding-x 32px · link 48px
+//   Cormorant Garamond lh 48px ls -1.2px ink rgb(26,26,26) · CTA wrapper
+//   mt 40px · CTA span 12px Mulish ls 2.64px pad 16/36 radius 9999px
+//   bg rgb(26,26,26) on cream text.
 
-// A touch-enabled 390×844 chromium context (the iPhone geometry without
-// switching browsers — locator.tap needs hasTouch).
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
 test.describe("mobile navigation", () => {
@@ -20,176 +28,144 @@ test.describe("mobile navigation", () => {
     await page.goto("/");
   });
 
-  test("app bar and bottom tab bar render", async ({ page }) => {
-    const bar = page.getByRole("banner");
-    await expect(bar).toBeVisible();
-    await expect(bar).toHaveCSS("height", "62px");
+  test("header renders logo, Book Now, status pill area and the hamburger", async ({ page }) => {
+    const banner = page.getByRole("banner");
+    await expect(banner).toBeVisible();
+    await expect(banner.getByRole("link", { name: "Maison Luminaire" })).toBeVisible();
+    await expect(banner.getByRole("link", { name: "Book Now" })).toBeVisible();
+    await expect(banner.getByRole("button", { name: "Open menu" })).toBeVisible();
+    // Desktop nav is hidden at 390.
+    await expect(banner.getByRole("navigation", { name: "Primary" })).toBeHidden();
+  });
 
-    const nav = page.getByRole("navigation", { name: "Primary" });
-    await expect(nav).toBeVisible();
-    // v2.7: the four view tabs are LINKS; More stays a button.
-    for (const label of ["Home", "Goals", "My Tasks", "Agent"]) {
-      await expect(nav.getByRole("link", { name: label, exact: true })).toBeVisible();
+  test("hamburger opens the full-screen drawer with the five nav links", async ({ page }) => {
+    await page.getByRole("button", { name: "Open menu" }).tap();
+    const drawer = page.locator("div.fixed.inset-0.z-\\[60\\]");
+    await expect(drawer).toBeVisible();
+    for (const label of ["Treatments", "Gallery", "Atelier", "Story", "Visit"]) {
+      await expect(drawer.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
-    await expect(nav.getByRole("button", { name: "More", exact: true })).toBeVisible();
+    await expect(drawer.getByRole("link", { name: "Book an appointment" })).toBeVisible();
+    await expect(drawer.getByRole("button", { name: "Close menu" })).toBeVisible();
   });
 
-  test("the ACTIVE tab carries the inset-well chip (v2.3/v2.4 parity)", async ({ page }) => {
-    const home = page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Home", exact: true });
-    const chip = home.locator("span").first();
+  test("drawer computed styles match the live reference (traps 1/2/4)", async ({ page }) => {
+    await page.getByRole("button", { name: "Open menu" }).tap();
+    const drawer = page.locator("div.fixed.inset-0.z-\\[60\\]");
 
-    // The wrapper chip: well background + the BRIGHT inset pair.
-    await expect(chip).toHaveCSS("background-color", "rgb(235, 231, 226)");
-    await expect(chip).toHaveCSS("border-radius", "14px");
-    const shadow = await chip.evaluate((el) => getComputedStyle(el).boxShadow);
-    expect(shadow).toContain("rgba(255, 252, 248, 0.75)");
-    expect(shadow).toContain("rgba(180, 165, 150, 0.32)");
-    expect(shadow).toContain("inset");
+    // Trap 1 — the theme background must be OPAQUE cream, not transparent.
+    await expect(drawer).toHaveCSS("background-color", "rgb(250, 248, 245)");
 
-    // v2.4 (measured live): the chip FILLS the tab — the live's tab anchors
-    // carry no padding and the inner chip stretches to the full tab width
-    // (73.2 of 73.2 at 390). A content-width chip (the v2.3 clone bug) is
-    // ~36px — half the tab.
-    const chipBox = await chip.boundingBox();
-    const tabBox = await home.boundingBox();
-    expect(chipBox).not.toBeNull();
-    expect(tabBox).not.toBeNull();
-    expect(Math.abs((chipBox?.width ?? 0) - (tabBox?.width ?? 0))).toBeLessThan(2);
+    const linksCol = drawer.locator(".flex-1.flex.flex-col").first();
+    // Trap 4 — gap-based spacing (8px), the engine-stable contract.
+    await expect(linksCol).toHaveCSS("display", "flex");
+    await expect(linksCol).toHaveCSS("gap", "8px");
+    await expect(linksCol).toHaveCSS("padding-left", "32px");
+    await expect(linksCol).toHaveCSS("justify-content", "center");
+
+    // Trap 2 — exact reference ink + typography.
+    const link = drawer.getByRole("link", { name: "Treatments", exact: true });
+    await expect(link).toHaveCSS("font-family", /Cormorant Garamond/);
+    await expect(link).toHaveCSS("font-size", "48px");
+    await expect(link).toHaveCSS("line-height", "48px");
+    await expect(link).toHaveCSS("letter-spacing", "-1.2px");
+    await expect(link).toHaveCSS("color", "rgb(26, 26, 26)");
+    await expect(link).toHaveCSS("margin-top", "0px");
+
+    // Trap 4 — the CTA wrapper's explicit 40px margin SURVIVES (the v3
+    // reference's total gap before the CTA is 8px gap + 40px margin).
+    const ctaWrap = drawer.locator(".mt-10").first();
+    await expect(ctaWrap).toHaveCSS("margin-top", "40px");
+
+    const ctaSpan = drawer.getByRole("link", { name: "Book an appointment" }).locator("span");
+    await expect(ctaSpan).toHaveCSS("font-family", /Mulish/);
+    await expect(ctaSpan).toHaveCSS("font-size", "12px");
+    await expect(ctaSpan).toHaveCSS("letter-spacing", "2.64px");
+    await expect(ctaSpan).toHaveCSS("padding-top", "16px");
+    await expect(ctaSpan).toHaveCSS("padding-left", "36px");
+    await expect(ctaSpan).toHaveCSS("background-color", "rgb(26, 26, 26)");
+    await expect(ctaSpan).toHaveCSS("color", "rgb(250, 248, 245)");
+    // rounded-full: v3 computed 9999px; v4 emits calc(infinity*1px) which
+    // Chrome reports as 33554400px — both are "fully round" for any box.
+    const radius = await ctaSpan.evaluate((el) => getComputedStyle(el).borderRadius);
+    expect(parseFloat(radius)).toBeGreaterThanOrEqual(9999);
+    await expect(ctaSpan).toHaveCSS("text-transform", "uppercase");
   });
 
-  test("the MORE tab renders wider than the view tabs (v2.4 flex-basis parity)", async ({ page }) => {
-    const nav = page.getByRole("navigation", { name: "Primary" });
-    const home = nav.getByRole("link", { name: "Home", exact: true });
-    const more = nav.getByRole("button", { name: "More", exact: true });
-    const homeBox = await home.boundingBox();
-    const moreBox = await more.boundingBox();
-    expect(homeBox).not.toBeNull();
-    expect(moreBox).not.toBeNull();
-    // The live's More button carries 8px of horizontal padding that
-    // participates in its flex basis (content-box sizing), rendering it
-    // ~6.4px wider than each view tab (81.2 vs 73.2 at 390).
-    expect((moreBox?.width ?? 0) - (homeBox?.width ?? 0)).toBeGreaterThan(4);
+  test("close button dismisses the drawer", async ({ page }) => {
+    await page.getByRole("button", { name: "Open menu" }).tap();
+    const drawer = page.locator("div.fixed.inset-0.z-\\[60\\]");
+    await expect(drawer).toBeVisible();
+    await drawer.getByRole("button", { name: "Close menu" }).tap();
+    await expect(drawer).toHaveCount(0);
   });
 
-  test("tab bar icons render at the live's computed stroke 1.5 (v2.9)", async ({ page }) => {
-    const nav = page.getByRole("navigation", { name: "Primary" });
-    const home = nav.getByRole("link", { name: "Home", exact: true });
-    const icon = home.locator("svg").first();
-    await expect(icon).toBeVisible();
-    // v2.9 (computed-style re-measure): the live stamps inline
-    // `stroke-width: 1.5` styles on every chrome icon — the attribute
-    // reads 2 but CSS beats presentation attributes, so the COMPUTED
-    // stroke is 1.5 (the v2.6 attribute census missed the override).
-    await expect(icon).toHaveCSS("stroke-width", "1.5px");
-    // The bar is content-height driven: pad 8/12 + chip 53.5 = 73.5 (the
-    // v2.3 clone's min-h-[54px] forced 74).
-    const bar = nav;
-    await expect(bar).toHaveCSS("padding", "8px 8px 12px");
+  test("Escape closes the drawer (a11y enhancement)", async ({ page }) => {
+    await page.getByRole("button", { name: "Open menu" }).tap();
+    const drawer = page.locator("div.fixed.inset-0.z-\\[60\\]");
+    await expect(drawer).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(drawer).toHaveCount(0);
   });
 
-  test("INACTIVE tabs render no well", async ({ page }) => {
-    const nav = page.getByRole("navigation", { name: "Primary" });
-    const goalsChip = nav.getByRole("link", { name: "Goals", exact: true }).locator("span").first();
-    await expect(goalsChip).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    const shadow = await goalsChip.evaluate((el) => getComputedStyle(el).boxShadow);
-    expect(shadow).toBe("none");
+  test("nav link taps close the drawer and navigate", async ({ page }) => {
+    await page.getByRole("button", { name: "Open menu" }).tap();
+    const drawer = page.locator("div.fixed.inset-0.z-\\[60\\]");
+    await drawer.getByRole("link", { name: "Treatments", exact: true }).tap();
+    await expect(page).toHaveURL(/\/services\/?$/);
+    await expect(drawer).toHaveCount(0);
+    await expect(
+      page.getByRole("heading", { name: /Our Signature/ }).first(),
+    ).toBeVisible();
+    // The hamburger returns after navigation.
+    await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
   });
 
-  test("tab taps switch views and move the well", async ({ page }) => {
-    const nav = page.getByRole("navigation", { name: "Primary" });
-    await nav.getByRole("link", { name: "Goals", exact: true }).tap();
-    await expect(page).toHaveURL(/\/goals\/?$/);
-    await expect(page.getByRole("heading", { name: "Goals", exact: true }).filter({ visible: true }).first()).toBeVisible();
-
-    const goalsChip = nav.getByRole("link", { name: "Goals", exact: true }).locator("span").first();
-    await expect(goalsChip).toHaveCSS("background-color", "rgb(235, 231, 226)");
-    // Home lost the well.
-    const homeChip = nav.getByRole("link", { name: "Home", exact: true }).locator("span").first();
-    await expect(homeChip).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  test("the drawer CTA navigates to /book", async ({ page }) => {
+    await page.getByRole("button", { name: "Open menu" }).tap();
+    await page.locator("div.fixed.inset-0.z-\\[60\\]").getByRole("link", { name: "Book an appointment" }).tap();
+    await expect(page).toHaveURL(/\/book\/?$/);
+    await expect(page.getByRole("heading", { name: /Reserve your/ })).toBeVisible();
   });
 
-  test("MORE opens the bottom sheet and navigates; never carries the well", async ({ page }) => {
-    const nav = page.getByRole("navigation", { name: "Primary" });
-    const more = nav.getByRole("button", { name: "More", exact: true });
-
-    // MORE has no well wrapper at all (its active state is color-only).
-    await expect(more.locator("span.orb-nav-active")).toHaveCount(0);
-
-    await more.tap();
-    const sheet = page.getByRole("dialog");
-    await expect(sheet).toBeVisible();
-    // v2.8 (measured live): the brand textContent is the literal "ORBITAL"
-    // (no text-transform — the old "Orbital" + uppercase reading retired).
-    await expect(sheet).toContainText("ORBITAL");
-    // v2.7: the sheet rows are real links now; Tasks targets the new
-    // /tasks (all-tasks) view.
-    await expect(sheet.getByRole("link", { name: "Tasks", exact: true })).toHaveAttribute("href", "/tasks");
-
-    await sheet.getByRole("link", { name: "Team", exact: true }).tap();
-    await expect(page).toHaveURL(/\/team\/?$/);
-    await expect(page.getByRole("heading", { name: "Team", exact: true }).filter({ visible: true }).first()).toBeVisible();
-    // The sheet closed on navigation.
-    await expect(page.getByRole("dialog")).toBeHidden();
-
-    // MORE stays well-free while Team is active.
-    await expect(more.locator("span.orb-nav-active")).toHaveCount(0);
-  });
-
-  test("mobile team header shows the short INVITE label; AI Agents header stays inline", async ({ page }) => {
-    await page.goto("/team");
-    // The header pill (aria-label "Invite Member") is the FIRST match — the
-    // empty-state button carries the same visible text.
-    const invite = page.getByRole("button", { name: "Invite Member" }).first();
-    await expect(invite).toBeVisible();
-    // v2.3: below sm the visible label is just "Invite" (the long text is
-    // the accessible name; the sm:hidden span carries the short one).
-    await expect(invite.getByText("Invite Member")).toBeHidden();
-    await expect(invite.getByText("Invite", { exact: true })).toBeVisible();
-
-    // v2.3: the NEW AGENT button stays on the AI Agents header row.
-    const agentsHeading = page.getByRole("heading", { name: "AI Agents" });
-    const newAgent = page.getByRole("button", { name: "New Agent" });
-    const headingBox = await agentsHeading.boundingBox();
-    const buttonBox = await newAgent.boundingBox();
-    expect(headingBox).not.toBeNull();
-    expect(buttonBox).not.toBeNull();
-    expect(Math.abs((headingBox?.y ?? 0) - (buttonBox?.y ?? 0))).toBeLessThan(40);
-    expect(buttonBox!.x).toBeGreaterThan(200); // right-aligned on the row
+  test("scrolled header gains the glass treatment (trap 1-adjacent)", async ({ page }) => {
+    const banner = page.getByRole("banner");
+    await expect(banner).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await page.mouse.wheel(0, 600);
+    await expect(banner).toHaveCSS("background-color", "rgba(250, 248, 245, 0.6)", {
+      timeout: 10_000,
+    });
+    // border-foreground/5: v3 computed rgba(26,26,26,0.05); v4's alpha
+    // modifier emits color-mix(in oklab, …) — the visually identical oklab
+    // representation. Assert the WIDTH (the hairline exists) instead of the
+    // color string; the color token itself is pinned in globals.css.
+    await expect(banner).toHaveCSS("border-bottom-width", "1px");
   });
 });
 
 test.describe("middle state (768) navigation", () => {
   test.use({ viewport: { width: 768, height: 844 } });
 
-  test("the floating pill nav carries the six desktop tabs with an inset-well active chip", async ({ page }) => {
+  test("hamburger still present at 768; desktop nav hidden until lg", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Primary" })).toBeHidden();
+  });
+});
+
+test.describe("desktop (1280) navigation", () => {
+  test.use({ viewport: { width: 1280, height: 900 } });
+
+  test("the five inline nav links render and navigate", async ({ page }) => {
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Primary" });
     await expect(nav).toBeVisible();
-    // v2.7: the pill items are links (the pill's "Tasks" targets
-    // /my-tasks, NOT the /tasks view — measured live).
-    for (const label of ["Home", "Goals", "Tasks", "Activity", "Team", "Settings"]) {
+    for (const label of ["Treatments", "Gallery", "Atelier", "Story", "Visit"]) {
       await expect(nav.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
-    const home = nav.getByRole("link", { name: "Home", exact: true });
-    // v2.9: the active well treatment lives on the INNER chip (the
-    // anchor is a bare flex wrapper — the live's A > chip structure).
-    const chip = home.locator("span").first();
-    await expect(chip).toHaveCSS("background-color", "rgb(235, 231, 226)");
-    const box = await nav.boundingBox();
-    expect(box?.width).toBeGreaterThan(400);
-    expect(box?.width).toBeLessThan(560);
-    expect(box?.x).toBeGreaterThan(100); // centered, not full-width
-  });
+    await expect(page.getByRole("button", { name: "Open menu" })).toHaveCount(0);
 
-  test("no app bar and no bottom tab bar at md", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.getByRole("banner")).toBeHidden();
-    // The mobile bottom bar is the Primary nav that CONTAINS the More
-    // button — it stays in the DOM (display:none) at md, so assert it is
-    // hidden rather than absent.
-    const mobileBar = page
-      .locator('nav[aria-label="Primary"]')
-      .filter({ has: page.getByRole("button", { name: "More", exact: true }) });
-    await expect(mobileBar).toBeHidden();
+    await nav.getByRole("link", { name: "Atelier", exact: true }).click();
+    await expect(page).toHaveURL(/\/team\/?$/);
   });
 });

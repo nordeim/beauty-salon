@@ -1,73 +1,108 @@
 import { expect, test } from "@playwright/test";
 
-// Login surface: the /login route renders the reference auth card, rejects
-// bad credentials, signs the demo user in, and honors authenticated visits.
-// This file OPTS OUT of the shared storageState (empty cookies) because it
-// tests the logged-out surface. (Deliberately does NOT probe the rate
-// limiter — 10 attempts/IP/15 min would poison the whole suite.)
+// Auth flow — login page surface, session cookie, /api/auth/me, logout.
 
-test.use({ storageState: { cookies: [], origins: [] } });
+const DEMO_EMAIL = "sepnetflix2023@outlook.com";
+const DEMO_PASSWORD = "$Abcd1234";
 
-test.describe("login route", () => {
-  test("renders the auth card with the circular logo chip", async ({ page }) => {
+test.describe("auth", () => {
+  test("login page renders the slate auth card", async ({ page }) => {
     await page.goto("/login");
-    await expect(page.getByRole("heading", { name: "Welcome to Project Management App" })).toBeVisible();
-
-    // v2.3: the logo is a white CIRCULAR chip (rounded-full + ring-4
-    // ring-white/50 + shadow-lg), not the retired rounded-square mark.
-    // (Tailwind v4 computes rounded-full as calc(infinity * 1px) → Chrome
-    // reports 33554432px, and ring-white/50 serializes in oklab() — so the
-    // assertions check the geometry and the 4px ring, not exact strings.)
-    const chip = page.locator("span.rounded-full.ring-4").first();
-    await expect(chip).toBeVisible();
-    const radius = await chip.evaluate((el) => parseFloat(getComputedStyle(el).borderRadius));
-    expect(radius).toBeGreaterThan(1000);
-    const shadow = await chip.evaluate((el) => getComputedStyle(el).boxShadow);
-    expect(shadow).toMatch(/0\.5\) 0px 0px 0px 4px/);
+    await expect(page.getByRole("heading", { name: "Welcome to Beauty Salon" })).toBeVisible();
+    await expect(page.getByText("Sign in to continue")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();
+    await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
   });
 
-  test("wrong password is rejected without a session", async ({ page }) => {
-    await page.goto("/login");
-    await page.getByLabel("Email").fill("demo@orbital.app");
-    await page.getByLabel("Password").fill("definitely-wrong");
-    await page.getByRole("button", { name: "Sign in" }).click();
-    // .first(): a double-render of the toast (observed once in a full-suite
-    // run) must not turn the rejection check into a strict-mode violation —
-    // any visible instance proves the 401 path.
-    await expect(page.getByText("Incorrect email or password").first()).toBeVisible({ timeout: 15_000 });
-    await expect(page).toHaveURL(/\/login/);
-  });
-
-  test("valid credentials sign in and land on the workspace", async ({ page }) => {
-    await page.goto("/login");
-    await page.getByLabel("Email").fill("demo@orbital.app");
-    await page.getByLabel("Password").fill("Demo1234!");
-    await page.getByRole("button", { name: "Sign in" }).click();
-    await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
-    // Desktop chrome: the sticky sidebar (not the mobile app bar) is the
-    // visible landmark once signed in.
-    await expect(page.locator("aside")).toBeVisible();
-  });
-
-  test("authenticated visits render the login card (the live's behavior — no redirect)", async ({ page }) => {
-    // F13/v2.11 (measured on the live 2026-09-24): the reference renders
-    // the FULL login card for authenticated visitors — the URL stays on
-    // /login, the card is byte-identical to the logged-out one, and
-    // signing in from that state lands on the workspace. The clone
-    // redirected authenticated visitors to / from v1.4 to v2.10; that
-    // drift is now closed (the page renders the card unconditionally).
+  test("wrong credentials are rejected without enumeration", async ({ page }) => {
     const res = await page.request.post("/api/auth/login", {
-      data: { email: "demo@orbital.app", password: "Demo1234!" },
+      data: { email: "nobody@maisonluminaire.test", password: "wrong" },
     });
-    expect(res.ok()).toBeTruthy();
+    expect(res.status()).toBe(401);
+    await expect(res.json()).resolves.toMatchObject({ error: expect.any(String) });
+  });
+
+  test("demo credentials sign in, set the session, and sign out", async ({ page }) => {
     await page.goto("/login");
-    await expect(page).toHaveURL(/\/login/);
-    await expect(page.getByRole("heading", { name: "Welcome to Project Management App" })).toBeVisible();
-    // Re-signing in from the authenticated state lands on the workspace
-    // (the live's flow: POST → router lands on from_url, default "/").
-    await page.getByLabel("Email").fill("demo@orbital.app");
-    await page.getByLabel("Password").fill("Demo1234!");
-    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.getByLabel("Email", { exact: true }).fill(DEMO_EMAIL);
+    await page.getByLabel("Password", { exact: true }).fill(DEMO_PASSWORD);
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+
     await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
+
+    const me = await page.request.get("/api/auth/me");
+    expect(me.status()).toBe(200);
+    const body = await me.json();
+    expect(body.user.email).toBe(DEMO_EMAIL);
+
+    const out = await page.request.post("/api/auth/logout");
+    expect(out.status()).toBe(200);
+  });
+
+  test("the login surface carries the reference's slate palette", async ({ page }) => {
+    await page.goto("/login");
+    const main = page.locator("main");
+    // The reference's from-slate-50-to-slate-100 wash is a gradient IMAGE;
+    // background-color alone stays transparent.
+    const bgImage = await main.evaluate((el) => getComputedStyle(el).backgroundImage);
+    expect(bgImage).toContain("linear-gradient");
+    expect(bgImage).toContain("rgb(248, 250, 252)"); // slate-50
+    expect(bgImage).toContain("rgb(241, 245, 249)"); // slate-100
+  });
+});
+
+test.describe("site routes", () => {
+  test("every public route answers 200 and carries the site chrome", async ({ page }) => {
+    for (const path of ["/", "/services", "/gallery", "/team", "/about", "/contact", "/privacy", "/terms", "/accessibility", "/refund"]) {
+      const res = await page.request.get(path);
+      expect(res.status(), `${path} should be 200`).toBe(200);
+    }
+  });
+
+  test("unknown routes render the 404 surface", async ({ page }) => {
+    await page.goto("/definitely-not-a-page");
+    await expect(page.getByRole("heading", { name: "404", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Page Not Found" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Go Home" })).toHaveAttribute("href", "/");
+    await expect(page.getByRole("banner")).toBeVisible();
+    await expect(page.getByRole("contentinfo")).toBeVisible();
+  });
+
+  test("the eight service detail pages resolve", async ({ page }) => {
+    for (const slug of ["balayage", "precision-cut", "glossing-treatment", "hydrafacial", "signature-facial", "gel-manicure", "signature-pedicure", "bridal-package"]) {
+      const res = await page.request.get(`/services/${slug}`);
+      expect(res.status(), slug).toBe(200);
+    }
+  });
+
+  test("a service detail page shows the sticky treatment card with price", async ({ page }) => {
+    await page.goto("/services/balayage");
+    await expect(page.getByRole("heading", { name: "Signature Balayage" }).first()).toBeVisible();
+    await expect(page.getByText("$285").first()).toBeVisible();
+    await expect(page.getByText("210 minutes")).toBeVisible();
+    await expect(page.getByRole("link", { name: /Book this treatment/ }).first()).toHaveAttribute(
+      "href",
+      "/book?service=balayage",
+    );
+    await expect(page.getByRole("heading", { name: "Before your visit" })).toBeVisible();
+  });
+
+  test("the team page lists the three stylists with booking links", async ({ page }) => {
+    await page.goto("/team");
+    for (const name of ["Amelia Voss", "Julian Reyes", "Nadia Okafor"]) {
+      await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
+    }
+    await expect(page.getByRole("link", { name: /Book with Amelia/ })).toHaveAttribute(
+      "href",
+      "/book?stylist=amelia-voss",
+    );
+  });
+
+  test("health endpoint reports ok", async ({ page }) => {
+    const res = await page.request.get("/api/health");
+    expect(res.status()).toBe(200);
+    await expect(res.json()).resolves.toMatchObject({ status: "ok", db: true });
   });
 });

@@ -11,21 +11,11 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
-  // Path-based SPA routing: the reference app's views live at real paths
-  // (/goals, /goals/<id>, /my-tasks, /activity, /team, /settings). We keep
-  // ONE page (src/app/page.tsx) and rewrite those paths onto it; the client
-  // store syncs view state with location.pathname (see src/lib/router.ts).
-  async rewrites() {
-    return [
-      { source: "/goals", destination: "/" },
-      { source: "/goals/:goalId", destination: "/" },
-      { source: "/my-tasks", destination: "/" },
-      { source: "/tasks", destination: "/" },
-      { source: "/activity", destination: "/" },
-      { source: "/team", destination: "/" },
-      { source: "/settings", destination: "/" },
-    ];
-  },
+  // Next 16's dev-origin protection silently blocks dev chunks for the
+  // 127.0.0.1 origin (symptom: unhydrated pages + native form GET fallbacks).
+  // Both loopback origins must be allowed — see
+  // docs/Tailwind-V4-Validation-Report.md §Appendix methodology (c).
+  allowedDevOrigins: ["127.0.0.1"],
 };
 
 export default nextConfig;

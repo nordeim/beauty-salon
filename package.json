@@ -1,7 +1,7 @@
 {
-  "name": "orbital",
+  "name": "beauty-salon",
   "version": "1.0.0",
-  "description": "ORBITAL — AI project management workspace (Next.js 16 + React 19 + Prisma/SQLite)",
+  "description": "Maison Luminaire — a beauty salon experience (Next.js 16 + React 19 + Tailwind v4 + Prisma/SQLite)",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
@@ -54,6 +54,9 @@
     "vitest": "^5.0.1"
   },
   "trustedDependencies": [
+    "@prisma/client",
+    "@prisma/engines",
+    "prisma",
     "unrs-resolver"
   ]
 }
