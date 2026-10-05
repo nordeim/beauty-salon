@@ -1,6 +1,6 @@
 # Session 9 — Audit: The Icon Layer + the Contact Structure (2026-10-05)
 
-**Baseline:** remote `main` @ `dcdea6a` · **Deliverable commit:** see `git log` (the icon class layer rebuilt to the live-measured census across 12 files, the contact Hours status-pill row, the login eye toggle removed, docs + screenshots refresh)
+**Baseline:** remote `main` @ `dcdea6a` · **Deliverable commit:** `da31367` (the icon class layer rebuilt to the live-measured census across 12 files, the contact Hours status-pill row, the login eye toggle removed, docs + screenshots refresh)
 **Method:** Mode C audit (`skills/code-review-and-audit` pipeline — Phase 3 as a targeted lightweight checklist; `skills/` excluded) + live parity verification with `skills/agent-browser` (login, all 13 routes, the drawer @390×844, the gallery lightbox, and a first-ever **both-sides icon census** — every `svg.lucide` glyph/class/computed size/color/margin extracted from the live reference and compared against the local DOM page by page) + TDD remediation per `docs/remediation-plan-session-9.md`.
 
 > Note: this file previously held the raw process transcript of session 8 (committed at `dcdea6a`). It has been replaced by this proper session-9 record — the same convention sessions 4–8 applied to their own transcript files.
