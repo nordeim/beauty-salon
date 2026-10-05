@@ -134,7 +134,11 @@ README (the payload-layer feature row + the print-census note + counts), AGENTS.
 
 ## 9. Push evidence (session 14)
 
-*(to be completed at T6)*
+- Committed as one atomic commit **`3a2894e`** to `main` (25 files changed: 4 code + the schema + 1 new spec + 1 extended spec + 6 docs + the new plan + worklog + 10 re-captured screenshots [08/09/10/11/12 byte-identical — skipped by git]); pushed via `docs/ssh_git_wrapper_v3.py` with `--remote git@github.com:nordeim/beauty-salon.git` (the paramiko ssh shim from the runbook's Appendix A placed on PATH at `/home/z/my-project/bin/shim/`, outside the repo).
+- Key fingerprint verified before the push: **`SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU`** (the runbook's paramiko method — matches the sessions 1–13 record; the same operator key).
+- Dry-run clean (`5914450..3a2894e` fast-forward); real push exit 0 with the wrapper's own remote verification **`refs/heads/main @ 3a2894e == local HEAD`** + the tracking-ref sync.
+- Independent re-confirmation via `git ls-remote` (shim + key): `3a2894e65326392745185d3c303d1dedcd8c1f6c refs/heads/main` — byte-exact == local HEAD.
+- Change-set secret scan clean pre-commit: no `AUTH_SECRET="<hex32+>"` material in the staged diff or any tracked file; no tracked env/db/key files beyond `.env.example`; the operator key shredded + removed post-push (the wrapper's temp copy shreds itself on every run).
 
 ## 10. Shipped Artefacts (this remediation)
 

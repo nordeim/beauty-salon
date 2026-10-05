@@ -371,3 +371,18 @@ Stage Summary:
 - Lesson recorded: wire-payload parity is invisible to every census that reads the DOM — the JSON body a form POSTs is only observable on the network; the print census splits into the author layer (parity) and the rendering layer (mechanism-driven divergence: inline styles vs classes under media conditions)
 - Gate: lint ✓ · typecheck ✓ · unit 63/63 ✓ · build 27/27 pages ✓ · e2e 119/119 ✓ (182 total; all pre-existing parity contracts untouched)
 - Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 17-FINAL
+Agent: main (Super Z)
+Task: Session 14 final push verification and wrap-up
+
+Work Log:
+- Pushed 3a2894e (the remediation) to git@github.com:nordeim/beauty-salon.git main via docs/ssh_git_wrapper_v3.py with the paramiko shim
+- Verified remote == local byte-exact: independent git ls-remote 3a2894e65326392745185d3c303d1dedcd8c1f6c refs/heads/main == local HEAD
+- Operator key fingerprint verified pre-push (SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU — the sessions 1-13 record) and shredded post-push
+- Final state: branch up to date with origin/main, working tree clean, unit 63/63 green
+
+Stage Summary:
+- Session 14 delivered and pushed: the wire-payload parity layer (the newsletter's source attribution + the booking's nine-field snake_case entity schema, both persisted and byte-pinned with key order), the print-media pins (zero print rules both sides + the deliberate print-visible stance + the mechanism guard), full docs alignment, 15 screenshots (mobile-menu 26124B byte-identical)
+- Final gate: lint + typecheck + 63 unit + 27 build pages + 119 e2e = 182 tests green
