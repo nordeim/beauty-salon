@@ -59,7 +59,12 @@
      parity assertions (not-found-parity.spec.ts) cannot be deterministic.
      Same principle as trap 2 (palette pinned, never defaulted) + trap 3
      (arbitrary sRGB form for computed parity): pin the values the
-     reference renders, keep the class names the reference's DOM carries. */
+     reference renders, keep the class names the reference's DOM carries.
+     Read-back contract: login-parity.spec.ts pins slate-900 (live-measured
+     rgb(15, 23, 42)) and not-found-parity.spec.ts pins the 404's slate
+     values — session 6's audit caught a one-digit transcription error in
+     slate-900 here (#0f172e), proving every pinned value needs a test
+     that reads it back. */
   --color-slate-50: #f8fafc;
   --color-slate-100: #f1f5f9;
   --color-slate-200: #e2e8f0;
@@ -69,7 +74,7 @@
   --color-slate-600: #475569;
   --color-slate-700: #334155;
   --color-slate-800: #1e293b;
-  --color-slate-900: #0f172e;
+  --color-slate-900: #0f172a;
 }
 
 @theme inline {

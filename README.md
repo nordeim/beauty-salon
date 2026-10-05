@@ -6,7 +6,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![Prisma](https://img.shields.io/badge/Prisma-6-2d3748?logo=prisma)
 ![SQLite](https://img.shields.io/badge/DB-SQLite-003b57?logo=sqlite)
-![Tests](https://img.shields.io/badge/tests-100_passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-101_passing-brightgreen)
 
 A production-grade, self-hosted clone of the **Maison Luminaire** beauty-salon experience — an editorial cream-and-ink marketing site, a Seamless Scheduler booking flow with ICS calendar downloads, and a cookie-session auth surface — rebuilt as a single Next.js application on Prisma/SQLite with byte-parity design tokens.
 
@@ -25,7 +25,7 @@ The reference app is a base44 SPA serving a hair / skin / nails salon brand: a s
 | 🔐 **Cookie-session auth** | scrypt password hashing, HMAC-signed httpOnly sessions, rate limiting, no account enumeration — and the reference auth shell's own font context (Tailwind's default stack, pinned by e2e) |
 | ✉️ **Newsletter capture** | Idempotent upserts into the database |
 | 🚦 **Open/Closed status** | Day-aware "Open today / Closed today" pill with the reference's breathing amber dot |
-| 🧪 **Evidence-backed parity** | 55 unit tests + 45 Playwright e2e specs, including computed-style assertions against live-extracted reference measurements (mobile drawer, login font context, the 404 slate card) |
+| 🧪 **Evidence-backed parity** | 55 unit tests + 46 Playwright e2e specs, including computed-style assertions against live-extracted reference measurements (mobile drawer, login font context + slate-900 read-back, the 404 slate card) |
 
 ## Architecture
 
@@ -96,7 +96,7 @@ bun run lint && bun run typecheck && bun run test
 # eslint clean · tsc clean · 55 tests passed
 
 bun run build && bun run test:e2e
-# 27 routes built · 45 e2e specs passed
+# 27 routes built · 46 e2e specs passed
 ```
 
 Demo login (seeded): `sepnetflix2023@outlook.com` / `$Abcd1234` (override at seed time with `DEMO_USER_PASSWORD`).
@@ -115,7 +115,7 @@ Demo login (seeded): `sepnetflix2023@outlook.com` / `$Abcd1234` (override at see
 | Layer | Command | Scope |
 |-------|---------|-------|
 | Unit | `bun run test` | 55 Vitest tests: db-path resolution (anchor rules, dotenv parsing, dev-time env-file-first precedence), hours model, ICS builder, scrypt/HMAC auth, repo hygiene (retired-model scan + script-reference guards), canonical-origin resolution |
-| E2E | `bun run test:e2e` | 45 Playwright specs: mobile-navigation parity (the Tailwind v4 trap contract), login font-context parity (the auth shell’s default stack), not-found parity (the reference’s slate centered 404 card with the attempted path interpolated), landing, booking, gallery, auth, route matrix, service details, team |
+| E2E | `bun run test:e2e` | 46 Playwright specs: mobile-navigation parity (the Tailwind v4 trap contract), login parity (the auth shell’s default font stack + the slate-900 sRGB read-back), not-found parity (the reference’s slate centered 404 card with the attempted path interpolated), landing, booking, gallery, auth, route matrix, service details, team |
 
 E2E boots the **production standalone server** on port 3100 with its own scratch database (`db/e2e.db`) — run `bun run build` first. A single spec: `bunx playwright test tests/e2e/mobile-navigation.spec.ts`.
 

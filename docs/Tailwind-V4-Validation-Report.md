@@ -339,3 +339,15 @@ reference's class names byte-identical (`bg-slate-50` stays `bg-slate-50`, now
 computing to `rgb(248, 250, 252)`). Pinned by the not-found parity specs
 (`tests/e2e/not-found-parity.spec.ts` — the 404 card's slate colors are asserted
 as exact `rgb()` strings).
+
+**Session-6 correction (the read-back lesson):** the pin itself shipped with a
+one-digit transcription error — `slate-900` was pinned `#0f172e` instead of the
+reference's `#0f172a`, so the login h1 and Sign In button (the only visible
+`slate-900` elements) computed to `rgb(15, 23, 46)` vs the reference's
+`rgb(15, 23, 42)`. It survived because the 404 specs that motivated the pin stop
+at slate-800, and the auth-shell parity spec pinned fonts only. Corrected in
+session 6, and the auth-shell spec now pins both slate-900 surfaces as exact
+`rgb()` strings (`tests/e2e/login-parity.spec.ts`) — the generalized lesson:
+**a pin is only as good as its verification; every pinned value needs a test
+that reads it back**, or transcription errors live in the "protected" layer
+itself.

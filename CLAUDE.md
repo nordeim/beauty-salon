@@ -74,7 +74,7 @@ bun run db:push && bun run db:seed
 | `bun run lint` / `typecheck` | ESLint 9 flat / tsc |
 | `bun run test` | Vitest unit (55) |
 | `bun run build` | Standalone production build (27 routes) |
-| `bun run test:e2e` | Playwright Chromium (45 specs; needs build first) |
+| `bun run test:e2e` | Playwright Chromium (46 specs; needs build first) |
 | `bun run db:push` / `db:seed` | Schema + reference content |
 
 Clean-check order: `lint → typecheck → test → build → test:e2e`.
@@ -87,7 +87,7 @@ Clean-check order: `lint → typecheck → test → build → test:e2e`.
 | E2E | Playwright | `tests/e2e/*.spec.ts` | Production standalone server :3100, isolated `db/e2e.db`, `workers: 1` |
 
 - Import `describe/it/expect` from `vitest` explicitly.
-- `mobile-navigation.spec.ts` pins the drawer's computed styles, `login-parity.spec.ts` the auth shell's default font stack, and `not-found-parity.spec.ts` the 404's slate centered card (path-interpolated message, Go Home button) — all against live-measured reference values. If any fails, the code drifted, not the spec.
+- `mobile-navigation.spec.ts` pins the drawer's computed styles, `login-parity.spec.ts` the auth shell's default font stack + slate-900 read-back (`rgb(15, 23, 42)`), and `not-found-parity.spec.ts` the 404's slate centered card (path-interpolated message, Go Home button) — all against live-measured reference values. If any fails, the code drifted, not the spec.
 - Never skip/weaken a test to pass the gate; fix the cause or flag the debt.
 
 ## Code Quality Standards

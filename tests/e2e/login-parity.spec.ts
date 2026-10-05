@@ -59,4 +59,22 @@ test.describe("login font context (auth-shell parity)", () => {
     expect(cs.fontWeight).toBe("700");
     expect(cs.letterSpacing).toBe("-0.75px");
   });
+
+  test("the auth shell's slate-900 surfaces compute to the reference's exact sRGB", async ({ page }) => {
+    await page.goto("/login");
+    // The two visible slate-900 elements (live-measured on the reference,
+    // 2026-10-05: both compute to rgb(15, 23, 42) — v3's slate-900). This
+    // is the trap-6 read-back: session 5 pinned the slate scale to sRGB hex
+    // in @theme, and session 6's audit found one transcription error in
+    // that very block (slate-900 pinned #0f172e -> rgb(15, 23, 46)). A pin
+    // is only as good as its verification — every pinned value needs a
+    // test that reads it back.
+    const h1 = page.getByRole("heading", { name: "Welcome to Beauty Salon" });
+    const h1Cs = await h1.evaluate((el) => getComputedStyle(el).color);
+    expect(h1Cs).toBe("rgb(15, 23, 42)"); // text-slate-900
+
+    const signin = page.getByRole("button", { name: "Sign in" });
+    const btnCs = await signin.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(btnCs).toBe("rgb(15, 23, 42)"); // bg-slate-900
+  });
 });

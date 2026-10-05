@@ -149,3 +149,26 @@ Stage Summary:
 - Gate: lint ✓ · typecheck ✓ · unit 55/55 ✓ · build 27/27 pages ✓ · e2e 45/45 ✓ (all pre-existing parity contracts untouched)
 - Live parity: byte-identical on every measured surface; the 404 was the only gap
 - Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 9
+Agent: main (Super Z)
+Task: Session 6 — audit the session-5 slate pin, live parity re-verification, TDD remediation (slate-900 read-back), docs + screenshots refresh, push
+
+Work Log:
+- git pull (remote main @ ca7e0e9 + the transcript-style docs/session_6.md); reviewed all root docs + session 1-5 logs + remediation plans + worklog; validated against the codebase (structure, invariants, counts; session-5 diff — NotFoundBody.tsx / not-found.tsx / slate pin / auth.spec corrections — matches the documented design)
+- Environment verified: deps installed, .env correct (DATABASE_URL=file:../db/custom.db), repo db seeded (ambient absolute DATABASE_URL still injected; wrapper defense holding)
+- Mode C audit: Phase 1 lint+tsc clean; Phase 2 bun audit = the same 2 dev-only advisories (stance re-verified), secret scan clean; Phase 3 lightweight checklist = noise register unchanged, no new findings; Phase 4 baseline gate green (unit 55/55, build 27/27 pages, e2e 45/45)
+- Live parity verification: drawer byte-identical on every pinned value live AND local (fixed z-60 cream, 5 links 48px Cormorant -1.2px lh-48, CTA wrapper mt-10 40px); login font context identical (default sans stack, normal features, auto smoothing); login slate-400/500/600/200/50 values measured live = pins; landing hero tokens identical; the 404 panel end-to-end identical (session-5 fix holding); contact content parity (new check: address/phone/email/hours identical)
+- KEY FINDING F1 (MEDIUM, parity gap introduced by the session-5 trap-6 fix): --color-slate-900 pinned #0f172e, but the reference/v3 slate-900 = #0f172a — the login h1 (text-slate-900) and Sign In button (bg-slate-900) rendered rgb(15,23,46) vs the live rgb(15,23,42). Survived because the 404 specs that motivated the pin stop at slate-800 and login-parity pinned fonts only; sub-perceptual (4/255 blue). All nine other slate pins verified correct against live values.
+- Wrote docs/remediation-plan-session-6.md (findings register, root cause, design, plan-vs-codebase validation matrix, TDD ToDo) and validated before executing
+- TDD execution: T1 RED (login-parity.spec.ts third test — the slate-900 read-back contract: h1 color + Sign In button bg = rgb(15,23,42) — failed exactly as predicted with rgb(15,23,46), 2 pre-existing green) -> T2 GREEN (one-character hex fix #0f172e -> #0f172a in globals.css + read-back note in the block comment; 3/3 green) -> T3 full gate green (lint, tsc, unit 55/55, build 27/27 pages, e2e 46/46 = 101 total)
+- Re-captured all 15 screenshots on the remediated build (mobile-menu 26124B byte-identical size to prior verified captures; login capture reflects the corrected slate-900); VLM-verified login (clean card, sans heading, dark Sign In button), mobile menu (cream overlay, serif links, CTA separation), contact (all content present; "missing hours" = the 720px viewport fold, hours verified identical in the DOM both sides)
+- Docs aligned: README (badge 101, 46 e2e, parity scope), AGENTS.md (login-parity contract = fonts + slate-900 read-back), CLAUDE.md (46/101 counts + parity line), PAD (§7 inventory 46/101, session-6 ledger), beauty-salon_SKILL.md v1.3.1 (project_state, checklist 46, Appendix B/C), Tailwind-V4-Validation-Report.md (session-6 correction note + read-back lesson); .env.example re-verified truthful (unchanged); proper docs/session_6.md replaced the transcript
+
+Stage Summary:
+- F1 FIXED and proven: the login h1 + Sign In button compute to rgb(15, 23, 42) — identical to the live reference — pinned by the slate-900 read-back contract in tests/e2e/login-parity.spec.ts (+1 e2e, 46 total, 101 with unit)
+- Lesson recorded: a pin is only as good as its verification — every pinned value needs a test that reads it back
+- Gate: lint ✓ · typecheck ✓ · unit 55/55 ✓ · build 27/27 pages ✓ · e2e 46/46 ✓ (all pre-existing parity contracts untouched)
+- Live parity: byte-identical on every measured surface
+- Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
