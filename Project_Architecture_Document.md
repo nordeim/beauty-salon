@@ -363,6 +363,7 @@ Single Prisma client singleton (`globalThis` cache in dev; error-only logging in
 - **Display serif** — Cormorant Garamond (300/400/500/600 + italic), self-hosted, `--font-cormorant`. All headings (`h1–h5` carry `font-family: var(--font-serif); letter-spacing: -0.01em` from the base layer), the logo, big price numerals, drawer links (48px at 390w), quotes.
 - **UI sans** — Mulish (300–600), self-hosted, `--font-mulish`, `font-feature-settings: "ss01", "cv11"` on body. Eyebrows, nav, buttons, form labels.
 - **Editorial tracking** — `tracking-editorial` (`@utility`, 0.22em) on every uppercase label; headline tracking is `tracking-tight` (−0.025em).
+- **Auth-shell font context (session-3 finding F1)** — the brand system covers marketing + booking ONLY. The reference's `/login` is a separate base44 CSS context that never loads the brand fonts: its whole chain (body, h1, inputs, buttons) computes to Tailwind's **default sans stack** with `font-feature-settings: normal` and `-webkit-font-smoothing: auto`. The clone pins that context with the `font-shell` `@utility` on the login `<main>` (+ directly on the `<h1>`, because the global heading base rule beats inheritance); `tests/e2e/login-parity.spec.ts` asserts the computed values.
 
 ### 5.2 Color Tokens (pinned, trap 1 + 2)
 
@@ -396,7 +397,7 @@ Hand-rolled shadcn-style primitives only where the reference uses them (pill but
 4. **space-y `:where()` rewrite** — drawer spacing is `gap-2` + `mt-10`; `space-y-*` with `mt-*` children is engine-ambiguous.
 5. **shadow-scale shift** — `--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05)` pinned in `@theme inline`.
 
-Accepted, visually-equivalent engine differences (do not "fix"): `rounded-full` → 33554400px (v3: 9999px); `border-foreground/5` → `color-mix(in oklab, …)` string form.
+Accepted, visually-equivalent engine differences (do not "fix"): `rounded-full` → 33554400px (v3: 9999px); `border-foreground/5` → `color-mix(in oklab, …)` string form; the login shell's `<body>` background (reference white vs shared-root cream) is reachable only via macOS rubber-band overscroll — the pinned slate gradient covers the viewport.
 
 ---
 
@@ -442,11 +443,11 @@ Public marketing + booking surface (matches the reference — nothing is gated).
 | Level | Tool | Count | What it locks |
 |---|---|---|---|
 | Unit | Vitest, `tests/*.test.ts` | 47 | db-path resolution contract (anchor rules + dotenv parsing + dev-time env-file-first precedence); hours model (formats + status per day); ICS builder (envelope, UTC stamps, midnight rollover, RFC 5545 escaping, data-URI); auth primitives (scrypt round-trip/salt/reject, session round-trip/tamper/expiry) |
-| E2E | Playwright, `tests/e2e/*.spec.ts` | 40 | mobile-navigation computed-style parity (traps), landing structure + carousel rotation + newsletter, booking flow end-to-end (deep links, submission, confirmation, ICS href), gallery (filter counts, lightbox + keyboard), auth (login surface, demo credentials, no-enumeration), route matrix + 404 + service details + team |
+| E2E | Playwright, `tests/e2e/*.spec.ts` | 42 | mobile-navigation computed-style parity (traps), login font-context parity (auth shell = default sans stack), landing structure + carousel rotation + newsletter, booking flow end-to-end (deep links, submission, confirmation, ICS href), gallery (filter counts, lightbox + keyboard), auth (login surface, demo credentials, no-enumeration), route matrix + 404 + service details + team |
 
 E2E runs the **production standalone build** on :3100 against an isolated seeded `db/e2e.db` (global-setup: `db push` + seed), single worker (shared SQLite file), `reuseExistingServer` locally. The gate order — `lint → typecheck → test → build → test:e2e` — is the only CI (no hosted pipelines).
 
-Verification ledger for this release: lint ✓ (0 errors), typecheck ✓, unit 33/33 ✓, build 27 routes ✓ (11 static + 8 SSG + 8 dynamic), e2e 40/40 ✓, live-parity spot checks on the dev server ✓ (drawer computed styles byte-identical to reference measurements).
+Verification ledger for this release (session 3): lint ✓ (0 errors), typecheck ✓, unit 47/47 ✓, build 27 routes ✓ (11 static + 8 SSG + 8 dynamic), e2e 42/42 ✓, live-parity re-verification ✓ (drawer computed styles byte-identical; login font context now matching the reference auth shell).
 
 ---
 

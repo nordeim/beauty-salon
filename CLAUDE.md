@@ -30,6 +30,7 @@ A self-hosted clone of the Maison Luminaire beauty-salon experience: an editoria
 
 - **Parity is the requirement.** Visual/behavioral fidelity to the reference outranks refactors. The computed-style e2e specs are the contract.
 - **Tokens are pinned, never defaulted.** Tailwind v4's defaults drift from the reference palette (trap 2); `globals.css` is the single source.
+- **Font contexts are per-surface.** Brand typography (Mulish body, Cormorant headings) serves marketing + booking; the auth shell (`/login`) renders in Tailwind's default sans stack (`font-shell`) — the reference's login is a separate CSS context. `login-parity.spec.ts` pins it.
 - **Client/server module discipline.** `content.ts` client-safe; `data.ts` server-only; a single wrong value import panics the build (see AGENTS.md).
 - **Evidence-based verification.** Label claims Verified / Reasoned / Assumed. If it wasn't executed, say so.
 
@@ -73,7 +74,7 @@ bun run db:push && bun run db:seed
 | `bun run lint` / `typecheck` | ESLint 9 flat / tsc |
 | `bun run test` | Vitest unit (47) |
 | `bun run build` | Standalone production build (27 routes) |
-| `bun run test:e2e` | Playwright Chromium (40 specs; needs build first) |
+| `bun run test:e2e` | Playwright Chromium (42 specs; needs build first) |
 | `bun run db:push` / `db:seed` | Schema + reference content |
 
 Clean-check order: `lint → typecheck → test → build → test:e2e`.
@@ -86,7 +87,7 @@ Clean-check order: `lint → typecheck → test → build → test:e2e`.
 | E2E | Playwright | `tests/e2e/*.spec.ts` | Production standalone server :3100, isolated `db/e2e.db`, `workers: 1` |
 
 - Import `describe/it/expect` from `vitest` explicitly.
-- `mobile-navigation.spec.ts` pins the drawer's computed styles against live-measured reference values — if it fails, the code drifted, not the spec.
+- `mobile-navigation.spec.ts` pins the drawer's computed styles and `login-parity.spec.ts` the auth shell's default font stack — both against live-measured reference values. If either fails, the code drifted, not the spec.
 - Never skip/weaken a test to pass the gate; fix the cause or flag the debt.
 
 ## Code Quality Standards

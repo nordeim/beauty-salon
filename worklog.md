@@ -83,3 +83,23 @@ Stage Summary:
 - Gate: lint ✓ · typecheck ✓ · unit 47/47 ✓ · build 27 routes ✓ · e2e 40/40 ✓ (mobile-nav parity intact)
 - New deliverables: scripts/with-repo-db.ts, +14 unit tests, docs/remediation-plan-session-2.md, beauty-salon_SKILL.md, refreshed docs/screenshots (14), aligned docs
 - Next: commit + push to main via docs/ssh_git_wrapper_v3.py
+
+---
+Task ID: 6
+Agent: main (Super Z)
+Task: Session 3 — parity re-audit, auth-shell font fix (TDD), docs + screenshots refresh, push
+
+Work Log:
+- git pull: remote added docs/session_2.md (23d8f6f); reviewed AGENTS/CLAUDE/README/PAD/beauty-salon_SKILL + session-2 plan/log; validated against the codebase (structure, configs, counts, session-2 diff: db-path v2.4 + with-repo-db wrapper + script rewiring all match the documented design; invariants hold)
+- Mode C audit re-run: Phase 1 lint+tsc clean; Phase 2 bun audit = the same 2 dev-only advisories (re-verified braces latest is still 3.0.3 — no upstream fix; deepmerge-ts 8.x override still rejected), no secrets tracked; Phase 3 checklist runner (228 non-skills findings — every non-benign one is a false positive or documented: safeParse has try/catch, e2e constants are test-only); Phase 4 baseline gate green (unit 47/47, build 27, e2e 40/40)
+- Live parity re-verification via agent-browser: login works; mobile drawer re-measured byte-identical to the pinned contract (fixed inset-0 z-60, rgb(250,248,245), flex-col gap 8px measured, 5 links 48px Cormorant -1.2px, CTA 48px gap, no scroll lock, tap closes+navigates); services content parity (same 8 names live and in db/custom.db)
+- KEY FINDING F1 (MEDIUM): the reference's /login is a separate base44 CSS context — its whole font chain (body/h1/p/input/button/label) computes to Tailwind's DEFAULT sans stack with normal feature settings and auto smoothing; the clone's login rendered the brand fonts (Mulish body, Cormorant h1 via the global heading rule). Cross-check confirmed the clone's global h1-h5 serif rule IS correct for marketing (live footer h4s without font-serif compute Cormorant; untracked live headings compute -0.01em) — the gap was strictly the auth shell
+- TDD fix: RED (tests/e2e/login-parity.spec.ts — 1 failed/1 passed exactly as predicted) → GREEN (@utility font-shell in globals.css + applied to login main + h1; two spec iterations: webkitFontSmoothing not on the CSSStyleDeclaration type, and Playwright strips prototype methods across the evaluate bridge — final form reads both properties inside the evaluate) → full gate green (lint, tsc, unit 47/47, build 27 routes, e2e 42/42)
+- Re-captured 14 screenshots (10 re-rendered, 4 byte-identical); VLM-verified the login card (clean, sans heading); refreshed local .env header (stale ORBITAL → Maison Luminaire template, untracked hygiene)
+- Docs aligned: README (badge 89, three font contexts, testing table), AGENTS.md (two FONT contexts invariant + login-parity contract), CLAUDE.md (per-surface font principle), PAD (§5.1 auth-shell context, §5.5 accepted body-bg difference, §7 inventory 42 + ledger refresh incl. stale 33/33 fix), beauty-salon_SKILL.md v1.1.0 (§4.2/4.3/§9 Bug 0, Appendix B 89, Appendix C session-3 row), docs/remediation-plan-session-3.md + docs/session_3.md
+
+Stage Summary:
+- F1 FIXED and proven: /login now computes to the reference auth shell's default sans stack end-to-end, pinned by tests/e2e/login-parity.spec.ts (+2 specs, 42 e2e total, 89 with unit)
+- Gate: lint ✓ · typecheck ✓ · unit 47/47 ✓ · build 27 routes ✓ · e2e 42/42 ✓ (mobile-nav parity intact; all 40 pre-existing specs untouched)
+- Deliverables: font-shell utility, login-page scoping, login-parity.spec.ts, 14 refreshed screenshots, aligned docs (README/AGENTS/CLAUDE/PAD/SKILL v1.1.0), remediation plan + session log
+- Next: secret scan → commit to main → SSH-wrapper push → verify remote == local

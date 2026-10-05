@@ -8,14 +8,17 @@ export const metadata: Metadata = {
 };
 
 // The auth surface keeps the reference's distinct slate/white visual language
-// (separate from the marketing site's cream editorial system). The wash uses
-// the arbitrary sRGB gradient form (trap-3 precedent): v4's bg-gradient-to-*
+// (separate from the marketing site's cream editorial system) — including its
+// FONT context: the reference's auth shell never loads the brand fonts, so
+// the whole surface renders in Tailwind's default sans stack (font-shell;
+// login-parity.spec.ts pins the computed contract). The wash uses the
+// arbitrary sRGB gradient form (trap-3 precedent): v4's bg-gradient-to-*
 // interpolates in oklab and Chrome reports lab() stops; the arbitrary form
 // keeps the computed colors identical to the reference's from-slate-50
 // to-slate-100 ramp.
 export default function LoginPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[linear-gradient(to_bottom_right,#f8fafc,#f1f5f9)] p-4">
+    <main className="min-h-screen flex items-center justify-center bg-[linear-gradient(to_bottom_right,#f8fafc,#f1f5f9)] p-4 font-shell">
       <div className="w-full max-w-md">
         <div className="text-card-foreground relative overflow-hidden border-0 shadow-2xl bg-white/95 backdrop-blur-sm rounded-2xl">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200" />
@@ -35,7 +38,7 @@ export default function LoginPage() {
                 </span>
               </div>
               <div className="space-y-2 sm:space-y-3">
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-shell">
                   Welcome to Beauty Salon
                 </h1>
                 <p className="text-slate-500 text-sm sm:text-base font-medium">

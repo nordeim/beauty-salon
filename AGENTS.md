@@ -23,7 +23,7 @@ Order for a clean check: `bun run lint && bun run typecheck && bun run test && b
 ## Architecture invariants
 
 - **Client-safe vs server-only modules**: `src/lib/content.ts` holds DTOs + `formatPrice` and MUST stay free of db/node imports — client components import from it. `src/lib/data.ts` is the server-only Prisma read seam. A single value import of `data.ts` from a client component drags `node:fs` (via `db-path.ts`) into the browser graph and panics Turbopack ("chunking context does not support external modules (request: node:fs)").
-- **Two visual systems, two chromes**: the marketing site (cream editorial, `(site)` route group: SiteHeader + SiteFooter) vs the auth surface (slate/white card, `/login`, standalone). `/book` + `/book/confirmation` use the third chrome (BookHeader: always-glass, h-16, "← Return to site").
+- **Two visual systems, two chromes — and two FONT contexts**: the marketing site (cream editorial, `(site)` route group: SiteHeader + SiteFooter) vs the auth surface (slate/white card, `/login`, standalone). `/book` + `/book/confirmation` use the third chrome (BookHeader: always-glass, h-16, "← Return to site"). Brand typography (body Mulish, `h1–h5` Cormorant via the globals base rule) covers marketing + booking ONLY — the reference's auth shell never loads the brand fonts, so `/login` renders in Tailwind's default sans stack (`font-shell` utility on `<main>` + the `<h1>`; pinned by `tests/e2e/login-parity.spec.ts`). Don't "fix" the login page back to Cormorant/Mulish.
 - **Route structure**: `(site)` group for chrome-wrapped marketing pages; `services/[slug]` is SSG via `generateStaticParams` over the DB rows; `/services` + `/book/confirmation` are dynamic (read `searchParams` — **async in Next 16, always `await`**).
 - **Booking contract**: POST `/api/appointments` validates + persists, then the client routes to `/book/confirmation?name=&date=&time=&service=` — the same query-string contract as the reference. The confirmation page regenerates the ICS data-URI from the service's duration.
 - **The seed is the content source**: services/stylists/gallery/testimonials mirror the reference app exactly. Changing copy = editing `prisma/seed.ts` and re-running `bun run db:seed` (idempotent upserts).
@@ -47,6 +47,7 @@ Order for a clean check: `bun run lint && bun run typecheck && bun run test && b
 
 - E2E specs share ONE seeded SQLite file and run with `workers: 1` — don't add `test.describe.parallel`.
 - `mobile-navigation.spec.ts` is the parity contract: computed-style assertions against values measured on the live reference (gap 8px, mt-10 40px, 48px Cormorant Garamond, 2.64px tracking, exact rgb colors). If a styling change breaks it, the change is wrong, not the spec.
+- `login-parity.spec.ts` is the auth-shell font contract: the whole `/login` surface computes to Tailwind's default sans stack (`font-feature-settings: normal`, `-webkit-font-smoothing: auto`) — the reference's login is a separate CSS context without the brand fonts. Same rule: if it fails, the code drifted, not the spec.
 - Unit tests import from `vitest` explicitly (no globals); the vitest config matches `*.test.ts` only, so Playwright's `*.spec.ts` files never double-run.
 - A red test is a regression or a wrong test — never skip to pass; never weaken an assertion to ship.
 

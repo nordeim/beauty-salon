@@ -6,9 +6,9 @@ description: >
   single application with byte-parity design tokens, a computed-style parity
   e2e contract, and a hardened dev-time database-pinning layer. Distilled
   from two build/remediation sessions using the six-phase process.
-version: 1.0.0
+version: 1.1.0
 last_updated: "2026-10-05"
-project_state: "47 unit + 40 e2e tests green; 27 routes; db-path seam v2.4 (env-file-first dev pinning)"
+project_state: "47 unit + 42 e2e tests green; 27 routes; db-path seam v2.4 (env-file-first dev pinning); auth-shell font-context parity (font-shell)"
 ---
 
 # beauty-salon_SKILL.md — Maison Luminaire Clone
@@ -175,8 +175,11 @@ Single source of truth: `src/app/globals.css`. No Tailwind config file exists.
 | Eyebrow / editorial label | Mulish | 500, `text-xs`/`text-sm` uppercase | `tracking-editorial` (0.22em) |
 | Body | Mulish | 300–400, `text-sm`/`text-base` | normal (ss01, cv11 feature settings) |
 | Mobile drawer links | Cormorant Garamond | 48px, line-height 48px | −1.2px (live-measured) |
+| **Auth shell (`/login`)** | **Tailwind default sans stack** (NOT the brand fonts) | `font-bold` h1 30px, `tracking-tight` −0.75px | — |
 
-### 4.3 Custom `@utility` definitions (4 — all in globals.css)
+The auth shell is the reference's **third font context**: the base44 login renders in a separate CSS context that never loads Cormorant/Mulish — everything computes to `ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"` with `font-feature-settings: normal` and `-webkit-font-smoothing: auto`. Pinned by the `font-shell` utility (`globals.css`) on the login `<main>` + `<h1>` and asserted by `tests/e2e/login-parity.spec.ts` (session-3 finding F1).
+
+### 4.3 Custom `@utility` definitions (5 — all in globals.css)
 
 | Utility | Definition purpose | Line |
 |---|---|---|
@@ -184,6 +187,7 @@ Single source of truth: `src/app/globals.css`. No Tailwind config file exists.
 | `glass` | cream 60% alpha + `backdrop-blur 20px saturate 140%` — scrolled header / BookHeader | L99 |
 | `prism-gradient` | 135° three-stop wash for hero/editorial moments | L108 |
 | `breathe` | status-dot pulse animation | L113 |
+| `font-shell` | the auth shell's default font context (stack + `normal` features + `auto` smoothing) | L125 |
 
 ### 4.4 Keyframes (1)
 
@@ -307,6 +311,13 @@ This project has no custom hooks directory; the hard-won client idioms live in t
 **Fix:** split the client-safe DTOs + `formatPrice` into `src/lib/content.ts` (zero db/node imports); `data.ts` stays server-only.
 **Lesson:** the boundary is enforceable by grep — `from "@/lib/data"` inside `src/components/**` must be type-only or absent.
 
+### Bug 0 (session-3): assuming the brand fonts are app-global (Medium)
+
+**Symptom:** the login page renders its h1 in Cormorant and its body in Mulish — the reference's `/login` computes to Tailwind's default sans stack instead.
+**Root cause:** the single-app clone shares one root layout, so the body `font-sans` (Mulish) and the global `h1–h5` serif base rule leak into the auth surface; the reference's login is a separate base44 CSS context that never loads the brand fonts.
+**Fix:** the `font-shell` utility (default stack + `normal` features + `auto` smoothing) on the login `<main>` and directly on its `<h1>` (inheritance cannot beat the base-layer heading rule).
+**Lesson:** per-surface font contexts must be measured on the live site, not inferred — brand fonts are NOT global. `tests/e2e/login-parity.spec.ts` pins it.
+
 ### Bug 2: hydration attribute mismatch from an environment-dependent initializer (High)
 
 **Symptom:** dev overlay "1 Issue"; server/client `class` mismatch on reveal sections.
@@ -380,7 +391,7 @@ bun run test:e2e      # 40 specs green (needs the build)
 
 **Security sweep:** `git ls-files | grep -E '^\.env$|\.db$|\.key$'` → empty; demo credential only in seed/tests (documented, `DEMO_USER_PASSWORD`-overridable); AUTH_SECRET set for prod.
 
-**Parity sweep:** `bunx playwright test tests/e2e/mobile-navigation.spec.ts` — the drawer's computed styles vs live-measured values (gap 8px, CTA margin 40px, 48px Cormorant, −1.2px tracking, exact rgb colors, `fixed inset-0 z-[60]`, `rgb(250,248,245)` ground).
+**Parity sweep:** `bunx playwright test tests/e2e/mobile-navigation.spec.ts tests/e2e/login-parity.spec.ts` — the drawer's computed styles vs live-measured values (gap 8px, CTA margin 40px, 48px Cormorant, −1.2px tracking, exact rgb colors, `fixed inset-0 z-[60]`, `rgb(250,248,245)` ground) and the auth shell's default sans stack.
 
 **DB sweep:** `db/custom.db` + `db/e2e.db` exist inside the repo; nothing under `<workspace>/db/`.
 
@@ -631,16 +642,17 @@ Full ADRs with alternatives: `Project_Architecture_Document.md` §1.3.
 | auth | `tests/auth.test.ts` | 8 | scrypt round-trip/salt/reject; session round-trip/tamper/expiry |
 | hours | `tests/hours.test.ts` | 4 | Formats + status per day |
 | ics | `tests/ics.test.ts` | 6 | Envelope, UTC stamps, rollover, escaping, data-URI |
-| e2e | `tests/e2e/*.spec.ts` | 40 | Mobile-nav parity (10), landing (10), booking (5), gallery (5), auth (10) |
+| e2e | `tests/e2e/*.spec.ts` | 42 | Mobile-nav parity (10), login font-context parity (2), landing (10), booking (5), gallery (5), auth (10) |
 
-Total: **87** (47 unit + 40 e2e). Gate: `lint → typecheck → test → build → test:e2e`.
+Total: **89** (47 unit + 42 e2e). Gate: `lint → typecheck → test → build → test:e2e`.
 
 ## Appendix C: Audit History
 
 | Date | Audit | Findings → outcome |
 |---|---|---|
 | 2026-10-04 | Session-1 build gate | 32/40 e2e → fixed v4 engine-difference assertions + gallery labels → 40/40 |
-| 2026-10-05 | Session-2 release audit (this document's source) | F1 ambient DATABASE_URL (HIGH → fixed, ADR-002b); F2 dev-only advisories braces/deepmerge-ts (MEDIUM → no upstream fix, accepted + documented); F3 stale vitest comment (LOW → fixed); F4 scanner noise (INFO → accepted); baseline gate green throughout; live parity re-verified (mobile drawer byte-match) |
+| 2026-10-05 | Session-2 release audit | F1 ambient DATABASE_URL (HIGH → fixed, ADR-002b); F2 dev-only advisories braces/deepmerge-ts (MEDIUM → no upstream fix, accepted + documented); F3 stale vitest comment (LOW → fixed); F4 scanner noise (INFO → accepted); baseline gate green throughout; live parity re-verified (mobile drawer byte-match) |
+| 2026-10-05 | Session-3 parity re-audit | F1 login font-context gap (MEDIUM → fixed: the reference auth shell renders in Tailwind's default sans stack — `font-shell` utility + `login-parity.spec.ts`, +2 e2e); F2 advisories re-verified (no upstream fix, stands); F3 checklist non-benign findings all false-positives; F4 local .env header refreshed; gate green 47 unit + 42 e2e; drawer + services parity re-confirmed live |
 
 ## Appendix D: Live-Site Validation Methodology
 

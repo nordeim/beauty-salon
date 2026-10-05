@@ -114,6 +114,21 @@
   animation: breathe 2.4s ease-in-out infinite;
 }
 
+/* Auth-shell font context (remediation-plan-session-3.md F1) — the
+   reference's /login renders in a separate CSS context (the base44 auth
+   shell) that never loads the brand fonts: the whole surface computes to
+   Tailwind's DEFAULT font stack with default feature settings and
+   smoothing. Applied on the login <main> (covers the subtree by
+   inheritance) and directly on its <h1> (the global h1–h5 base rule beats
+   inheritance, so the heading needs the explicit utility). The stack is
+   byte-identical to the value measured on the live reference. */
+@utility font-shell {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-feature-settings: normal;
+  -webkit-font-smoothing: auto;
+}
+
 @keyframes breathe {
   0%,
   100% {
