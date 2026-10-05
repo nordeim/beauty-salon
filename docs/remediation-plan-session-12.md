@@ -150,10 +150,11 @@ Documented in this plan + the session log + the SKILL/pad updates; no code chang
 
 ## 9. Push evidence (session 12)
 
-- Committed as one atomic commit to `main`; pushed via `docs/ssh_git_wrapper_v3.py` with `--remote git@github.com:nordeim/beauty-salon.git` (the wrapper's default remote is the runbook's task-management origin — the sessions 8–11 note).
+- Committed as one atomic commit **`8e15453`** to `main` (27 files changed: 5 code + 1 new spec + the API route + globals.css + 6 docs + worklog + this plan + 13 re-captured screenshots [09/10/11 byte-identical — skipped by git]); pushed via `docs/ssh_git_wrapper_v3.py` with `--remote git@github.com:nordeim/beauty-salon.git` (the wrapper's default remote is the runbook's task-management origin — the sessions 8–11 note; the paramiko ssh shim from the runbook's Appendix A placed on PATH at `/home/z/my-project/bin/shim/`, outside the repo).
 - Key fingerprint verified before the push: **`SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU`** (the runbook's paramiko method — matches the sessions 1–11 record; the same operator key).
-- Remote == local verified after the push (the wrapper's own remote verification + an independent `git ls-remote` re-confirmation); the operator key shredded + removed post-push.
-- Change-set secret scan clean pre-commit; no tracked env/db/key files beyond `.env.example`.
+- Dry-run clean (`da96302..8e15453` fast-forward); real push exit 0 with the wrapper's own remote verification **`refs/heads/main @ 8e15453 == local HEAD`** + the tracking-ref sync.
+- Independent re-confirmation via `git ls-remote` (shim + key): `8e15453fe34496b80b1ce69cc138865ac45cce66 refs/heads/main` — byte-exact == local HEAD.
+- Change-set secret scan clean pre-commit: the single `BEGIN OPENSSH PRIVATE KEY` match in the change set is `docs/session_12.md`'s own scan-description prose (the sessions 8–11 documented pattern); no tracked env/db/key files beyond `.env.example`; the operator key shredded + removed post-push (the wrapper's temp copy shreds itself on every run).
 
 ## 10. Shipped Artefacts (this remediation)
 
