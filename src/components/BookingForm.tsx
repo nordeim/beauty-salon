@@ -80,121 +80,132 @@ export function BookingForm({
 
   return (
     <form
-      className="glass border border-foreground/10 rounded-sm p-6 md:p-12 max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5"
+      className="glass border border-foreground/10 rounded-sm p-6 md:p-12 max-w-3xl mx-auto"
       onSubmit={onSubmit}
     >
-      <label className="block">
-        <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
-          Full name <span className="text-secondary">*</span>
-        </span>
-        <input
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={inputClass}
-          autoComplete="name"
-        />
-      </label>
+      {/* The reference's form is a BLOCK-level glass card: the 7 fields nest
+          inside a grid div, while the Notes label (mt-5) and the button row
+          (mt-10) sit outside it as block siblings — live-measured session 8
+          (docs/remediation-plan-session-8.md §5.2). */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <label className="block">
+          <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
+            Full name <span className="text-secondary">*</span>
+          </span>
+          <input
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={inputClass}
+            autoComplete="name"
+          />
+        </label>
 
-      <label className="block">
-        <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
-          Email <span className="text-secondary">*</span>
-        </span>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className={inputClass}
-          autoComplete="email"
-        />
-      </label>
+        <label className="block">
+          <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
+            Email <span className="text-secondary">*</span>
+          </span>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={inputClass}
+            autoComplete="email"
+          />
+        </label>
 
-      <label className="block">
-        <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
-          Phone
-        </span>
-        <input
-          type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className={inputClass}
-          autoComplete="tel"
-        />
-      </label>
+        <label className="block">
+          <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
+            Phone
+          </span>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className={inputClass}
+            autoComplete="tel"
+          />
+        </label>
 
-      <label className="block">
-        <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
-          Stylist
-        </span>
-        <select value={stylist} onChange={(e) => setStylist(e.target.value)} className={inputClass}>
-          <option value="">No preference</option>
-          {stylists.map((s) => (
-            <option key={s.slug} value={s.slug}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-      </label>
+        <label className="block">
+          <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
+            Stylist
+          </span>
+          <select
+            value={stylist}
+            onChange={(e) => setStylist(e.target.value)}
+            className={inputClass}
+          >
+            <option value="">No preference</option>
+            {stylists.map((s) => (
+              <option key={s.slug} value={s.slug}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </label>
 
-      <label className="block">
-        <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
-          Service <span className="text-secondary">*</span>
-        </span>
-        <select
-          required
-          value={service}
-          onChange={(e) => setService(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select a service</option>
-          {services.map((s) => (
-            <option key={s.slug} value={s.slug}>
-              {s.name} · {formatPrice(s.priceCents)}
-            </option>
-          ))}
-        </select>
-      </label>
+        <label className="block">
+          <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
+            Service <span className="text-secondary">*</span>
+          </span>
+          <select
+            required
+            value={service}
+            onChange={(e) => setService(e.target.value)}
+            className={inputClass}
+          >
+            <option value="">Select a service</option>
+            {services.map((s) => (
+              <option key={s.slug} value={s.slug}>
+                {s.name} · {formatPrice(s.priceCents)}
+              </option>
+            ))}
+          </select>
+        </label>
 
-      <label className="block">
-        <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
-          Preferred date <span className="text-secondary">*</span>
-        </span>
-        <input
-          type="date"
-          required
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className={inputClass}
-        />
-      </label>
+        <label className="block">
+          <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
+            Preferred date <span className="text-secondary">*</span>
+          </span>
+          <input
+            type="date"
+            required
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className={inputClass}
+          />
+        </label>
 
-      <label className="block">
-        <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
-          Preferred time <span className="text-secondary">*</span>
-        </span>
-        <input
-          type="time"
-          required
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className={inputClass}
-        />
-      </label>
+        <label className="block">
+          <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
+            Preferred time <span className="text-secondary">*</span>
+          </span>
+          <input
+            type="time"
+            required
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className={inputClass}
+          />
+        </label>
+      </div>
 
-      <label className="block md:col-span-2">
+      <label className="block mt-5">
         <span className="block text-[10px] uppercase tracking-editorial text-foreground/60 mb-2">
           Notes
         </span>
         <textarea
           rows={4}
+          placeholder="Anything we should know — inspiration, allergies, previous treatments..."
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           className={inputClass}
         />
       </label>
 
-      <div className="md:col-span-2 mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <p className="text-[11px] uppercase tracking-editorial text-foreground/50 max-w-sm leading-relaxed">
           24-hour cancellation policy · Confirmation within 2 business hours
         </p>
@@ -209,7 +220,7 @@ export function BookingForm({
       </div>
 
       {error && (
-        <p role="alert" className="md:col-span-2 text-sm text-destructive">
+        <p role="alert" className="mt-4 text-sm text-destructive">
           {error}
         </p>
       )}

@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { buildIcs, icsDataUri } from "@/lib/ics";
 
+// The ICS contract is LIVE-MEASURED (session 8): three reference bookings
+// whose advertised service durations are 210 / 60 / 180 minutes all produced
+// exactly 90-minute events — the reference emits a FIXED 90-minute block and
+// performs NO RFC 5545 comma escaping anywhere (a comma-bearing client name
+// and the LOCATION address both pass through raw). The prior suite pinned the
+// session-1 assumptions (service-duration DTEND + escaped LOCATION) — the
+// session-6 lesson applied: every pinned value is read back against the
+// measured contract.
 describe("ICS generation", () => {
   const base = {
     date: "2026-10-21",
     time: "11:30",
-    durationMin: 210,
     name: "Test Client",
     service: "balayage",
     uid: "1791152126744",
@@ -18,29 +25,45 @@ describe("ICS generation", () => {
     expect(ics.endsWith("END:VEVENT\r\nEND:VCALENDAR")).toBe(true);
   });
 
-  it("carries the booking as UTC stamps with the service duration", () => {
+  it("carries the booking as UTC stamps with the FIXED 90-minute block", () => {
     const ics = buildIcs(base);
     expect(ics).toContain("DTSTART:20261021T113000Z");
-    // 210 minutes after 11:30 is 15:00 the same day.
-    expect(ics).toContain("DTEND:20261021T150000Z");
+    // Live-measured: DTEND = DTSTART + 90 minutes regardless of the service's
+    // advertised duration (balayage advertises 210 minutes; the reference's
+    // download still ends 90 minutes after it starts). 11:30 → 13:00.
+    expect(ics).toContain("DTEND:20261021T130000Z");
   });
 
-  it("rolls over midnight when the duration crosses it", () => {
-    const ics = buildIcs({ ...base, time: "23:00", durationMin: 120 });
-    expect(ics).toContain("DTSTART:20261021T230000Z");
+  it("rolls over midnight under the fixed block", () => {
+    const ics = buildIcs({ ...base, time: "23:30" });
+    expect(ics).toContain("DTSTART:20261021T233000Z");
+    // 23:30 + 90 minutes = 01:00 the next day.
     expect(ics).toContain("DTEND:20261022T010000Z");
   });
 
   it("quotes the client name and service in SUMMARY/DESCRIPTION", () => {
     const ics = buildIcs(base);
     expect(ics).toContain("SUMMARY:Maison Luminaire — balayage");
-    expect(ics).toContain("DESCRIPTION:Reservation for Test Client. We will confirm within 2 business hours.");
+    expect(ics).toContain(
+      "DESCRIPTION:Reservation for Test Client. We will confirm within 2 business hours.",
+    );
     expect(ics).toContain("UID:1791152126744@maisonluminaire");
   });
 
-  it("escapes the LOCATION commas per RFC 5545", () => {
+  it("passes a comma-bearing client name through RAW (no RFC 5545 escaping)", () => {
+    // Live-measured session 8: a booking as "Anna Marx, Jr." produced
+    // "DESCRIPTION:Reservation for Anna Marx, Jr.. We will confirm…" — the
+    // reference escapes nothing; byte-parity of the download outranks RFC
+    // correctness here (documented divergence).
+    const ics = buildIcs({ ...base, name: "Anna Marx, Jr." });
+    expect(ics).toContain("DESCRIPTION:Reservation for Anna Marx, Jr.. We will confirm");
+    expect(ics).not.toContain("Anna Marx\\,");
+  });
+
+  it("carries the LOCATION with RAW commas (the reference escapes nothing)", () => {
     const ics = buildIcs(base);
-    expect(ics).toContain("LOCATION:24 Rue Lumière\\, Suite 3\\, New York\\, NY 10013");
+    expect(ics).toContain("LOCATION:24 Rue Lumière, Suite 3, New York, NY 10013");
+    expect(ics).not.toContain("\\,");
   });
 
   it("data-URI encodes for the Add to calendar link", () => {

@@ -6,8 +6,6 @@ export interface IcsInput {
   date: string;
   /** 24h time, HH:MM */
   time: string;
-  /** service duration in minutes */
-  durationMin: number;
   /** full client name */
   name: string;
   /** service slug (e.g. "balayage") */
@@ -15,6 +13,12 @@ export interface IcsInput {
   /** unique id (Date.now() at generation time) */
   uid: string;
 }
+
+// The reference's ICS carries a FIXED 90-minute event block — the service's
+// advertised duration never enters the download. Live-measured session 8:
+// bookings whose advertised durations are 210 / 60 / 180 minutes all produced
+// exactly 90-minute events (docs/remediation-plan-session-8.md §5.1).
+const APPOINTMENT_BLOCK_MIN = 90;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -36,9 +40,9 @@ function addMinutes(date: string, time: string, minutes: number): string {
 }
 
 export function buildIcs(input: IcsInput): string {
-  const { date, time, durationMin, name, service, uid } = input;
+  const { date, time, name, service, uid } = input;
   const dtstart = toUtcStamp(date, time);
-  const dtend = addMinutes(date, time, durationMin);
+  const dtend = addMinutes(date, time, APPOINTMENT_BLOCK_MIN);
   const dtstamp = `${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`;
 
   const lines = [
@@ -52,7 +56,11 @@ export function buildIcs(input: IcsInput): string {
     `DTEND:${dtend}`,
     `SUMMARY:Maison Luminaire — ${service}`,
     `DESCRIPTION:Reservation for ${name}. We will confirm within 2 business hours.`,
-    "LOCATION:24 Rue Lumière\\, Suite 3\\, New York\\, NY 10013",
+    // The reference performs NO RFC 5545 comma escaping anywhere — its
+    // LOCATION and comma-bearing client names pass through raw (live-measured
+    // session 8). The payload is byte-parity with the reference's download,
+    // which outranks RFC correctness here (documented divergence).
+    "LOCATION:24 Rue Lumière, Suite 3, New York, NY 10013",
     "END:VEVENT",
     "END:VCALENDAR",
   ];

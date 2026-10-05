@@ -6,9 +6,9 @@ description: >
   single application with byte-parity design tokens, a computed-style parity
   e2e contract, and a hardened dev-time database-pinning layer. Distilled
   from two build/remediation sessions using the six-phase process.
-version: 1.4.0
+version: 1.5.0
 last_updated: "2026-10-05"
-project_state: "60 unit + 58 e2e tests green; 27 routes; db-path seam v2.4 (env-file-first dev pinning); auth-shell font-context parity (font-shell) + slate-900 sRGB read-back (login-parity); not-found parity (slate card, path-interpolated, NotFoundBody island); service-detail parity (first-sentence H2, check-icon prep grid, exclusive-open FaqAccordion, Ready-to-begin CTA, per-service FAQ data in the faqs column); legal parity (LegalBlock model: accessibility checklist + note variant + mt-3 + br coordinator, privacy/terms top-level hoisting); slate scale pinned to sRGB (trap 6, slate-900 digit corrected session 6 + read-back contract); opacity-modifier oklab serialization documented (trap 7 — assert channels, not strings); repo hygiene guard (scaffold relics removed); metadataBase wiring (site.ts)"
+project_state: "61 unit + 62 e2e tests green; 27 routes; db-path seam v2.4 (env-file-first dev pinning); auth-shell font-context parity (font-shell) + slate-900 sRGB read-back (login-parity); not-found parity (slate card, path-interpolated, NotFoundBody island); service-detail parity (first-sentence H2, check-icon prep grid, exclusive-open FaqAccordion, Ready-to-begin CTA, per-service FAQ data in the faqs column); legal parity (LegalBlock model: accessibility checklist + note variant + mt-3 + br coordinator, privacy/terms top-level hoisting); booking parity (nested-grid form + mt-5/mt-10 margins, Notes placeholder, Calendar h-4 w-4 icon, ICS fixed 90-minute block + raw commas — decoded-href read-back); slate scale pinned to sRGB (trap 6, slate-900 digit corrected session 6 + read-back contract); opacity-modifier oklab serialization documented (trap 7 — assert channels, not strings); repo hygiene guard (scaffold relics removed); metadataBase wiring (site.ts)"
 ---
 
 # beauty-salon_SKILL.md — Maison Luminaire Clone
@@ -254,7 +254,7 @@ Need an event handler, state, or a browser API? → client island. Otherwise →
 
 ### 5.5 The booking contract (ADR-007)
 
-POST `/api/appointments` validates + persists → client routes to `/book/confirmation?name=&date=&time=&service=` (the reference's exact query-string contract) → the confirmation page (dynamic, server) resolves the service for its duration and renders, generating the ICS as a `data:text/calendar` download link via `src/lib/ics.ts`. Deep-link preselection: `/book?service=…&stylist=…`.
+POST `/api/appointments` validates + persists → client routes to `/book/confirmation?name=&date=&time=&service=` (the reference's exact query-string contract) → the confirmation page (dynamic, server) renders from the query string alone — **no DB read**: the "Add to calendar" download is the reference's **fixed 90-minute ICS event block** (`APPOINTMENT_BLOCK_MIN` in `src/lib/ics.ts`) with **raw-comma** LOCATION/name text (the reference performs no RFC 5545 escaping — byte-parity of the download outranks RFC correctness; documented divergence), and the link's icon is lucide `Calendar` at `h-4 w-4` (session-8 live-measured — the prior CalendarPlus@14 was a pre-settle artifact). The form mirrors the reference's DOM: a **block-level** glass card, 7 fields in a nested `grid grid-cols-1 md:grid-cols-2 gap-5`, the Notes label (`block mt-5`, placeholder `Anything we should know — inspiration, allergies, previous treatments...`) and button row (`mt-10`) outside the grid — pinned by `tests/e2e/booking-parity.spec.ts`. Deep-link preselection: `/book?service=…&stylist=…`.
 
 ---
 
@@ -384,9 +384,9 @@ Debug order discipline: reproduce with the exact command → read `dev.log` → 
 ```bash
 bun run lint          # eslint clean
 bun run typecheck     # tsc clean
-bun run test          # 60 unit tests green
+bun run test          # 61 unit tests green
 bun run build         # 27 routes; standalone emitted
-bun run test:e2e      # 58 specs green (needs the build)
+bun run test:e2e      # 62 specs green (needs the build)
 ```
 
 **Security sweep:** `git ls-files | grep -E '^\.env$|\.db$|\.key$'` → empty; demo credential only in seed/tests (documented, `DEMO_USER_PASSWORD`-overridable); AUTH_SECRET set for prod.
@@ -630,7 +630,7 @@ Prisma models (7 — `prisma/schema.prisma`): `Service` (unique slug), `Stylist`
 | ADR-004 | Client-safe content split (`content.ts` vs `data.ts`) | Keeps `node:fs` out of the browser graph |
 | ADR-005 | Tailwind v4 trap-pinning strategy | Five engine differences pinned by tests |
 | ADR-006 | Playwright computed-style parity as acceptance | "Looks the same" → executable |
-| ADR-007 | Deep-link query-string confirmation flow | Mirrors the reference URL contract; ICS regenerates client-side-linkable |
+| ADR-007 | Deep-link query-string confirmation flow | Mirrors the reference URL contract; the ICS carries the reference's fixed 90-minute block (session-8 correction — no service resolution, no RFC escaping) |
 
 Full ADRs with alternatives: `Project_Architecture_Document.md` §1.3.
 
@@ -641,13 +641,13 @@ Full ADRs with alternatives: `Project_Architecture_Document.md` §1.3.
 | db-path | `tests/db-path.test.ts` | 29 | Anchor resolution (11), standalone detector (4), dotenv parser (8), dev-time precedence (6) |
 | auth | `tests/auth.test.ts` | 8 | scrypt round-trip/salt/reject; session round-trip/tamper/expiry |
 | hours | `tests/hours.test.ts` | 4 | Formats + status per day |
-| ics | `tests/ics.test.ts` | 6 | Envelope, UTC stamps, rollover, escaping, data-URI |
+| ics | `tests/ics.test.ts` | 7 | Envelope, UTC stamps, the fixed 90-minute block, rollover, raw-comma LOCATION + names, data-URI |
 | repo hygiene | `tests/repo-hygiene.test.ts` | 3 | No retired scaffold-model references in code dirs; doc-referenced scripts exist; package.json-referenced scripts exist |
 | site-url | `tests/site-url.test.ts` | 5 | `siteUrl()` default/blank fallbacks, well-formed pass-through, malformed + non-absolute fallbacks |
 | first-sentence | `tests/first-sentence.test.ts` | 5 | The service-detail description-heading splitter (`. ` boundary, no-boundary, trailing-only, empty) |
-| e2e | `tests/e2e/*.spec.ts` | 58 | Mobile-nav parity (10), login parity (3 — font context, h1 treatment, the slate-900 sRGB read-back), not-found parity (3 — the 404 slate card, path interpolation, Go Home button), service-detail parity (6 — first-sentence H2, check-icon prep grid, exclusive-open FAQ accordion, single-item service, Ready-to-begin CTA, seed-correction read-backs), legal parity (6 — accessibility checklist, note/mt-3/br conventions, privacy hoisting, terms hoisting, refund unchanged, text-correction read-backs), landing (10), booking (5), gallery (5), auth (10) |
+| e2e | `tests/e2e/*.spec.ts` | 62 | Mobile-nav parity (10), login parity (3 — font context, h1 treatment, the slate-900 sRGB read-back), not-found parity (3 — the 404 slate card, path interpolation, Go Home button), service-detail parity (6 — first-sentence H2, check-icon prep grid, exclusive-open FAQ accordion, single-item service, Ready-to-begin CTA, seed-correction read-backs), legal parity (6 — accessibility checklist, note/mt-3/br conventions, privacy hoisting, terms hoisting, refund unchanged, text-correction read-backs), booking parity (4 — nested-grid form + computed margins, Notes placeholder, Calendar icon, decoded-ICS fixed block), landing (10), booking (5), gallery (5), auth (10) |
 
-Total: **118** (60 unit + 58 e2e). Gate: `lint → typecheck → test → build → test:e2e`.
+Total: **123** (61 unit + 62 e2e). Gate: `lint → typecheck → test → build → test:e2e`.
 
 ## Appendix C: Audit History
 
@@ -660,6 +660,7 @@ Total: **118** (60 unit + 58 e2e). Gate: `lint → typecheck → test → build 
 | 2026-10-05 | Session-5 parity audit | F1 the 404 surface never live-measured — clone rendered cream-editorial, reference renders a slate centered card (MEDIUM → rebuilt: `NotFoundBody.tsx` island, path via `useSyncExternalStore`, real Go Home button, pinned by `not-found-parity.spec.ts` +3 e2e; auth.spec 404 assertions corrected from clone-authored to live contract); F2 session_5.md transcript (LOW → proper log); F3 advisories carried (stands); trap 6 found: v4's oklch palette serializes as `lab()`/`oklch()` — slate scale pinned to sRGB hex; live parity byte-identical on every other surface (drawer, login, landing, 8/8 services, 3/3 stylists, 12/12 gallery, booking, deep links); gate green 55 unit + 45 e2e |
 | 2026-10-05 | Session-6 audit (the session-5 slate pin) | F1 one-digit transcription error in the trap-6 pin — `--color-slate-900` pinned `#0f172e` vs the reference/v3 `#0f172a`; the login h1 + Sign In button rendered `rgb(15, 23, 46)` vs the live `rgb(15, 23, 42)` (MEDIUM → corrected; the missing read-back contract added to `login-parity.spec.ts` +1 e2e — lesson: every pinned value needs a test that reads it back); F2 session_6.md transcript (LOW → proper log); F3 advisories carried (stands); all nine other slate pins verified correct against live values (50/200/400/500/600 measured live; 300/600/700/800 e2e-pinned); live parity byte-identical everywhere else (drawer, login font context, landing, 404 panel end-to-end, contact content); gate green 55 unit + 46 e2e |
 | 2026-10-05 | Session-7 audit (service detail + legal structure) | F1 the service detail pages (8/8) shipped four of the reference's six sections — FAQ + Ready-to-begin missing, description H2 composed instead of the first sentence of longDescription, prep list numbered instead of check-icon rows (MEDIUM → rebuilt: `firstSentence` helper, `FaqAccordion` exclusive-open island, `faqs` JSON column + seed data extracted live, Ready-to-begin dark CTA, check-icon prep grid; pinned by `service-detail-parity.spec.ts` +6 e2e); F2 the legal pages' structure flattened — accessibility's 8-item checklist/note variant/br coordinator/mt-3 and privacy/terms' top-level paragraph hoisting unrepresentable in the old p/h2 model (MEDIUM → `LegalBlock` model + renderer rework, pinned by `legal-parity.spec.ts` +6 e2e); six session-1 transcription errors corrected (3 longDescriptions, 3 legal texts) with read-back contracts; trap 7 found: v4's opacity modifier serializes as `oklab(L a b / α)` where v3 emitted `rgba()` — pixels identical, specs assert resolved channels (also revealed the login input `bg-slate-50/50` had always computed oklab — a session-6 blind spot, documented); F3 advisories carried (stands); live parity: all 8 service pages + all 4 legal pages text-identical both sides; gate green 60 unit + 58 e2e (118 total) |
+| 2026-10-05 | Session-8 audit (booking form + ICS contract + confirmation icon) | F1 the ICS download carried the service's advertised duration instead of the reference's FIXED 90-minute event block — live bookings advertising 210/60/180 min all produced 90-min events (MEDIUM → `APPOINTMENT_BLOCK_MIN` in `ics.ts`, the confirmation page's dead `getService` lookup removed; `tests/ics.test.ts` rewritten to the decoded contract); F2 the ICS escaped LOCATION commas per RFC 5545 while the reference escapes nothing — comma-bearing names included (LOW → raw commas, documented divergence); F3 the booking Notes textarea lacked the reference's placeholder (MEDIUM → exact bytes `Anything we should know — inspiration, allergies, previous treatments...`); F4 the form was itself the grid vs the reference's block form + nested grid + outside Notes (`block mt-5`)/button row (`mt-10` 40px vs the clone's 36px) (LOW → restructured); F5 the Add-to-calendar icon was CalendarPlus@14 vs the reference's settled `Calendar` `h-4 w-4` (MEDIUM → corrected; the 14px reading was a pre-settle artifact); F6 the clone's a11y additions (aria-label/aria-pressed/autoComplete) documented as accepted divergences; F7 README/PAD said `GalleryExperience` — the file is `GalleryGrid.tsx` (docs fixed); advisories carried (stands); gallery lightbox verified fully holding (keyboard, wrap-around, filter scoping); lesson: the read-back rule extends to downloads — the ICS href was regex-checked for `balayage` for six green sessions while never being decoded; pinned by `booking-parity.spec.ts` +4 e2e; gate green 61 unit + 62 e2e (123 total) |
 
 ## Appendix D: Live-Site Validation Methodology
 

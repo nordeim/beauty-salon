@@ -72,9 +72,9 @@ bun run db:push && bun run db:seed
 |---|---|
 | `bun run dev` | Dev server :3000 |
 | `bun run lint` / `typecheck` | ESLint 9 flat / tsc |
-| `bun run test` | Vitest unit (60) |
+| `bun run test` | Vitest unit (61) |
 | `bun run build` | Standalone production build (27 routes) |
-| `bun run test:e2e` | Playwright Chromium (58 specs; needs build first) |
+| `bun run test:e2e` | Playwright Chromium (62 specs; needs build first) |
 | `bun run db:push` / `db:seed` | Schema + reference content |
 
 Clean-check order: `lint → typecheck → test → build → test:e2e`.
@@ -83,11 +83,11 @@ Clean-check order: `lint → typecheck → test → build → test:e2e`.
 
 | Level | Tool | Location | Notes |
 |---|---|---|---|
-| Unit | Vitest | `tests/*.test.ts` | db-path (anchors, dotenv parsing, dev-time env-file-first precedence), hours, ICS, auth (scrypt/HMAC) — pure seams only |
+| Unit | Vitest | `tests/*.test.ts` | db-path (anchors, dotenv parsing, dev-time env-file-first precedence), hours, ICS (the fixed 90-minute block + raw commas), auth (scrypt/HMAC) — pure seams only |
 | E2E | Playwright | `tests/e2e/*.spec.ts` | Production standalone server :3100, isolated `db/e2e.db`, `workers: 1` |
 
 - Import `describe/it/expect` from `vitest` explicitly.
-- `mobile-navigation.spec.ts` pins the drawer's computed styles, `login-parity.spec.ts` the auth shell's default font stack + slate-900 read-back (`rgb(15, 23, 42)`), `not-found-parity.spec.ts` the 404's slate centered card (path-interpolated message, Go Home button), `service-detail-parity.spec.ts` the detail page's first-sentence heading + check-icon prep grid + exclusive-open FAQ accordion + Ready-to-begin CTA, and `legal-parity.spec.ts` the legal structure (accessibility checklist, note variant, mt-3, br coordinator, privacy/terms hoisting) — all against live-measured reference values. If any fails, the code drifted, not the spec.
+- `mobile-navigation.spec.ts` pins the drawer's computed styles, `login-parity.spec.ts` the auth shell's default font stack + slate-900 read-back (`rgb(15, 23, 42)`), `not-found-parity.spec.ts` the 404's slate centered card (path-interpolated message, Go Home button), `service-detail-parity.spec.ts` the detail page's first-sentence heading + check-icon prep grid + exclusive-open FAQ accordion + Ready-to-begin CTA, `legal-parity.spec.ts` the legal structure (accessibility checklist, note variant, mt-3, br coordinator, privacy/terms hoisting), and `booking-parity.spec.ts` the booking form's nested-grid structure + Notes placeholder + Calendar icon + the decoded-ICS fixed 90-minute block — all against live-measured reference values. If any fails, the code drifted, not the spec.
 - Never skip/weaken a test to pass the gate; fix the cause or flag the debt.
 
 ## Code Quality Standards

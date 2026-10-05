@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarPlus } from "lucide-react";
+import { Calendar, CalendarPlus } from "lucide-react";
 import { BookHeader } from "@/components/layout/BookHeader";
-import { getService } from "@/lib/data";
 import { buildIcs, icsDataUri } from "@/lib/ics";
 
 export const metadata: Metadata = {
@@ -29,14 +28,15 @@ export default async function ConfirmationPage({
   searchParams: Promise<{ name?: string; date?: string; time?: string; service?: string }>;
 }) {
   const { name = "", date = "", time = "", service = "" } = await searchParams;
-  const serviceRow = service ? await getService(service) : null;
   const firstName = name.split(" ")[0] || name;
-  const durationMin = serviceRow?.durationMin ?? 60;
 
+  // The receipt is a pure function of the query string — the reference does
+  // NOT resolve the service for the ICS: its download carries a fixed
+  // 90-minute event block regardless of the service's advertised duration
+  // (live-measured session 8), so no DB read is needed here.
   const ics = buildIcs({
     date,
     time,
-    durationMin,
     name,
     service,
     uid: String(Date.now()),
@@ -92,7 +92,7 @@ export default async function ConfirmationPage({
                 download="maison-luminaire-appointment.ics"
                 className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-7 py-4 text-[11px] uppercase tracking-editorial hover:bg-secondary transition"
               >
-                <CalendarPlus size={14} aria-hidden />
+                <Calendar className="h-4 w-4" aria-hidden />
                 Add to calendar
               </a>
               <Link className="inline-block" href="/">

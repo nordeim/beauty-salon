@@ -6,7 +6,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![Prisma](https://img.shields.io/badge/Prisma-6-2d3748?logo=prisma)
 ![SQLite](https://img.shields.io/badge/DB-SQLite-003b57?logo=sqlite)
-![Tests](https://img.shields.io/badge/tests-118_passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-123_passing-brightgreen)
 
 A production-grade, self-hosted clone of the **Maison Luminaire** beauty-salon experience — an editorial cream-and-ink marketing site, a Seamless Scheduler booking flow with ICS calendar downloads, and a cookie-session auth surface — rebuilt as a single Next.js application on Prisma/SQLite with byte-parity design tokens.
 
@@ -20,12 +20,12 @@ The reference app is a base44 SPA serving a hair / skin / nails salon brand: a s
 |---------|-------------|
 | 🎨 **Editorial design system** | Cormorant Garamond + Mulish on warm cream `hsl(44 29% 97%)` with sage secondary and peach accent — every token pinned in Tailwind v4 `@theme` (see [Design System](#design-system)) |
 | 📱 **Full-screen mobile menu** | The reference's giant-serif overlay drawer, engineered around the Tailwind v3→v4 `space-y` selector rewrite (flex `gap` + explicit `mt-10`) with computed-style parity pinned by e2e |
-| 📅 **The Seamless Scheduler** | Booking form with deep-link preselection (`/book?service=…&stylist=…`), full server-side validation, and a confirmation page that generates RFC 5545 ICS calendar files |
+| 📅 **The Seamless Scheduler** | Booking form with deep-link preselection (`/book?service=…&stylist=…`), the reference's exact field structure (nested 2-column grid + outside Notes/CTA rows) and Notes placeholder, full server-side validation, and a confirmation page that generates the reference's ICS calendar download — a **fixed 90-minute event block** with raw-comma text, byte-parity with the live `.ics` (pinned by `tests/e2e/booking-parity.spec.ts`) |
 | 🖼️ **Filterable gallery + lightbox** | Twelve works across five categories with keyboard-navigable prev/next lightbox |
 | 🔐 **Cookie-session auth** | scrypt password hashing, HMAC-signed httpOnly sessions, rate limiting, no account enumeration — and the reference auth shell's own font context (Tailwind's default stack, pinned by e2e) |
 | ✉️ **Newsletter capture** | Idempotent upserts into the database |
 | 🚦 **Open/Closed status** | Day-aware "Open today / Closed today" pill with the reference's breathing amber dot |
-| 🧪 **Evidence-backed parity** | 60 unit tests + 58 Playwright e2e specs, including computed-style assertions against live-extracted reference measurements (mobile drawer, login font context + slate-900 read-back, the 404 slate card, the service detail FAQ/CTA surfaces, the legal page structure) |
+| 🧪 **Evidence-backed parity** | 61 unit tests + 62 Playwright e2e specs, including computed-style assertions against live-extracted reference measurements (mobile drawer, login font context + slate-900 read-back, the 404 slate card, the service detail FAQ/CTA surfaces, the legal page structure, the booking form structure + decoded-ICS contract) |
 
 ## Architecture
 
@@ -58,12 +58,12 @@ The reference app is a base44 SPA serving a hair / skin / nails salon brand: a s
   📂 components/
     📂 layout/             SiteHeader (scroll + drawer), BookHeader, SiteFooter
     📄 Reveal.tsx            IntersectionObserver scroll reveal
-    📄 TestimonialCarousel / GalleryExperience / ServicesExperience / BookingForm / LoginForm / StatusPill / LegalPage
+    📄 TestimonialCarousel / GalleryGrid / ServicesExperience / BookingForm / LoginForm / StatusPill / LegalPage
   📂 lib/
     📄 content.ts            CLIENT-SAFE DTOs + formatPrice (no db imports)
     📄 data.ts               Server-only Prisma read seam
     📄 auth.ts               scrypt + HMAC sessions + rate limiter
-    📄 ics.ts                RFC 5545 ICS builder
+    📄 ics.ts                ICS builder (the reference's fixed 90-minute block)
     📄 hours.ts              Opening-hours model + status logic
     📄 db.ts / db-path.ts    Prisma client + SQLite path resolution
 📂 prisma/                  schema.prisma + seed.ts (reference content)
@@ -93,10 +93,10 @@ curl -s localhost:3000/api/health
 # {"status":"ok","db":true}
 
 bun run lint && bun run typecheck && bun run test
-# eslint clean · tsc clean · 60 tests passed
+# eslint clean · tsc clean · 61 tests passed
 
 bun run build && bun run test:e2e
-# 27 routes built · 58 e2e specs passed
+# 27 routes built · 62 e2e specs passed
 ```
 
 Demo login (seeded): `sepnetflix2023@outlook.com` / `$Abcd1234` (override at seed time with `DEMO_USER_PASSWORD`).
@@ -114,8 +114,8 @@ Demo login (seeded): `sepnetflix2023@outlook.com` / `$Abcd1234` (override at see
 
 | Layer | Command | Scope |
 |-------|---------|-------|
-| Unit | `bun run test` | 60 Vitest tests: db-path resolution (anchor rules, dotenv parsing, dev-time env-file-first precedence), hours model, ICS builder, scrypt/HMAC auth, repo hygiene (retired-model scan + script-reference guards), canonical-origin resolution, the service-detail first-sentence splitter |
-| E2E | `bun run test:e2e` | 58 Playwright specs: mobile-navigation parity (the Tailwind v4 trap contract), login parity (the auth shell’s default font stack + the slate-900 sRGB read-back), not-found parity (the reference’s slate centered 404 card with the attempted path interpolated), service-detail parity (the first-sentence description heading, the check-icon prep grid, the exclusive-open FAQ accordion, the Ready-to-begin CTA), legal parity (the accessibility checklist + note/mt-3/br conventions, the privacy/terms top-level paragraph hoisting), landing, booking, gallery, auth, route matrix, team |
+| Unit | `bun run test` | 61 Vitest tests: db-path resolution (anchor rules, dotenv parsing, dev-time env-file-first precedence), hours model, ICS builder (the fixed 90-minute block, midnight rollover, raw-comma LOCATION + names), scrypt/HMAC auth, repo hygiene (retired-model scan + script-reference guards), canonical-origin resolution, the service-detail first-sentence splitter |
+| E2E | `bun run test:e2e` | 62 Playwright specs: mobile-navigation parity (the Tailwind v4 trap contract), login parity (the auth shell’s default font stack + the slate-900 sRGB read-back), not-found parity (the reference’s slate centered 404 card with the attempted path interpolated), service-detail parity (the first-sentence description heading, the check-icon prep grid, the exclusive-open FAQ accordion, the Ready-to-begin CTA), legal parity (the accessibility checklist + note/mt-3/br conventions, the privacy/terms top-level paragraph hoisting), booking parity (the nested-grid form + computed margins, the Notes placeholder, the Calendar icon, the decoded-ICS fixed 90-minute block), landing, booking flow, gallery, auth, route matrix, team |
 
 E2E boots the **production standalone server** on port 3100 with its own scratch database (`db/e2e.db`) — run `bun run build` first. A single spec: `bunx playwright test tests/e2e/mobile-navigation.spec.ts`.
 
