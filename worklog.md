@@ -103,3 +103,26 @@ Stage Summary:
 - Gate: lint ✓ · typecheck ✓ · unit 47/47 ✓ · build 27 routes ✓ · e2e 42/42 ✓ (mobile-nav parity intact; all 40 pre-existing specs untouched)
 - Deliverables: font-shell utility, login-page scoping, login-parity.spec.ts, 14 refreshed screenshots, aligned docs (README/AGENTS/CLAUDE/PAD/SKILL v1.1.0), remediation plan + session log
 - Next: secret scan → commit to main → SSH-wrapper push → verify remote == local
+
+---
+Task ID: 7
+Agent: main (Super Z)
+Task: Session 4 — hygiene audit (dead scaffold scripts + phantom env var), live parity re-verification, TDD remediation, docs + screenshots refresh, push
+
+Work Log:
+- git clone (workspace reset); reviewed all root docs + session 1-4 logs + remediation plans + worklog; validated against the codebase (structure, configs, counts consistent; session-3 diff matches documented design; invariants hold)
+- Environment rebuilt: bun install, .env (DATABASE_URL=file:../db/custom.db + fresh AUTH_SECRET), db:push + db:seed -> repo db/custom.db (8/3/12/4/1 rows) — ambient absolute DATABASE_URL still injected, wrapper defense holding
+- Mode C audit: Phase 1 lint+tsc clean; Phase 2 bun audit = same 2 dev-only advisories (stance re-verified), no secrets tracked; Phase 3 checklist_runner 234 non-skills findings = identical noise register to session 3 (2 criticals = documented e2e constants; JSON.parse = safeParse false positive; 211 PascalCase React components); Phase 4 baseline gate green (unit 47/47, build 27, e2e 42/42)
+- Live parity re-verified via agent-browser: login works (redirects to landing; dashboard image still 404); mobile drawer byte-identical to pinned contract on live AND local (fixed inset-0 z-60 cream rgb(250,248,245), flex-col gap 8px, 5 links 48px Cormorant -1.2px rgb(26,26,26), CTA gap 48px, no scroll lock, tap closes+navigates); login font context byte-identical (default sans stack, normal features, auto smoothing); landing hero tokens identical (102.4px Cormorant h1, cream body, fixed 80px transparent header); 8/8 service names live == local -> NO parity remediation required
+- KEY FINDINGS: F1 14 dead pre-clone scaffold scripts in scripts/ (10 reference retired Goal/Task/ActivityLog models — would crash; 4 old-app probes; only with-repo-db.ts is live); F2 NEXT_PUBLIC_SITE_URL documented in 4 places but read by nothing (DEPLOYMENT.md even claimed sitemap/robots feeds); F3 DEPLOYMENT.md pre-clone remnants (ORBITAL header, 16->6 API count, orbital paths, smoke-test reference); F4 session_4.md was a session-3 transcript; F5 advisories carried
+- Wrote docs/remediation-plan-session-4.md (findings register, root cause, design, plan-vs-codebase validation matrix, TDD ToDo) and validated before executing
+- TDD execution: T1 RED (tests/repo-hygiene.test.ts 3 specs — retired-models spec failed exactly as predicted; tests/site-url.test.ts 5 specs failed on missing module; two test-side shapings: regex self-match on comment examples reworded, doc-scan historical-record exclusion + dropped over-constrained refs>0 assertion) -> T2 GREEN (14 scripts deleted, scripts/ = with-repo-db.ts exactly; DEPLOYMENT.md fixed) -> T3 GREEN (src/lib/site.ts siteUrl() + metadataBase in layout.tsx; live emits no canonical/og tags so invisible wiring is parity-preserving) -> T4 full gate green (lint, tsc, unit 55/55, build 27 routes, e2e 42/42)
+- Re-captured 14 screenshots on the remediated build (mobile-menu 26124B byte-identical to prior verified captures); VLM-verified login (sans heading, clean card) + mobile menu (cream overlay, serif links, CTA separation); .env.example made truthful (SITE_URL comment + project_management postgres remnant)
+- Docs aligned: README (55/97, env+testing tables), AGENTS.md (Environment: SITE_URL, scripts inventory, hygiene guard), CLAUDE.md (counts, env purpose, lib map + site), PAD (§7 inventory + session-4 ledger), beauty-salon_SKILL.md v1.2.0 (project_state, checklist counts incl. fixing session-3's "40 specs" miss, Appendix B/C rows), docs/session_4.md replaced with proper session log, remediation plan updated with execution results
+
+Stage Summary:
+- F1 FIXED: scripts/ holds exactly with-repo-db.ts, pinned by tests/repo-hygiene.test.ts (retired-model scan + doc/pkg script-reference guards)
+- F2 FIXED: NEXT_PUBLIC_SITE_URL resolves metadataBase via src/lib/site.ts (never throws; localhost fallback), pinned by tests/site-url.test.ts; .env.example truthful
+- Gate: lint ✓ · typecheck ✓ · unit 55/55 ✓ · build 27 routes ✓ · e2e 42/42 ✓ (97 total; parity contracts untouched)
+- Live parity: byte-identical on all measured surfaces (drawer, login font chain, landing tokens, services content)
+- Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local

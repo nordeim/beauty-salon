@@ -442,12 +442,12 @@ Public marketing + booking surface (matches the reference — nothing is gated).
 
 | Level | Tool | Count | What it locks |
 |---|---|---|---|
-| Unit | Vitest, `tests/*.test.ts` | 47 | db-path resolution contract (anchor rules + dotenv parsing + dev-time env-file-first precedence); hours model (formats + status per day); ICS builder (envelope, UTC stamps, midnight rollover, RFC 5545 escaping, data-URI); auth primitives (scrypt round-trip/salt/reject, session round-trip/tamper/expiry) |
+| Unit | Vitest, `tests/*.test.ts` | 55 | db-path resolution contract (anchor rules + dotenv parsing + dev-time env-file-first precedence); hours model (formats + status per day); ICS builder (envelope, UTC stamps, midnight rollover, RFC 5545 escaping, data-URI); auth primitives (scrypt round-trip/salt/reject, session round-trip/tamper/expiry); repo hygiene (no retired scaffold-model references; doc/package script references resolve); canonical-origin resolution (`siteUrl` default/blank/malformed/non-absolute fallbacks) |
 | E2E | Playwright, `tests/e2e/*.spec.ts` | 42 | mobile-navigation computed-style parity (traps), login font-context parity (auth shell = default sans stack), landing structure + carousel rotation + newsletter, booking flow end-to-end (deep links, submission, confirmation, ICS href), gallery (filter counts, lightbox + keyboard), auth (login surface, demo credentials, no-enumeration), route matrix + 404 + service details + team |
 
 E2E runs the **production standalone build** on :3100 against an isolated seeded `db/e2e.db` (global-setup: `db push` + seed), single worker (shared SQLite file), `reuseExistingServer` locally. The gate order — `lint → typecheck → test → build → test:e2e` — is the only CI (no hosted pipelines).
 
-Verification ledger for this release (session 3): lint ✓ (0 errors), typecheck ✓, unit 47/47 ✓, build 27 routes ✓ (11 static + 8 SSG + 8 dynamic), e2e 42/42 ✓, live-parity re-verification ✓ (drawer computed styles byte-identical; login font context now matching the reference auth shell).
+Verification ledger for this release (session 4): lint ✓ (0 errors), typecheck ✓, unit 55/55 ✓, build 27 routes ✓ (11 static + 8 SSG + 8 dynamic), e2e 42/42 ✓, live-parity re-verification ✓ (drawer computed styles byte-identical — gap 8px, 48px Cormorant −1.2px, CTA 48px; login font context matching the reference auth shell; landing hero tokens identical; 8/8 service names). Session-4 remediation: 14 pre-clone scaffold scripts removed from `scripts/` (`with-repo-db.ts` retained), `NEXT_PUBLIC_SITE_URL` wired to the root layout's `metadataBase` via `src/lib/site.ts` (pinned by `tests/site-url.test.ts`), `docs/DEPLOYMENT.md` pre-clone remnants (ORBITAL naming, smoke-test reference, sitemap/robots claim) corrected. Historical ledger — session 3: lint ✓, typecheck ✓, unit 47/47 ✓, build 27 routes ✓, e2e 42/42 ✓, auth-shell font parity fix (`font-shell` utility, pinned by `tests/e2e/login-parity.spec.ts`).
 
 ---
 

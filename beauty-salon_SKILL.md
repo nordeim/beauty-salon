@@ -6,9 +6,9 @@ description: >
   single application with byte-parity design tokens, a computed-style parity
   e2e contract, and a hardened dev-time database-pinning layer. Distilled
   from two build/remediation sessions using the six-phase process.
-version: 1.1.0
+version: 1.2.0
 last_updated: "2026-10-05"
-project_state: "47 unit + 42 e2e tests green; 27 routes; db-path seam v2.4 (env-file-first dev pinning); auth-shell font-context parity (font-shell)"
+project_state: "55 unit + 42 e2e tests green; 27 routes; db-path seam v2.4 (env-file-first dev pinning); auth-shell font-context parity (font-shell); repo hygiene guard (scaffold relics removed); metadataBase wiring (site.ts)"
 ---
 
 # beauty-salon_SKILL.md — Maison Luminaire Clone
@@ -384,9 +384,9 @@ Debug order discipline: reproduce with the exact command → read `dev.log` → 
 ```bash
 bun run lint          # eslint clean
 bun run typecheck     # tsc clean
-bun run test          # 47 unit tests green
+bun run test          # 55 unit tests green
 bun run build         # 27 routes; standalone emitted
-bun run test:e2e      # 40 specs green (needs the build)
+bun run test:e2e      # 42 specs green (needs the build)
 ```
 
 **Security sweep:** `git ls-files | grep -E '^\.env$|\.db$|\.key$'` → empty; demo credential only in seed/tests (documented, `DEMO_USER_PASSWORD`-overridable); AUTH_SECRET set for prod.
@@ -642,9 +642,11 @@ Full ADRs with alternatives: `Project_Architecture_Document.md` §1.3.
 | auth | `tests/auth.test.ts` | 8 | scrypt round-trip/salt/reject; session round-trip/tamper/expiry |
 | hours | `tests/hours.test.ts` | 4 | Formats + status per day |
 | ics | `tests/ics.test.ts` | 6 | Envelope, UTC stamps, rollover, escaping, data-URI |
+| repo hygiene | `tests/repo-hygiene.test.ts` | 3 | No retired scaffold-model references in code dirs; doc-referenced scripts exist; package.json-referenced scripts exist |
+| site-url | `tests/site-url.test.ts` | 5 | `siteUrl()` default/blank fallbacks, well-formed pass-through, malformed + non-absolute fallbacks |
 | e2e | `tests/e2e/*.spec.ts` | 42 | Mobile-nav parity (10), login font-context parity (2), landing (10), booking (5), gallery (5), auth (10) |
 
-Total: **89** (47 unit + 42 e2e). Gate: `lint → typecheck → test → build → test:e2e`.
+Total: **97** (55 unit + 42 e2e). Gate: `lint → typecheck → test → build → test:e2e`.
 
 ## Appendix C: Audit History
 
@@ -653,6 +655,7 @@ Total: **89** (47 unit + 42 e2e). Gate: `lint → typecheck → test → build �
 | 2026-10-04 | Session-1 build gate | 32/40 e2e → fixed v4 engine-difference assertions + gallery labels → 40/40 |
 | 2026-10-05 | Session-2 release audit | F1 ambient DATABASE_URL (HIGH → fixed, ADR-002b); F2 dev-only advisories braces/deepmerge-ts (MEDIUM → no upstream fix, accepted + documented); F3 stale vitest comment (LOW → fixed); F4 scanner noise (INFO → accepted); baseline gate green throughout; live parity re-verified (mobile drawer byte-match) |
 | 2026-10-05 | Session-3 parity re-audit | F1 login font-context gap (MEDIUM → fixed: the reference auth shell renders in Tailwind's default sans stack — `font-shell` utility + `login-parity.spec.ts`, +2 e2e); F2 advisories re-verified (no upstream fix, stands); F3 checklist non-benign findings all false-positives; F4 local .env header refreshed; gate green 47 unit + 42 e2e; drawer + services parity re-confirmed live |
+| 2026-10-05 | Session-4 hygiene audit | F1 14 dead pre-clone scaffold scripts in `scripts/` (MEDIUM → removed, `with-repo-db.ts` retained, pinned by `tests/repo-hygiene.test.ts`); F2 `NEXT_PUBLIC_SITE_URL` documented-but-unused (MEDIUM-LOW → wired to `metadataBase` via `src/lib/site.ts`, pinned by `tests/site-url.test.ts`); F3 DEPLOYMENT.md pre-clone remnants — ORBITAL naming, smoke-test reference, sitemap/robots claim (LOW → fixed); F4 advisories carried (stands); live parity re-verified byte-identical (drawer, login font chain, landing tokens, 8/8 services); gate green 55 unit + 42 e2e |
 
 ## Appendix D: Live-Site Validation Methodology
 

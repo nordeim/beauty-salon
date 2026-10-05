@@ -6,7 +6,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![Prisma](https://img.shields.io/badge/Prisma-6-2d3748?logo=prisma)
 ![SQLite](https://img.shields.io/badge/DB-SQLite-003b57?logo=sqlite)
-![Tests](https://img.shields.io/badge/tests-89_passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-97_passing-brightgreen)
 
 A production-grade, self-hosted clone of the **Maison Luminaire** beauty-salon experience — an editorial cream-and-ink marketing site, a Seamless Scheduler booking flow with ICS calendar downloads, and a cookie-session auth surface — rebuilt as a single Next.js application on Prisma/SQLite with byte-parity design tokens.
 
@@ -25,7 +25,7 @@ The reference app is a base44 SPA serving a hair / skin / nails salon brand: a s
 | 🔐 **Cookie-session auth** | scrypt password hashing, HMAC-signed httpOnly sessions, rate limiting, no account enumeration — and the reference auth shell's own font context (Tailwind's default stack, pinned by e2e) |
 | ✉️ **Newsletter capture** | Idempotent upserts into the database |
 | 🚦 **Open/Closed status** | Day-aware "Open today / Closed today" pill with the reference's breathing amber dot |
-| 🧪 **Evidence-backed parity** | 47 unit tests + 42 Playwright e2e specs, including computed-style assertions against live-extracted reference measurements (mobile drawer + login font context) |
+| 🧪 **Evidence-backed parity** | 55 unit tests + 42 Playwright e2e specs, including computed-style assertions against live-extracted reference measurements (mobile drawer + login font context) |
 
 ## Architecture
 
@@ -93,7 +93,7 @@ curl -s localhost:3000/api/health
 # {"status":"ok","db":true}
 
 bun run lint && bun run typecheck && bun run test
-# eslint clean · tsc clean · 47 tests passed
+# eslint clean · tsc clean · 55 tests passed
 
 bun run build && bun run test:e2e
 # 27 routes built · 42 e2e specs passed
@@ -107,14 +107,14 @@ Demo login (seeded): `sepnetflix2023@outlook.com` / `$Abcd1234` (override at see
 |----------|---------|-------|
 | `DATABASE_URL` | SQLite file URL | Default `file:../db/custom.db` — resolves against `prisma/schema.prisma` (see `src/lib/db-path.ts`); use an absolute path in production. Note: an ambient `DATABASE_URL` env var beats `.env` — the wrapped dev scripts defend against that (see Quick Start) |
 | `AUTH_SECRET` | HMAC key for session cookies | Generate with `openssl rand -hex 32`; falls back to a dev-only constant |
-| `NEXT_PUBLIC_SITE_URL` | Canonical origin | Used for metadata; defaults to `http://localhost:3000` |
+| `NEXT_PUBLIC_SITE_URL` | Canonical origin | Resolves the app's `metadataBase` (`src/lib/site.ts`); falls back to `http://localhost:3000` when unset or malformed |
 | `DEMO_USER_PASSWORD` | Seed-time demo password | Optional; defaults to the documented demo credential |
 
 ## Testing
 
 | Layer | Command | Scope |
 |-------|---------|-------|
-| Unit | `bun run test` | 47 Vitest tests: db-path resolution (anchor rules, dotenv parsing, dev-time env-file-first precedence), hours model, ICS builder, scrypt/HMAC auth |
+| Unit | `bun run test` | 55 Vitest tests: db-path resolution (anchor rules, dotenv parsing, dev-time env-file-first precedence), hours model, ICS builder, scrypt/HMAC auth, repo hygiene (retired-model scan + script-reference guards), canonical-origin resolution |
 | E2E | `bun run test:e2e` | 42 Playwright specs: mobile-navigation parity (the Tailwind v4 trap contract), login font-context parity (the auth shell’s default stack), landing, booking, gallery, auth, 404 |
 
 E2E boots the **production standalone server** on port 3100 with its own scratch database (`db/e2e.db`) — run `bun run build` first. A single spec: `bunx playwright test tests/e2e/mobile-navigation.spec.ts`.

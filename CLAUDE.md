@@ -72,7 +72,7 @@ bun run db:push && bun run db:seed
 |---|---|
 | `bun run dev` | Dev server :3000 |
 | `bun run lint` / `typecheck` | ESLint 9 flat / tsc |
-| `bun run test` | Vitest unit (47) |
+| `bun run test` | Vitest unit (55) |
 | `bun run build` | Standalone production build (27 routes) |
 | `bun run test:e2e` | Playwright Chromium (42 specs; needs build first) |
 | `bun run db:push` / `db:seed` | Schema + reference content |
@@ -118,7 +118,7 @@ src/app/book/       scheduler + confirmation (BookHeader chrome)
 src/app/login/      auth card (standalone slate system)
 src/app/api/        health · auth/{login,logout,me} · appointments · newsletter
 src/components/     layout chrome + client islands + LegalPage
-src/lib/            content (client-safe) · data (server) · auth · ics · hours · db
+src/lib/            content (client-safe) · data (server) · auth · ics · hours · db · site
 prisma/             schema + seed (the content source)
 tests/              unit + e2e
 ```
@@ -134,7 +134,7 @@ Prisma 6 + SQLite. `DATABASE_URL="file:../db/custom.db"` resolves against `prism
 |----------|---------|---------|
 | `DATABASE_URL` | SQLite file URL | `file:../db/custom.db` |
 | `AUTH_SECRET` | Session HMAC key (≥32 chars in prod) | `openssl rand -hex 32` |
-| `NEXT_PUBLIC_SITE_URL` | Canonical origin | `http://localhost:3000` |
+| `NEXT_PUBLIC_SITE_URL` | Canonical origin — resolves `metadataBase` (`src/lib/site.ts`) | `http://localhost:3000` |
 | `DEMO_USER_PASSWORD` | Optional seed-time override | — |
 
 ## Anti-Patterns to Avoid

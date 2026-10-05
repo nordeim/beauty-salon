@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Mulish } from "next/font/google";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 // The reference app pairs Cormorant Garamond (display serif) with Mulish
@@ -21,6 +22,7 @@ const mulish = Mulish({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: {
     default: "Maison Luminaire — Beauty Salon",
     template: "%s | Beauty Salon",
