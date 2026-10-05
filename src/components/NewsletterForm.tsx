@@ -17,10 +17,13 @@ export function NewsletterForm() {
     if (!email || state === "loading") return;
     setState("loading");
     try {
+      // The reference's wire payload (live-measured session 14 via request
+      // capture): { email, source } — the source attribution marks the
+      // homepage 15%-offer form. Key order included (devtools-visible).
       await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, source: "homepage_15off" }),
       });
     } catch {
       // The reference swallows POST failures and renders the success state.

@@ -53,18 +53,24 @@ export function BookingForm({
     if (submitting) return;
     setSubmitting(true);
     try {
+      // The reference's wire payload (live-measured session 14 via request
+      // capture): its Booking entity schema on the wire — snake_case field
+      // names in this exact order, "" (never null) for the unset
+      // phone/stylist/notes, and status always "pending". Key order is
+      // devtools-visible (JSON.stringify preserves insertion order).
       await fetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
-          email,
-          phone: phone || null,
-          stylistSlug: stylist || null,
-          serviceSlug: service,
-          date,
-          time,
-          notes: notes || null,
+          client_name: name,
+          client_email: email,
+          client_phone: phone,
+          service_slug: service,
+          stylist_slug: stylist,
+          requested_date: date,
+          requested_time: time,
+          notes,
+          status: "pending",
         }),
       });
     } catch {

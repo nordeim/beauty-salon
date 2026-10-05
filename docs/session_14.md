@@ -1,93 +1,62 @@
-I'll start by internalizing this complex task and setting up a structured plan. This is a comprehensive codebase remediation task with very explicit instructions, so I'll proceed directly.
-The workspace is a fresh git repo. Now let me clone the beauty-salon repository:
-Repo cloned successfully. Now let me review the core documentation files:
-Let me read the architecture document in sections:
-Now let me read the beauty-salon_SKILL.md:
-Core documentation reviewed. Now let me examine the session docs and worklog:
-All session docs reviewed. Now let me validate understanding against the codebase:
-Now let me validate key code files against the documented architecture:
-Codebase matches documented architecture. Now let me set up the environment and run baseline verification:
-The `.env` already carries `DATABASE_URL="file:../db/custom.db"` (the requested value — resolving against `prisma/schema.prisma` puts the db at the repo root's `db/` folder). Let me push and seed:
-Database seeded at the repo root `db/custom.db`. Now running the baseline audit gates (Phase 1 + 4):
-Build clean — 27 routes. Now the e2e baseline:
-**Baseline fully green** — lint ✓ · tsc ✓ · unit 61/61 · build 27/27 · e2e 104/104 (165 total) — exactly matching the documented session-12 state. Now let me examine recent code changes and review the relevant repo skills:
-Important finding — the last 3 commits (`330bdc3`, `3130c44`, `dceec22`) are post-session-12 owner commits including package.json changes. Let me examine those diffs:
-Note: `start_server_log.txt` contains a committed real AUTH_SECRET — a security hygiene issue to flag in the audit. Now let me review the key repo skills:
-Now let me run Phase 2 (security scan) of the audit and review the mobile-nav skill guidance:
-Phase 2 findings registered — including a **new secret leak**: `start_server_log.txt` carries a real committed AUTH_SECRET. Now let me review the mobile-nav/Tailwind v4 skill guidance:
-Let me verify the actual SiteHeader mobile drawer implementation and its parity spec:
-SiteHeader matches the trap-4-safe documented pattern. Now let me clone the scandihaven reference repo and review its patterns:
-The skills catalogs are essentially the same collection. Now let me read the agent-browser skill for the live parity verification:
-agent-browser is available. Let me start the dev server and access the reference site:
-Logged into the reference site. Let me capture the reference state and verify the mobile navigation:
-Live mobile drawer contract verified — matches all pinned values (gap 8px, px-8, mt-10 40px, 48px serif, −1.2px tracking). Let me test drawer navigation behavior and check the reference for drift:
-Live reference verified — no drift; parity contracts hold. Now let me verify the clone's mobile menu on the local dev server:
-Clone drawer is byte-identical to the live reference. Let me verify tap-through navigation:
-Mobile menu verified working on both sides. Now let me complete the Phase 3 audit checklist and check current screenshots/docs state:
-paramiko 5.0.0 installed. Let me read the full shim implementation from Appendix A:
-Now let me deploy the SSH shim (per the runbook) and then conduct the session-13 candidate audit — the keyboard/focus-ring census. First, the shim:
-Shim deployed. Now the session-13 candidate audit — the keyboard/focus-ring census (both sides). Live reference first:
-**Focus-layer divergence detected!** The live login shows a shadcn focus ring (slate-400 border + 2px offset ring); the clone shows none. Let me inspect the clone's LoginForm classes:
-Both sides show focus rings — the earlier "none" was a live-CSSStyleDeclaration measurement trap. Let me do the precise focus census comparison:
-The focus census begins. Let me systematically measure all focus surfaces on the live reference:
-The `transition` class causes synchronous read artifacts. Let me redo the census with transitions neutralized:
-Now the same census on the clone's /book:
-/book focus parity is identical. Now the login focus census with the frozen-transition method, both sides:
-Focus-ring divergences found on the login shell. Let me get the live's exact class lists to design the fix:
-The input class strings are byte-identical — this is a **new Tailwind v4 engine trap** (same classes, different focus-ring color resolution). Let me verify the remaining details:
-Marketing-surface focus parity is identical. Let me complete the census with the remaining login elements and drawer links:
-Live drawer focus measured (UA default outlines). Now the clone:
-Focus census complete — the only gap is the login shell's focus rings. Now let me check the second session-13 candidate (ICS edge dates):
-The audit is complete. Let me validate the fix design against the existing specs before writing the remediation plan:
-No conflicts with existing specs. Let me examine globals.css for the fix location:
-The fix design is validated. Let me confirm the login main carries the font-shell scope:
-All validated. Let me review the repo-hygiene test to extend it consistently:
-Now I have everything needed. Let me write the comprehensive remediation plan:
-Remediation plan saved and validated. Now executing **T1 (RED)** — writing the focus-parity spec:
-Now the repo-hygiene secret scan extension and the ICS year-boundary test:
-Let me fix the `require` usage with a proper ESM import:
-Now the ICS year-boundary test:
-Now running the RED phase — unit tests first (secret scan should be RED):
-**RED confirmed** — the secret scan flags exactly the predicted file. Now the e2e RED phase against the pre-fix build:
-The two guard failures are transition artifacts (reads during the 150ms border transition). Let me freeze transitions in the spec — matching the live-measurement method:
-**RED confirmed exactly as predicted** — 4 actionable failures (F2×2, F3, F4), all guards green, and the class-census guard proves the classes are byte-identical (trap-9 premise). Now **T2 (GREEN)**:
-Now the LoginForm button class fix:
-Now the start_server_log.txt secret redaction:
-All fixes applied. Verifying the unit layer first:
-Unit 63/63 green. Rebuilding for the e2e GREEN check:
-**GREEN — 10/10 focus-parity specs pass.** Now **T3** — the full gate:
-**FULL GATE GREEN** — lint ✓ · tsc ✓ · unit 63/63 · build 27/27 · e2e 114/114 (**177 total**). Now **T4** — live re-verification of the fixed surfaces:
-**Fixed focus rings verified value-by-value** — exact match with the live reference on every element. Now the drawer standing check and screenshots:
-Drawer standing check holds. Now capturing the 15 canonical screenshots:
-All 15 captured — and `11-mobile-menu-open.png` is **26124B, the byte-identical pixel-consistency signal** from every prior session. Let me verify:
-Byte-identity confirmed — `11-mobile-menu-open.png` and `09-login-desktop.png` are unchanged from HEAD (proving the settled login rendering is untouched; only the focused state changed). Let me VLM-verify the two key changed captures per the repo convention:
-The VLM shows the bottom CTA is below the fold — session-11's convention captures 02 scrolled to the CTA. Let me re-capture:
-T4 complete. Now **T5 — documentation alignment**. Starting with README:
-Now the README trap log and testing sections:
-README aligned. Now AGENTS.md:
-Now CLAUDE.md:
-Now the PAD — version table, §7 inventory, and session-13 ledger:
-PAD clean. Now the SKILL.md → v1.10.0:
-Now adding the Appendix C session-13 row:
-SKILL v1.10.0 complete. Now the proper session_13.md record:
-Now updating the remediation plan with executed results:
-Now the worklog entries:
-Both worklogs updated. Now the final gate re-verification (docs changed since the last unit run — the hygiene test scans them):
-Change set complete. Now **T6** — secret scan, commit, and push:
-Secret fully purged. Committing:
-Committed as `512814e`. Now the SSH push sequence per the runbook — key materialization and fingerprint verification:
-**Fingerprint verified** — `SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU` matches the sessions 1–12 record. Dry-run next:
-Dry-run clean (fast-forward `dceec22..512814e`). Real push:
-**Remote == local verified byte-exact** (`512814e...`). Now shredding the operator key:
-Push complete. Now recording the push evidence (the sessions 8–12 follow-up pattern):
-**Session 13 complete** — both commits pushed and verified byte-exact, keys shredded. Final cleanup and verification:
-Session 13 complete — all work committed and pushed to `main` (remote == local verified byte-exact, keys shredded).
+# Session 14 — Audit: The Wire-Payload Census + The Print-Media Census (2026-10-06)
 
-**What this session found & fixed:**
+**Baseline:** remote `main` @ `5914450` (session-13 deliverable `512814e` + the push-evidence follow-up `6e62509` + the owner's session-log commit — docs only, zero code drift) · **Deliverable commit:** the wire-payload layer — the newsletter's `{ email, source: "homepage_15off" }` attribution (persisted on the new `source` column) + the booking's nine-field snake_case entity wire schema (`client_name` … `status: "pending"`, `""` for unset optionals, key order pinned; the new `status` column persists it) — and the print-media pins (zero `@media print` rules both sides + the deliberate print-visible stance + the mechanism guard) — +2 e2e payload contracts + 3 e2e print specs (182 total), docs + screenshots refresh
 
-1. **Focus-ring parity gap (the session-12 suggested candidate)** — a first-ever both-sides focus census found the login inputs rendering an ink ring where the reference renders slate-400, from *byte-identical class strings*: **a new Tailwind v4 engine trap (#9 — variant-ordering conflicts)**. Fixed via the auth-shell token scope; pinned by 10 new e2e specs.
-2. **A committed real AUTH_SECRET** in `start_server_log.txt` — redacted (rotate your deployed instance's key) + a tracked-files secret-scan guard added.
-3. **Mobile menu re-verified byte-identical** both sides @390×844 — no v4 regression (your emphasis).
-4. Validated the owner's dependency bump (Next 16.3.8/Prisma 6.19.3) — full gate green: **lint · tsc · 63 unit · 27 pages · 114 e2e = 177 tests**.
+**Method:** Mode C audit (`skills/code-review-and-audit` pipeline — Phase 3 as the targeted lightweight checklist; `skills/` excluded) + live parity verification with `skills/agent-browser` (login, the mobile drawer @390×844 standing check — the task brief's emphasis — and **the two session-13 log's suggested candidates**: the print stylesheet census and the newsletter `source` payload registration, extended into a full **wire-payload census of both write paths via request capture** — the booking submission route-aborted on the reference so zero writes landed) + TDD remediation per `docs/remediation-plan-session-14.md`.
 
-**Suggested next steps:** visit `/login` and Tab through the fields to see the corrected focus rings, or review `docs/remediation-plan-session-13.md`. For a session 14, candidates: a print stylesheet census, or the newsletter `source: "homepage_15off"` payload registration.
+> Note: this file previously held the raw process transcript of session 13 (committed by the owner). It has been replaced by this proper session-14 record — the same convention sessions 4–13 applied to their own transcript files.
+
+## What this session set out to do
+
+Pull the workspace fresh, re-validate the documented architecture against the codebase (the owner's `5914450` commit added only this file — no code drift), re-run the Mode C audit baseline, then execute the session-13 log's suggested candidates: **the print stylesheet census** and **the newsletter `source: "homepage_15off"` payload registration** — the latter extended into a wire-payload census of BOTH write paths (the newsletter and the booking POST bodies, request-captured on the reference itself). Remediate everything found via TDD, re-capture screenshots, align documentation, push to `main`.
+
+## Audit results (all phases)
+
+- **Phase 1 (lint + typecheck):** clean — ESLint 0 errors, `tsc --noEmit` clean.
+- **Phase 2 (security):** `bun audit` shows the same two dev-only transitive advisories as sessions 2–13 (`braces`, `deepmerge-ts`) — the accepted-risk stance re-verified. Tracked env/db/key files: only `.env.example`. No secrets.
+- **Phase 3 (lightweight checklist):** the targeted greps reproduce the established noise register — `console.log`/TODO absent from `src/`; `scripts/` = exactly `with-repo-db.ts`; zero client `data.ts` imports.
+- **Phase 4 (tests):** baseline fully green — unit 63/63, build 27/27 pages, e2e 114/114 (177 total) — exactly the documented session-13 state.
+
+## Live parity verification (agent-browser)
+
+**The wire-payload census** (request capture on the reference itself):
+
+- **The newsletter POST body:** `{"email":"…","source":"homepage_15off"}` — exactly two fields, `email` then `source`; the response echoes the stored entity (`{"email":"…","source":"homepage_15off","id":"…","created_date":"…",…}`) — the reference **persists** the source. The clone posted `{ email }` only — the session-12 INFO registration, now actionable (**F1**).
+- **The booking POST body** (captured via a route-aborted submission — zero writes to the reference): `{"client_name":"…","client_email":"…","client_phone":"…","service_slug":"balayage","stylist_slug":"","requested_date":"2026-11-15","requested_time":"14:30","notes":"","status":"pending"}` — nine fields, snake_case, `""` (never null) for unset phone/stylist/notes, `status` always `"pending"`. The clone posted camelCase `{name, email, phone||null, stylistSlug||null, serviceSlug, date, time, notes||null}` — a complete wire-schema divergence (**F2**).
+- **The fire-and-forget contracts re-verified live:** the route-aborted Booking POST on the reference STILL navigated to `/book/confirmation?name=Session+Fourteen&date=2026-11-15&time=14%3A30&service=balayage` — session 12's deobfuscated bundle behavior re-measured, and the confirmation query-string contract confirmed (`name`, `date`, `time`, `service`-as-slug, in that order).
+
+**The print-media census:**
+
+- **The author layer is at parity:** the live's single 913-rule stylesheet carries ZERO `@media print` rules; the clone's compiled CSS (204KB, 21 media queries — the hover/forced-colors/RM/breakpoint families) also carries zero (**F3** — pinned).
+- **The rendering layer diverges by mechanism:** PDF captures of both landings (Chromium printToPDF) show the live's fresh-load print as 13 letter pages carrying ONLY the repeated fixed header + footer bits — its animation framework hides unrevealed content with INLINE styles (`opacity: 0; filter: blur(8px); transform: translateY(40px)`) which are media-query-immune, and its revealed elements carry `opacity: 1` inline (also media-immune). The clone prints the full content (11 pages): its `.reveal-hidden` CLASS (identical values) is collapsed by the `prefers-reduced-motion: reduce` rule, and **Chromium's print pipeline forces reduced-motion** — so the clone's content reveals in print (**F4** — the a11y-addition family acquiring a print consequence; documented accepted divergence, pinned as the deliberate stance). After a normal scroll-through both sites print identically — the divergence exists only for never-revealed content.
+- **The fixed header repeats on every printed page on both sides** (position: fixed — "BOOK NOW" ×13 live / ×11 clone) — identical print behavior (**F5**).
+- **The mobile drawer @390×844 re-verified byte-identical both sides** (fixed z-60 cream `rgb(250,248,245)`, flex gap 8px, padL 32px, 5 links 48px Cormorant lh 48 ls −1.2px ink, CTA mt 40px, tap-through → `/services`) — the task brief's emphasis, **no Tailwind v4 regression** (**F6**). The reference verified un-drifted (services title/h1 128px/bottom-CTA).
+
+## Findings and the TDD fixes
+
+All four actionable findings fixed per the plan across 5 files + 1 new spec + 1 extended spec:
+
+- **F1** (`src/components/NewsletterForm.tsx` + `src/app/api/newsletter/route.ts` + `prisma/schema.prisma`): the POST body gains `source: "homepage_15off"` (key order included — `JSON.stringify` preserves insertion order, the devtools-visible order); the API narrows the optional field (string, ≤100 chars) and persists it on the new `source String?` column (the upsert's idempotent `update: {}` no-op unchanged — the clone's documented "Idempotent subscribe" contract).
+- **F2** (`src/components/BookingForm.tsx` + `src/app/api/appointments/route.ts` + `prisma/schema.prisma`): the POST body rebuilt to the live's exact nine-field schema in its exact order, `""` for unset phone/stylist/notes, `status: "pending"` always; the API route reads the wire names, keeps every existing validation semantic, maps wire → DB columns at the create boundary (`client_name` → `name` …), and persists the new `status String @default("pending")` column. The DB schema's own column names deliberately unchanged — parity at the observable wire boundary, substrate freedom behind it.
+- **F3 + F4** (`tests/e2e/print-parity.spec.ts`, new): P1 the zero-print-rules pin (fetch the served CSS, assert no `@media print` — matching the live's census); P2 the deliberate print-visible stance (under `emulateMedia({ media: "print", reducedMotion: "reduce" })` — approximating Chromium's forced-RM print pipeline — a below-fold `.reveal-hidden` computes opacity 1); P3 the mechanism guard (print media alone reveals NOTHING — the visibility flows only through the RM collapse).
+
+**RED evidence:** the two payload contracts failed exactly as the register predicted (P1: the newsletter body lacked `source`; P2: the booking body was camelCase/null/no-status) — and the three print pins were green immediately (pins, not fixes — the session-13 ICS-pin precedent). **GREEN:** both payload contracts green after the fixes (raw-postData byte-compares + real-API 201 acceptance); the full gate — lint ✓ · typecheck ✓ · unit 63/63 · build 27/27 · e2e **119/119 (182 total)** — with every pre-existing contract untouched.
+
+## Everything else shipped this session
+
+- **Post-fix live re-verification (value-by-value):** the clone's newsletter submission POSTs `{"email":"s14-clone-clean@maisonluminaire.test","source":"homepage_15off"}` → 201 → persisted (`source: 'homepage_15off'` in the dev DB); the clone's booking submission POSTs the byte-identical nine-field schema (only the probe values differ from the live's capture) → 201 → persisted (`status: 'pending'`); the confirmation navigation URL identical to the live's contract. (An aborted-route interception mid-session accidentally re-verified the fire-and-forget stance once more on the clone — the newsletter POST blocked at the network layer still rendered the success state.)
+- 15 dev-server screenshots re-captured on the remediated build. **The mobile-menu capture is 26124B — byte-identical to every prior verified session (md5-confirmed; the pixel-consistency signal). 08-book/09-login/10-landing-mobile/12-book-mobile also byte-identical — including both form surfaces the payload fixes touched, proving the changes are invisible to the settled DOM exactly as designed.** 02 VLM-verified (the dark BOOK AN APPOINTMENT pill in view, scrolled to the footer per the session-11 convention); 14 VLM-verified (the flower watermark + ADD TO CALENDAR + the heading); 13's lightbox DOM-verified open (the z-70 fixed overlay) before capture.
+- Documentation aligned: README (badge 182, 63/119 counts, the wire-payload + print-media feature rows, the testing table), AGENTS.md (the booking-contract wire schema + the wire-payload invariant + the print-media invariant + the print-parity contract line + the 119 count), CLAUDE.md (counts + the parity list), PAD (§4.1 the two new columns + §4.2 the wire-schema note, §7 inventory 63/119 + the session-14 ledger), `beauty-salon_SKILL.md` **v1.11.0** (project_state, Appendix B 119/182, Appendix C — the session-14 row). `.env.example` re-verified truthful (unchanged — the fixes read no env).
+- The remediation plan (`docs/remediation-plan-session-14.md`) with its findings register, plan-vs-codebase validation matrix, and executed ToDo results; this session log; the worklog record.
+
+## The lesson (recorded in SKILL v1.11.0 + PAD)
+
+**Wire-payload parity is invisible to every census that reads the DOM.** The session-12 form-control census read attributes, placeholders, and classes; the state census read rendered text after interaction; but the JSON body a form POSTs is only observable on the network (devtools/request interception), and no prior instrument captured it — the session-12 INFO registration of `source` was the first glimpse, now a byte-pinned contract on both write paths. And the print census splits the same way into two layers: the **author layer** (the `@media print` rule census — at parity, both zero) and the **rendering layer** (mechanism-driven divergence: the reference's INLINE-style hidden states are media-query-immune, while the clone's class-based reveal responds to Chromium's forced-reduced-motion print pipeline — the a11y addition acquiring a visible-in-print consequence, documented as the accepted divergence rather than replicated).
+
+## Carried / accepted (unchanged + extended)
+
+- `braces` and `deepmerge-ts` advisories — dev-only transitive chains, no upstream fix / not safe to force; documented in `docs/remediation-plan-session-2.md` §4.4 and re-verified in sessions 3–14.
+- The clone's invisible a11y additions, the per-page `document.title`, the login shell's `<body>` overscroll difference, the in-memory rate limiter, the inert Google OAuth, notice-only Forgot-password/Sign-up, the lucide-react alias class token, the og/twitter/PWA head metas, the opacity-modifier oklab serialization (trap 7), the individual-transform properties (trap 8), the variant-ordering conflicts (trap 9), the reveal timing family, and the remaining PAD §10 deferred items — by design, mirroring the reference.
+- **The print-visible stance (session 14's F4):** the clone prints its full content where the reference's fresh-load print shows only the header/footer — the `prefers-reduced-motion` collapse (the clone's a11y addition) firing under Chromium's forced-RM print pipeline. NOT replicated: matching would require removing the RM collapse (degrading screen a11y) or adding print rules the live doesn't have (breaking the F3 parity pin). After a scroll-through both print identically.
+- The owner's `package-lock.json` coexisting with `bun.lock` — documented (Bun remains the sanctioned runtime).
+- The reference's own inconsistencies replicated faithfully: the NY-pointing map embed, the raw-comma ICS text, the favicon's svg-type hint, the inert `duration-s]` token, the dead manifest declaration, the dead `#` article link, the fire-and-forget POST forms, the byte-identical login class strings whose v3 resolution the scoped rules emulate (trap 9) — and now the wire payloads whose snake_case entity schema the clone's API accepts and maps at the boundary.

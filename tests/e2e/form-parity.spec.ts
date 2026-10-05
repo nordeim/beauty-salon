@@ -308,4 +308,76 @@ test.describe("form parity (the control census + the loading/success/failure sta
     // the interception fulfills before the server sees the request).
     await expect(page.locator("main [role=alert]")).toBeVisible({ timeout: 10_000 });
   });
+
+  // ── The wire-payload layer (session 14) ─────────────────────────────────
+  // Session 12 censused the controls and the rendered states; the JSON bodies
+  // the forms POST are only observable on the network, and no prior
+  // instrument captured them. Live-measured 2026-10-06 (agent-browser request
+  // capture on the reference itself — the booking submission route-aborted,
+  // so zero writes landed): the newsletter body is {email, source} and the
+  // booking body is the reference's nine-field snake_case entity schema with
+  // "" for unset optionals and status always "pending". The assertions pin
+  // the RAW postData string (key order included — JSON.stringify preserves
+  // insertion order, the devtools-visible order). Same rule: if this fails,
+  // the code drifted, not the spec.
+
+  test("P1: the newsletter POST body carries the live's source field (wire payload)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const email = `wire-payload-${Date.now()}@maisonluminaire.test`;
+    const [response] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes("/api/newsletter") && r.request().method() === "POST"),
+      page.getByPlaceholder("Your email").fill(email).then(() =>
+        page.getByRole("button", { name: /Claim 15% off/ }).click(),
+      ),
+    ]);
+
+    // Byte-parity with the live's measured body — exactly two fields, email
+    // first, the source attribution second.
+    expect(response.request().postData()).toBe(JSON.stringify({ email, source: "homepage_15off" }));
+
+    // The API accepts the payload (the fire-and-forget UI would mask a 400,
+    // so the acceptance needs its own assertion).
+    expect(response.status()).toBe(201);
+  });
+
+  test("P2: the booking POST body is the live's nine-field snake_case wire schema", async ({
+    page,
+  }) => {
+    await page.goto("/book");
+    const email = `wire-payload-${Date.now()}@maisonluminaire.test`;
+    const [response] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes("/api/appointments") && r.request().method() === "POST"),
+      page
+        .getByLabel(/Full name/i)
+        .fill("Wire Payload")
+        .then(() => page.getByLabel(/Email/i).fill(email))
+        .then(() => page.getByLabel(/Service/i).selectOption("balayage"))
+        .then(() => page.getByLabel(/Preferred date/i).fill("2026-11-14"))
+        .then(() => page.getByLabel(/Preferred time/i).fill("14:30"))
+        .then(() => page.getByRole("button", { name: /Request appointment/ }).click()),
+    ]);
+
+    // Byte-parity with the live's measured entity wire schema: snake_case
+    // field names in the live's exact order, "" (never null) for the unset
+    // phone/stylist/notes, and status always "pending".
+    expect(response.request().postData()).toBe(
+      JSON.stringify({
+        client_name: "Wire Payload",
+        client_email: email,
+        client_phone: "",
+        service_slug: "balayage",
+        stylist_slug: "",
+        requested_date: "2026-11-14",
+        requested_time: "14:30",
+        notes: "",
+        status: "pending",
+      }),
+    );
+
+    // The API accepts the payload (full validation preserved behind the wire
+    // rename — garbage never persists).
+    expect(response.status()).toBe(201);
+  });
 });

@@ -74,6 +74,7 @@ model Appointment {
   date        String // YYYY-MM-DD (preferred date)
   time        String // HH:MM (preferred time)
   notes       String?
+  status      String   @default("pending") // the reference's Booking wire field, persisted
   createdAt   DateTime @default(now())
 
   @@index([createdAt])
@@ -82,6 +83,7 @@ model Appointment {
 model NewsletterSubscriber {
   id        String   @id @default(cuid())
   email     String   @unique
+  source    String? // the reference's wire attribution ("homepage_15off"), persisted
   createdAt DateTime @default(now())
 }
 
