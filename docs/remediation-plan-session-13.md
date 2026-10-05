@@ -124,11 +124,15 @@ One unit test: `2026-12-31T23:30` + the fixed 90-minute block → `DTSTART:20261
 - [x] **T3.** Full gate: `lint → typecheck → unit → build → test:e2e` — every pre-existing spec green. *(Executed: lint ✓ · tsc ✓ · unit 63/63 ✓ · build 27/27 ✓ · e2e **114/114** ✓ — **177 total**; every pre-existing contract untouched.)*
 - [x] **T4.** Live re-verification of every remediated surface + the drawer standing check + the 15 screenshots re-captured. *(Executed: the login inputs' focused shadow value-by-value = the live exact (`rgb(255,255,255) 0 0 0 2px, rgb(148,163,184) 0 0 0 4px` + border); the button's `rgb(9,9,11)` ring + shadow-sm; the drawer standing check all pinned values identical; 15 captures re-taken — the mobile-menu capture 26124B byte-identical (md5-confirmed), 01/08/09/10/12 also byte-identical [09 proves the settled login unchanged — only the focused state changed]; 02 re-captured scrolled to the below-fold CTA + VLM-verified; 13's lightbox DOM-verified (z-70) before capture; 14 VLM-verified.)*
 - [x] **T5.** Documentation aligned (README, AGENTS.md, CLAUDE.md, PAD §1.2 + §5.5 + §7, SKILL v1.10.0, `.env.example` re-verified, the proper `docs/session_13.md`, the worklog entry, this plan's executed results). *(All applied; `.env.example` unchanged — the fixes read no env.)*
-- [ ] **T6.** Secret scan → commit to `main` → push via `docs/ssh_git_wrapper_v3.py` → verify remote == local. *(Pending — see §9.)*
+- [x] **T6.** Secret scan → commit to `main` → push via `docs/ssh_git_wrapper_v3.py` → verify remote == local. *(Executed — see the push evidence in §9.)*
 
 ## 9. Push evidence (session 13)
 
-*(to be completed at T6)*
+- Committed as one atomic commit **`512814e`** to `main` (23 files changed: 2 code + 1 new spec + 2 unit-test extensions + the redaction + 6 docs + the new plan + worklog + 9 re-captured screenshots [01/08/09/10/11/12 byte-identical — skipped by git]); pushed via `docs/ssh_git_wrapper_v3.py` with `--remote git@github.com:nordeim/beauty-salon.git` (the wrapper's default remote is the runbook's task-management origin — the sessions 8–12 note; the paramiko ssh shim from the runbook's Appendix A placed on PATH at `/home/z/my-project/bin/shim/`, outside the repo).
+- Key fingerprint verified before the push: **`SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU`** (the runbook's paramiko method — matches the sessions 1–12 record; the same operator key).
+- Dry-run clean (`dceec22..512814e` fast-forward); real push exit 0 with the wrapper's own remote verification **`refs/heads/main @ 512814e == local HEAD`** + the tracking-ref sync.
+- Independent re-confirmation via `git ls-remote` (shim + key): `512814e538d0bee5001684643c04c85527370482 refs/heads/main` — byte-exact == local HEAD.
+- Change-set secret scan clean pre-commit: the redacted value appears nowhere in the working tree (full-value grep); no tracked env/db/key files beyond `.env.example`; the operator key shredded + removed post-push (the wrapper's temp copy shreds itself on every run).
 
 ## 10. Shipped Artefacts (this remediation)
 
