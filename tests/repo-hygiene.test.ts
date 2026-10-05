@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -88,6 +89,25 @@ function packageReferencedScripts(): string[] {
   return [...refs];
 }
 
+// Tracked-files secret scan (session-13 F1): a real AUTH_SECRET value must
+// never live in a tracked file. The pattern requires a QUOTED value of at
+// least 32 hex chars — `.env.example`'s documented empty default
+// (`AUTH_SECRET=""`) and prose mentions of the variable NAME stay legal;
+// only actual key material trips it. The scan runs over `git ls-files`
+// output (tracked files only — the local `.env` is git-ignored and out of
+// scope by design), excluding the binary-ish and lock file families where
+// hex blobs are expected (images, lockfile integrity hashes).
+const LIVE_AUTH_SECRET = /AUTH_SECRET\s*=\s*["'][0-9a-fA-F]{32,}["']/;
+
+function gitTrackedTextFiles(): string[] {
+  const listed = execSync("git ls-files", { cwd: repoRoot, encoding: "utf8" })
+    .split("\n")
+    .filter(Boolean)
+    // binary + lockfile + font families: not prose, hex blobs expected
+    .filter((f) => !/\.(png|jpg|jpeg|gif|webp|ico|svg|woff2?|ttf|otf|db|tgz|lock)$/.test(f));
+  return listed;
+}
+
 describe("repo hygiene — scaffold relics", () => {
   it("live code never references the retired scaffold models", () => {
     const offenders = scanCodeForRetiredModels();
@@ -112,5 +132,18 @@ describe("repo hygiene — scaffold relics", () => {
       (r) => !existsSync(path.join(repoRoot, "scripts", r)),
     );
     expect(missing).toEqual([]);
+  });
+});
+
+describe("repo hygiene — secrets", () => {
+  it("no tracked file carries a live AUTH_SECRET value", () => {
+    const offenders: string[] = [];
+    for (const file of gitTrackedTextFiles()) {
+      const full = path.join(repoRoot, file);
+      if (!existsSync(full)) continue;
+      const text = readFileSync(full, "utf8");
+      if (LIVE_AUTH_SECRET.test(text)) offenders.push(file);
+    }
+    expect(offenders).toEqual([]);
   });
 });

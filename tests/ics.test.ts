@@ -41,6 +41,16 @@ describe("ICS generation", () => {
     expect(ics).toContain("DTEND:20261022T010000Z");
   });
 
+  it("rolls over the year boundary under the fixed block", () => {
+    // Session-13 hardening pin (the session-12 log's second suggested
+    // candidate): 23:30 on Dec 31 + 90 minutes = 01:00 on Jan 1 of the
+    // NEXT year — the Date.UTC arithmetic already handles it; this pin
+    // makes the contract explicit.
+    const ics = buildIcs({ ...base, date: "2026-12-31", time: "23:30" });
+    expect(ics).toContain("DTSTART:20261231T233000Z");
+    expect(ics).toContain("DTEND:20270101T010000Z");
+  });
+
   it("quotes the client name and service in SUMMARY/DESCRIPTION", () => {
     const ics = buildIcs(base);
     expect(ics).toContain("SUMMARY:Maison Luminaire — balayage");

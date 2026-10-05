@@ -184,6 +184,28 @@ input[type="time"]::-webkit-datetime-edit {
   -webkit-font-smoothing: auto;
 }
 
+/* Auth-shell focus rings (remediation-plan-session-13.md F2/F3, live-measured
+   session 13): the reference's platform shell is a separate TOKEN context —
+   its --background is WHITE (not the brand cream) and its --ring is
+   zinc-950 #09090b (not the brand ink) — so the login surface's
+   ring-offset-background / focus-visible:ring-ring must resolve against the
+   shell's values, not the brand's. And TRAP 9: with the byte-identical input
+   class strings, v4's variant ordering resolves focus-visible:ring-ring OVER
+   focus:ring-slate-400 where the reference's v3 engine resolves the opposite
+   — the live's inputs therefore render a slate-400 ring. The scoped
+   input:focus rule (specificity (0,2,1)) beats both ring-color utilities
+   ((0,2,0)) and pins the live's outcome engine-independently. The only
+   --color-background consumers inside the shell are the two
+   ring-offset-background tokens (verified) — no other surface can shift.
+   Pinned by tests/e2e/focus-parity.spec.ts. */
+.font-shell {
+  --color-ring: #09090b;
+  --color-background: #ffffff;
+}
+.font-shell input:focus {
+  --tw-ring-color: #94a3b8;
+}
+
 @keyframes breathe {
   0%,
   100% {

@@ -2,7 +2,7 @@ $ grep -v '^#' .env
 
 DATABASE_URL="file:../db/custom.db"
 NEXT_PUBLIC_SITE_URL=https://beauty-salon.jesspete.shop
-AUTH_SECRET="4439ce628729a5bf12f4ff7232aae4f1bbed35f78ecb8e86b7b165c29e784b5e"
+AUTH_SECRET="<redacted-session-13 — a real key was pasted here when the log was committed; rotate the deployed instance's secret>"
 
 $ bun install
 [57.39ms] ".env"
