@@ -81,4 +81,45 @@ describe("ICS generation", () => {
     expect(uri.startsWith("data:text/calendar;charset=utf-8,BEGIN%3AVCALENDAR")).toBe(true);
     expect(decodeURIComponent(uri.split(",", 2)[1]!)).toContain("END:VCALENDAR");
   });
+
+  it("carries NO STATUS line (the live-measured census — the reference's download omits it)", () => {
+    // Session-15 census (the session-14 log's suggested candidate): the
+    // reference's Add-to-calendar href, decoded from a booking made on the
+    // live app itself, carries no STATUS field — no CONFIRMED/TENTATIVE/
+    // CANCELLED. An RFC-minded maintainer adding one would break the
+    // byte-parity download; this pin forces that conversation.
+    const ics = buildIcs(base);
+    expect(ics).not.toMatch(/^STATUS:/m);
+  });
+
+  it("carries NO TRANSP line (the live-measured census — the reference's download omits it)", () => {
+    // Same census: no TRANSP:OPAQUE/TRANSPARENT either. The reference
+    // emits the minimal VEVENT it always did.
+    const ics = buildIcs(base);
+    expect(ics).not.toMatch(/^TRANSP:/m);
+  });
+
+  it("matches the live capture's field order exactly (the 13-line census)", () => {
+    // The decoded live capture (session 15): BEGIN:VCALENDAR, VERSION,
+    // PRODID, BEGIN:VEVENT, UID, DTSTAMP, DTSTART, DTEND, SUMMARY,
+    // DESCRIPTION, LOCATION, END:VEVENT, END:VCALENDAR — UID before
+    // DTSTAMP included. The line-KEY sequence pins the order without
+    // pinning the (time-dependent) values.
+    const keys = buildIcs(base).split("\r\n").map((l) => l.split(":")[0]);
+    expect(keys).toEqual([
+      "BEGIN",
+      "VERSION",
+      "PRODID",
+      "BEGIN",
+      "UID",
+      "DTSTAMP",
+      "DTSTART",
+      "DTEND",
+      "SUMMARY",
+      "DESCRIPTION",
+      "LOCATION",
+      "END",
+      "END",
+    ]);
+  });
 });

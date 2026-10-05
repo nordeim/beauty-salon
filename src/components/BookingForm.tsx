@@ -78,7 +78,7 @@ export function BookingForm({
       // anyway — see the comment above.
     }
     const params = new URLSearchParams({ name, date, time, service });
-    router.push(`/book/confirmation?${params.toString()}`);
+    router.push(`/book/confirmation?${params.toString()}`, { scroll: false });
   }
 
   return (

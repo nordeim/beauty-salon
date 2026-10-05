@@ -51,7 +51,7 @@ export function SiteFooter() {
             <ul className="space-y-2 text-sm text-background/80">
               {VISIT_LINKS.map((l) => (
                 <li key={l.href}>
-                  <Link className="hover:text-background transition" href={l.href}>
+                  <Link className="hover:text-background transition" href={l.href} scroll={false}>
                     {l.label}
                   </Link>
                 </li>
@@ -112,7 +112,7 @@ export function SiteFooter() {
           <div>© 2026 Maison Luminaire. Built on Base44.</div>
           <div className="flex gap-8">
             {LEGAL_LINKS.map((l) => (
-              <Link key={l.href} className="hover:text-background" href={l.href}>
+              <Link key={l.href} className="hover:text-background" href={l.href} scroll={false}>
                 {l.label}
               </Link>
             ))}

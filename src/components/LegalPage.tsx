@@ -9,6 +9,7 @@
 //     (sm italic 50% ink) carry the reference's own classes
 import type { LegalBlock, LegalPageData, LegalPBlock, LegalUlBlock } from "@/lib/legal";
 import { cn } from "@/lib/utils";
+import { DeadHashLink } from "@/components/DeadHashLink";
 
 interface Section {
   heading?: string;
@@ -58,9 +59,13 @@ function Paragraph({ block, className }: { block: LegalPBlock; className?: strin
     content = (
       <>
         {before}
-        <a href={link.href} className={link.className}>
-          {link.text}
-        </a>
+        {/* The dead-# link renders through the DeadHashLink island: the
+            reference's SPA router resolves "#" to the current path (no URL
+            change, no history entry, instant scroll to top — live-measured
+            session 15); the browser's default anchor semantics would append
+            "#" and push a history entry. The href ATTRIBUTE stays "#" (the
+            links-parity href census pins it). */}
+        <DeadHashLink text={link.text} className={link.className} />
         {after}
       </>
     );

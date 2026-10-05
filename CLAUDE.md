@@ -72,9 +72,9 @@ bun run db:push && bun run db:seed
 |---|---|
 | `bun run dev` | Dev server :3000 |
 | `bun run lint` / `typecheck` | ESLint 9 flat / tsc |
-| `bun run test` | Vitest unit (63) |
+| `bun run test` | Vitest unit (66) |
 | `bun run build` | Standalone production build (27 routes) |
-| `bun run test:e2e` | Playwright Chromium (119 specs; needs build first) |
+| `bun run test:e2e` | Playwright Chromium (125 specs; needs build first) |
 | `bun run db:push` / `db:seed` | Schema + reference content |
 
 Clean-check order: `lint → typecheck → test → build → test:e2e`.

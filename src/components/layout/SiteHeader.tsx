@@ -55,7 +55,7 @@ export function SiteHeader() {
         )}
       >
         <div className="max-w-[1400px] mx-auto px-3 md:px-6 h-20 flex items-center justify-between">
-          <Link className="font-serif text-xl md:text-2xl" href="/">
+          <Link className="font-serif text-xl md:text-2xl" href="/" scroll={false}>
             Maison Luminaire
           </Link>
 
@@ -65,6 +65,7 @@ export function SiteHeader() {
                 key={item.href}
                 className="relative text-[11px] uppercase tracking-editorial transition-colors text-foreground/60 hover:text-foreground"
                 href={item.href}
+                scroll={false}
               >
                 {item.label}
               </Link>
@@ -75,7 +76,7 @@ export function SiteHeader() {
             <div className="hidden md:inline-flex">
               <StatusPill />
             </div>
-            <Link className="inline-block" href="/book">
+            <Link className="inline-block" href="/book" scroll={false}>
               <span className="inline-flex items-center justify-center rounded-full font-sans uppercase tracking-editorial transition-colors duration-500 select-none text-[10px] px-5 py-2.5 bg-foreground text-background hover:bg-secondary">
                 Book Now
               </span>
@@ -95,7 +96,7 @@ export function SiteHeader() {
       {open && (
         <div className="fixed inset-0 z-[60] bg-background">
           <div className="absolute top-0 inset-x-0 h-20 flex items-center justify-between px-3 md:px-6">
-            <Link className="font-serif text-xl" href="/" onClick={() => setOpen(false)}>
+            <Link className="font-serif text-xl" href="/" scroll={false} onClick={() => setOpen(false)}>
               Maison Luminaire
             </Link>
             <button
@@ -114,6 +115,7 @@ export function SiteHeader() {
                   <Link
                     className="block font-serif text-5xl md:text-7xl tracking-tight hover:italic transition-all"
                     href={item.href}
+                    scroll={false}
                     onClick={() => setOpen(false)}
                   >
                     {item.label}
@@ -121,7 +123,7 @@ export function SiteHeader() {
                 </div>
               ))}
               <div className="mt-10">
-                <Link className="inline-block" href="/book" onClick={() => setOpen(false)}>
+                <Link className="inline-block" href="/book" scroll={false} onClick={() => setOpen(false)}>
                   <span className="inline-flex items-center justify-center rounded-full font-sans uppercase tracking-editorial transition-colors duration-500 select-none text-xs px-9 py-4 bg-foreground text-background hover:bg-secondary">
                     Book an appointment
                   </span>

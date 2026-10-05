@@ -68,7 +68,7 @@ function LoginForm() {
       });
       const body = (await res.json().catch(() => null)) as { error?: string } | null;
       if (!res.ok) throw new Error(body?.error ?? "Invalid email or password");
-      router.push("/");
+      router.push("/", { scroll: false });
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong — please try again.");

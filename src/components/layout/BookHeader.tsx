@@ -9,10 +9,11 @@ export function BookHeader() {
         <Link
           className="text-[11px] uppercase tracking-editorial text-foreground/70 hover:text-foreground transition"
           href="/"
+          scroll={false}
         >
           ← Return to site
         </Link>
-        <Link className="font-serif text-xl" href="/">
+        <Link className="font-serif text-xl" href="/" scroll={false}>
           Maison Luminaire
         </Link>
         <span className="w-24" aria-hidden />

@@ -92,7 +92,7 @@ export default function ContactPage() {
             </div>
 
             <div className="pt-6">
-              <Link className="inline-block" href="/book">
+              <Link className="inline-block" href="/book" scroll={false}>
                 <span className="inline-flex items-center justify-center rounded-full font-sans uppercase tracking-editorial transition-colors duration-500 select-none text-xs px-9 py-4 bg-foreground text-background hover:bg-secondary">
                   Reserve an appointment
                 </span>

@@ -40,7 +40,7 @@ export default async function ServiceDetailPage({
     return (
       <section className="pt-40 px-6 max-w-3xl mx-auto text-center">
         <h1 className="font-serif text-4xl mb-6">Service not found</h1>
-        <Link className="text-[11px] uppercase tracking-editorial underline" href="/services">
+        <Link className="text-[11px] uppercase tracking-editorial underline" href="/services" scroll={false}>
           Return to the almanac
         </Link>
       </section>
@@ -54,6 +54,7 @@ export default async function ServiceDetailPage({
           <Link
             className="inline-flex items-center gap-2 text-[11px] uppercase tracking-editorial text-foreground/60 hover:text-foreground mb-12"
             href="/services"
+            scroll={false}
           >
             <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
             Back to services
@@ -78,7 +79,7 @@ export default async function ServiceDetailPage({
                   {service.durationMin} minutes
                 </div>
                 <div className="mt-8">
-                  <Link className="inline-block w-full" href={`/book?service=${service.slug}`}>
+                  <Link className="inline-block w-full" href={`/book?service=${service.slug}`} scroll={false}>
                     <span className="inline-flex items-center justify-center rounded-full font-sans uppercase tracking-editorial transition-colors duration-500 select-none text-xs px-9 py-4 bg-foreground text-background hover:bg-secondary w-full">
                       Book this treatment
                     </span>
@@ -155,7 +156,7 @@ export default async function ServiceDetailPage({
             Reserve {service.name.toLowerCase()} with the next available stylist.
           </p>
           <div className="mt-10">
-            <Link className="inline-block" href={`/book?service=${service.slug}`}>
+            <Link className="inline-block" href={`/book?service=${service.slug}`} scroll={false}>
               <span className="inline-flex items-center justify-center rounded-full font-sans uppercase tracking-editorial transition-colors duration-500 select-none text-xs px-9 py-4 bg-background text-foreground hover:bg-accent">
                 Book this treatment
               </span>

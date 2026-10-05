@@ -63,6 +63,7 @@ export default async function TeamPage() {
                   <Link
                     className="mt-6 inline-flex items-center justify-between w-full gap-2 group/btn rounded-full border border-foreground/20 px-5 py-3 text-[11px] uppercase tracking-editorial hover:bg-foreground hover:text-background transition-colors duration-500"
                     href={`/book?stylist=${s.slug}`}
+                    scroll={false}
                   >
                     Book with {s.name.split(" ")[0]}
                     <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover/btn:rotate-45" aria-hidden />

@@ -70,6 +70,7 @@ export function ServicesExperience({
               <Link
                 className="group block p-8 md:p-12 hover:bg-accent/30 transition-colors duration-500 h-full"
                 href={`/services/${s.slug}`}
+                scroll={false}
               >
                 <div className="flex items-start justify-between gap-6 mb-8">
                   <div>
@@ -98,7 +99,7 @@ export function ServicesExperience({
             artifact and its settled transform: none (computed-identical
             to default — the session-10 settled-state rule). */}
         <div className="mt-20 text-center">
-          <Link className="inline-block" href="/book">
+          <Link className="inline-block" href="/book" scroll={false}>
             <span className="inline-flex items-center justify-center rounded-full font-sans uppercase tracking-editorial transition-colors duration-500 select-none text-xs px-9 py-4 bg-foreground text-background hover:bg-secondary">
               Book an appointment
             </span>

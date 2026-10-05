@@ -102,7 +102,7 @@ export default async function ConfirmationPage({
                 <Calendar className="h-4 w-4" aria-hidden />
                 Add to calendar
               </a>
-              <Link className="inline-block" href="/">
+              <Link className="inline-block" href="/" scroll={false}>
                 <span className="inline-flex items-center justify-center rounded-full font-sans uppercase tracking-editorial transition-colors duration-500 select-none text-[11px] px-7 py-3.5 bg-transparent text-foreground border border-foreground/30 hover:border-foreground hover:bg-foreground hover:text-background">
                   Return home
                 </span>

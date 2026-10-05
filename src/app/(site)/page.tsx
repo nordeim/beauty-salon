@@ -103,6 +103,7 @@ export default async function LandingPage() {
               <Link
                 className="flex items-center justify-center h-28 w-28 rounded-full bg-foreground text-background text-[10px] uppercase tracking-editorial shadow-2xl hover:scale-105 transition-transform duration-300 text-center leading-tight px-3"
                 href="/book"
+                scroll={false}
               >
                 Book a Treatment
               </Link>
@@ -135,7 +136,7 @@ export default async function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-foreground/10">
             {CATEGORY_CARDS.map((card) => (
               <div key={card.name} className="bg-background">
-                <Link className="group block relative overflow-hidden" href={card.href}>
+                <Link className="group block relative overflow-hidden" href={card.href} scroll={false}>
                   <div className="relative aspect-[4/5] overflow-hidden">
                     {/* `duration-s]` below is the REFERENCE'S OWN corrupted
                         class token (a template-literal artifact — it generates
@@ -203,6 +204,7 @@ export default async function LandingPage() {
             <Link
               className="inline-flex items-center gap-2 text-[11px] uppercase tracking-editorial text-foreground hover:text-secondary transition"
               href="/about"
+              scroll={false}
             >
               Read our full story
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
