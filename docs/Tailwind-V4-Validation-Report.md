@@ -311,3 +311,31 @@ assertions must read the right property per stack. (c) Next 16's dev-origin
 protection silently blocks dev chunks for the `127.0.0.1` origin (unhydrated page,
 native form GET fallbacks) — `allowedDevOrigins: ["127.0.0.1"]` in next.config.ts
 restores both origins.
+
+---
+
+## Appendix: Project Trap Log — Trap 6: The oklch Palette String Serialization (session 5)
+
+**Found by**: the session-5 not-found parity work — the first live measurement of
+the reference's 404 surface (the one interactive surface never measured before;
+see `docs/remediation-plan-session-5.md` F1).
+
+- **v3 (the reference app's compiled CSS):** the default palette is authored in
+  sRGB hex — `.bg-slate-50 { background-color: #f8fafc }` — and Chrome's
+  `getComputedStyle` serializes it as `rgb(248, 250, 252)`.
+- **v4 (this codebase, pre-fix):** the default palette is authored in oklch —
+  `--color-slate-50: oklch(98.4% 0.003 247.858)` — and the computed string
+  serializes as `lab(98.1434 -0.369519 -1.05966)` (or `oklch(…)`), NOT `rgb(…)`.
+
+The rendered pixels are identical (v4's oklch values are the v3 hexes converted;
+lab(98.14…) converts back to rgb(248,250,252)), so nothing is visually wrong —
+but every computed-color parity assertion against a live-measured v3 `rgb()`
+string is non-deterministic. The auth shell (`/login`, `text-slate-*`) had never
+tripped this because its parity spec pins fonts, not colors.
+
+Fix: the same token-pin precedent as trap 2/ADR-005 — pin the slate scale (50–900)
+to the reference's exact sRGB hex in `@theme` (`src/app/globals.css`), keeping the
+reference's class names byte-identical (`bg-slate-50` stays `bg-slate-50`, now
+computing to `rgb(248, 250, 252)`). Pinned by the not-found parity specs
+(`tests/e2e/not-found-parity.spec.ts` — the 404 card's slate colors are asserted
+as exact `rgb()` strings).

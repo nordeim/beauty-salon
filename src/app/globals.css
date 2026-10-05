@@ -50,6 +50,28 @@
   --font-sans: var(--font-mulish), "Mulish", system-ui, sans-serif;
 }
 
+@theme {
+  /* The slate scale — pinned to the reference's exact sRGB values (v3 hex).
+     The auth shell (/login) and the 404 surface run on the reference's
+     slate palette. Tailwind v4's default slate scale is defined in oklch:
+     the rendered pixels match, but the COMPUTED string serializes as
+     lab()/oklch() instead of the reference's rgb() form, so computed-style
+     parity assertions (not-found-parity.spec.ts) cannot be deterministic.
+     Same principle as trap 2 (palette pinned, never defaulted) + trap 3
+     (arbitrary sRGB form for computed parity): pin the values the
+     reference renders, keep the class names the reference's DOM carries. */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172e;
+}
+
 @theme inline {
   /* Trap 5 — v3-geometry shadow-sm (v4 moved the token one notch heavier) */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);

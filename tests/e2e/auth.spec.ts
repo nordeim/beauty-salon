@@ -65,7 +65,13 @@ test.describe("site routes", () => {
     await page.goto("/definitely-not-a-page");
     await expect(page.getByRole("heading", { name: "404", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Page Not Found" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Go Home" })).toHaveAttribute("href", "/");
+    // The reference's Go Home control is a real <button> that navigates
+    // home (live-measured 2026-10-05) — not a link. The full computed-
+    // style contract lives in not-found-parity.spec.ts.
+    const goHome = page.getByRole("button", { name: "Go Home" });
+    await expect(goHome).toBeVisible();
+    await goHome.click();
+    await expect(page).toHaveURL("/");
     await expect(page.getByRole("banner")).toBeVisible();
     await expect(page.getByRole("contentinfo")).toBeVisible();
   });

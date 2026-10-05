@@ -126,3 +126,26 @@ Stage Summary:
 - Gate: lint ✓ · typecheck ✓ · unit 55/55 ✓ · build 27 routes ✓ · e2e 42/42 ✓ (97 total; parity contracts untouched)
 - Live parity: byte-identical on all measured surfaces (drawer, login font chain, landing tokens, services content)
 - Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 8
+Agent: main (Super Z)
+Task: Session 5 — parity audit (the unmeasured 404), trap-6 slate pin, TDD remediation, docs + screenshots refresh, push
+
+Work Log:
+- git pull (remote main @ 36a0f49 + the transcript-style docs/session_5.md); reviewed all root docs + session 1-4 logs + remediation plans + worklog; validated against the codebase (structure, invariants, counts; session-4 diff — site.ts/metadataBase/hygiene+site-url suites — matches the documented design)
+- Environment verified: deps installed, .env correct (DATABASE_URL=file:../db/custom.db), repo db/custom.db seeded 8/3/12/4/1 (ambient absolute DATABASE_URL still injected; wrapper defense holding)
+- Mode C audit: Phase 1 lint+tsc clean; Phase 2 bun audit = the same 2 dev-only advisories (stance re-verified), secret scan clean; Phase 3 run as a targeted lightweight checklist (after the checklist runner destabilized shells in session 4) — noise register unchanged, no new actionable findings; Phase 4 baseline gate green (unit 55/55, build 27/27 pages, e2e 42/42)
+- Live parity verification (widest sweep yet): drawer byte-identical on every pinned value live AND local (fixed z-60 cream, gap 8px, 48px Cormorant -1.2px, CTA mt-10 40px -> 48px gap, no scroll lock, tap closes+navigates); login font chain identical (default sans stack h1/p/label/button; no visible text outside font-shell main); landing tokens identical; nav hrefs identical; NEW content checks: 8/8 services+prices, 3/3 stylists, 12/12 gallery (titles/categories/order), testimonials, status pill, booking form + ?service=slug deep-link preselection — all identical
+- KEY FINDING F1 (MEDIUM, first parity gap since session 3): the 404 surface was never live-measured — clone rendered cream-editorial (giant serif 404, generic message, uppercase pill link); the reference renders a SLATE centered card (bg-slate-50 min-h-screen panel, max-w-md, text-7xl font-light text-slate-300 404 + centered divider, text-2xl slate-800 subtitle, message INTERPOLATING the attempted path, real Go Home <button> white/bordered/rounded-lg). Root cause: session-1 authored the 404 unmeasured + the e2e spec was written against the clone's own DOM (role=link + href) so the gate stayed green
+- Wrote docs/remediation-plan-session-5.md (findings register, root cause, design, plan-vs-codebase validation matrix, TDD ToDo) and validated before executing
+- TDD execution: T1 RED (not-found-parity.spec.ts 3 specs + auth.spec.ts 404 assertions corrected to the live contract — 4 failed exactly as predicted) -> T2 GREEN (NotFoundBody.tsx client island + not-found.tsx rewrite; two discoveries: (a) usePathname returns the static shell's /_not-found, not the attempted URL -> useSyncExternalStore reading window.location with a "" server snapshot = zero hydration mismatch; (b) TRAP 6: bg-slate-50 computes to lab(98.14...) — v4's oklch palette serializes as lab()/oklch(), not the reference's v3 rgb() string (pixels identical, string unstable) -> slate scale 50-900 pinned to the reference's sRGB hex in @theme, the trap-2/ADR-005 token-pin precedent; one test-side fix: divider selector needed a structural form since h-0.5 needs CSS escaping) -> T3 full gate green (lint, tsc, unit 55/55, build 27/27 pages, e2e 45/45 = 100 total)
+- Re-captured all 14 screenshots + new 15-not-found-desktop.png (mobile-menu 26124B byte-identical size to prior verified captures); VLM-verified login + mobile menu + the 404 capture
+- Docs aligned: README (badge 100, 45 e2e), AGENTS.md (six traps + not-found-parity contract + usePathname/static-shell gotcha), CLAUDE.md (counts, six-trap line, components map), PAD (§7 inventory, component tree, session-5 ledger), beauty-salon_SKILL.md v1.3.0 (project_state, quickstart, Appendix B/C), Tailwind-V4-Validation-Report.md (trap-6 appendix), .env.example re-verified truthful; proper docs/session_5.md replaced the transcript
+
+Stage Summary:
+- F1 FIXED: the 404 now renders the reference's slate centered card byte-identically (path-interpolated message, real Go Home button), pinned by tests/e2e/not-found-parity.spec.ts (+3 e2e, 45 total, 100 with unit)
+- TRAP 6 pinned: the slate scale pinned to sRGB hex in @theme — computed-color parity assertions are deterministic; documented in AGENTS/CLAUDE/PAD/SKILL/trap log
+- Gate: lint ✓ · typecheck ✓ · unit 55/55 ✓ · build 27/27 pages ✓ · e2e 45/45 ✓ (all pre-existing parity contracts untouched)
+- Live parity: byte-identical on every measured surface; the 404 was the only gap
+- Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local

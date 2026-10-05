@@ -30,12 +30,13 @@ Order for a clean check: `bun run lint && bun run typecheck && bun run test && b
 
 ## Framework quirks (verified the hard way)
 
-- **Tailwind v4 is CSS-first**: all tokens live in `src/app/globals.css` `@theme`; there is no `tailwind.config.js`. Five v3→v4 engine traps are pinned in this codebase — read `docs/Tailwind-V4-Validation-Report.md` Appendix (Project Trap Log) BEFORE touching `globals.css`, the mobile drawer, or shadows:
+- **Tailwind v4 is CSS-first**: all tokens live in `src/app/globals.css` `@theme`; there is no `tailwind.config.js`. Six v3→v4 engine traps are pinned in this codebase — read `docs/Tailwind-V4-Validation-Report.md` Appendix (Project Trap Log) BEFORE touching `globals.css`, the mobile drawer, or shadows:
   1. `@theme` colors must be FULL `hsl(…)` values — a bare triplet resolves to transparent.
   2. The palette is pinned to the reference's exact HSL — don't "simplify" to v4 defaults (oklch drift).
   3. `bg-gradient-to-*` interpolates in oklab and Chrome reports `lab()` stops — for computed-color parity use the arbitrary `bg-[linear-gradient(…)]` form (see `/login` main).
   4. v4's `space-y` uses `:where()` (zero specificity) — a child's `mt-*` WINS, the opposite of v3. The mobile drawer is `gap-2` + `mt-10` BY DESIGN; do not convert to `space-y-*`.
   5. v4's `shadow-sm` is one notch heavier than v3's — `--shadow-sm` is pinned in `@theme inline`. Also: v4 `rounded-full` computes to `33554400px` (v3: `9999px`), and `border-foreground/5` reports as `color-mix(in oklab, …)` — both fine, don't "fix" them.
+  6. v4's default palette serializes as oklch — a class like `bg-slate-50` computes to `lab(…)`/`oklch(…)`, not the reference's v3 `rgb()` string (pixels identical, string unstable). The slate scale is pinned to the reference's sRGB hex in `@theme` so computed-color parity assertions are deterministic — don't remove that block.
 - **`react-hooks/set-state-in-effect` is enforced**: no sync `setState` inside effect bodies. The sanctioned patterns are in `Reveal.tsx` (state init constant, IO callback flips it) and `StatusPill.tsx` (render-time computation + `suppressHydrationWarning` — the next-themes idiom).
 - **Hydration-sensitive initializers**: `useState(() => typeof IntersectionObserver === …)` evaluates differently on server vs client and produces an attribute-mismatch warning — keep initial state environment-independent.
 - **`next/image` `fill` requires a positioned parent** (`relative`/`absolute`/`fixed`); every `aspect-*` container that holds a fill image must carry `relative`.
@@ -48,6 +49,7 @@ Order for a clean check: `bun run lint && bun run typecheck && bun run test && b
 - E2E specs share ONE seeded SQLite file and run with `workers: 1` — don't add `test.describe.parallel`.
 - `mobile-navigation.spec.ts` is the parity contract: computed-style assertions against values measured on the live reference (gap 8px, mt-10 40px, 48px Cormorant Garamond, 2.64px tracking, exact rgb colors). If a styling change breaks it, the change is wrong, not the spec.
 - `login-parity.spec.ts` is the auth-shell font contract: the whole `/login` surface computes to Tailwind's default sans stack (`font-feature-settings: normal`, `-webkit-font-smoothing: auto`) — the reference's login is a separate CSS context without the brand fonts. Same rule: if it fails, the code drifted, not the spec.
+- `not-found-parity.spec.ts` is the 404 contract: the reference's not-found is a slate centered card (not the cream editorial system) with the attempted path interpolated into the message and a real Go Home `<button>` — measured live, pinned. The path comes from `window.location` via `useSyncExternalStore` (the static `/_not-found` shell makes `usePathname` return the shell path, not the attempted URL). Same rule: if it fails, the code drifted, not the spec.
 - Unit tests import from `vitest` explicitly (no globals); the vitest config matches `*.test.ts` only, so Playwright's `*.spec.ts` files never double-run.
 - A red test is a regression or a wrong test — never skip to pass; never weaken an assertion to ship.
 
