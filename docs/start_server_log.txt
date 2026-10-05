@@ -1,3 +1,9 @@
+$ grep -v '^#' .env
+
+DATABASE_URL="file:../db/custom.db"
+NEXT_PUBLIC_SITE_URL=https://beauty-salon.jesspete.shop
+AUTH_SECRET="4439ce628729a5bf12f4ff7232aae4f1bbed35f78ecb8e86b7b165c29e784b5e"
+
 $ bun install
 [57.39ms] ".env"
 bun install v1.3.14 (0d9b296a)
