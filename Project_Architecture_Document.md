@@ -65,6 +65,14 @@ The reference application is a client-rendered SPA. The clone's defining constra
 - **Consequences:** SQLite caps write concurrency — acceptable for a salon's booking volume; production can swap `provider` + an absolute/Postgres URL without touching the seam.
 - **Alternatives Rejected:** Hardcoded absolute paths (break portability); Postgres-only (adds infra to a demo-scale app).
 
+**ADR-002b: The dev-time DATABASE_URL pinner (`scripts/with-repo-db.ts`)** — added in the session-2 audit (see `docs/remediation-plan-session-2.md` F1)
+
+- **Context:** Standard dotenv precedence (process env beats `.env`) means a sandboxed/managed shell that exports an ambient absolute `DATABASE_URL` pointing outside the repo silently relocates the dev database — observed in the wild: `dev`, `build` SSG, `db:push`, and `db:seed` all read/wrote `<workspace>/db/custom.db` instead of `<repo>/db/custom.db`, while e2e stayed correct only because it pins its env explicitly.
+- **Decision:** The dev-time scripts (`dev`/`build`/`start`/`db:push`/`db:seed`/`db:migrate`/`db:reset`) run through `scripts/with-repo-db.ts`, which resolves the repo `.env` file's `DATABASE_URL` FIRST (`parseDotenvValue` + `devDatabaseUrl`, both pure and unit-tested in `tests/db-path.test.ts`), then spawns the wrapped command with the resolved URL set explicitly in its environment — generalizing the e2e suite's proven explicit-env pattern.
+- **Rationale:** Explicitly-set child env beats ambient noise; the repo `.env` is the documented source of truth for local development, so the fix cannot drift from the configuration users actually edit.
+- **Consequences:** An operator wanting a one-off dev override must edit `.env` (or call the CLI directly) — documented in AGENTS.md. With no `.env` shipped (production), the wrapper is a transparent passthrough: the 12-factor env-var precedence is preserved for the standalone runtime (`src/lib/db.ts` deliberately does NOT use the env-file-first rule — the e2e webServer's explicit `file:../db/e2e.db` relies on process-env precedence).
+- **Alternatives Rejected:** Changing `db.ts` to env-file-first (breaks the e2e contract and production rotation); baking the URL into `next.config.ts` `env` (same conflict); warning-only (silent wrong-DB is worse than a deterministic pin).
+
 **ADR-003: Cookie-session auth with scrypt + HMAC (no auth library)**
 
 - **Context:** The reference login is a base44-hosted surface (Google OAuth + email/password). The clone must offer working sign-in without third-party identity dependencies.
@@ -433,7 +441,7 @@ Public marketing + booking surface (matches the reference — nothing is gated).
 
 | Level | Tool | Count | What it locks |
 |---|---|---|---|
-| Unit | Vitest, `tests/*.test.ts` | 33 | db-path resolution contract; hours model (formats + status per day); ICS builder (envelope, UTC stamps, midnight rollover, RFC 5545 escaping, data-URI); auth primitives (scrypt round-trip/salt/reject, session round-trip/tamper/expiry) |
+| Unit | Vitest, `tests/*.test.ts` | 47 | db-path resolution contract (anchor rules + dotenv parsing + dev-time env-file-first precedence); hours model (formats + status per day); ICS builder (envelope, UTC stamps, midnight rollover, RFC 5545 escaping, data-URI); auth primitives (scrypt round-trip/salt/reject, session round-trip/tamper/expiry) |
 | E2E | Playwright, `tests/e2e/*.spec.ts` | 40 | mobile-navigation computed-style parity (traps), landing structure + carousel rotation + newsletter, booking flow end-to-end (deep links, submission, confirmation, ICS href), gallery (filter counts, lightbox + keyboard), auth (login surface, demo credentials, no-enumeration), route matrix + 404 + service details + team |
 
 E2E runs the **production standalone build** on :3100 against an isolated seeded `db/e2e.db` (global-setup: `db push` + seed), single worker (shared SQLite file), `reuseExistingServer` locally. The gate order — `lint → typecheck → test → build → test:e2e` — is the only CI (no hosted pipelines).

@@ -1,10 +1,12 @@
 import { defineConfig } from "vitest/config";
 import path from "node:path";
 
-// Unit-test layer for the pure domain seams (router, clarify questions,
-// plan sanitizer, check-in mapping, db-path resolution). Browser/E2E
-// coverage lives in tests/e2e/*.spec.ts (Playwright — never picked up by
-// this config, which matches *.test.ts only) plus scripts/smoke-test.sh.
+// Unit-test layer for the pure domain seams of the Maison Luminaire app:
+// SQLite URL resolution (db-path: anchor rules, dotenv parsing, dev-time
+// env-file-first precedence), the opening-hours model + open/closed status
+// logic, the RFC 5545 ICS builder, and the scrypt/HMAC auth primitives.
+// Browser/E2E coverage lives in tests/e2e/*.spec.ts (Playwright — never
+// picked up by this config, which matches *.test.ts only).
 export default defineConfig({
   test: {
     include: ["src/**/*.test.ts", "tests/**/*.test.ts"],

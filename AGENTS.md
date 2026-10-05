@@ -8,13 +8,13 @@ Run from the repo root. **Bun** is the runtime (never `npm`/`pnpm` here).
 
 | Command | What it does |
 |---|---|
-| `bun run dev` | Dev server on :3000 (logs to `dev.log`) |
-| `bun run build` | Production standalone build (`.next/standalone/server.js` + static assets copied in) |
-| `bun run start` | Run the standalone build (`NODE_ENV=production`) |
+| `bun run dev` | Dev server on :3000 (logs to `dev.log`) — via `scripts/with-repo-db.ts`, which pins `DATABASE_URL` to the repo `.env`'s value (see Environment) |
+| `bun run build` | Production standalone build (`.next/standalone/server.js` + static assets copied in); SSG reads run through the same wrapper |
+| `bun run start` | Run the standalone build (`NODE_ENV=production`); with a repo `.env` present it pins the repo DB, without one it is a transparent 12-factor passthrough |
 | `bun run lint` / `bun run typecheck` | ESLint 9 flat / `tsc --noEmit` |
 | `bun run test` | Vitest unit layer (`src/**/*.test.ts`, `tests/*.test.ts`) |
 | `bun run test:e2e` | Playwright e2e — requires a prior `bun run build`; boots the standalone server on :3100 with its own `db/e2e.db` (pushed + seeded by global-setup) |
-| `bun run db:push` / `db:seed` | Prisma schema push / idempotent seed (reference content + demo user) |
+| `bun run db:push` / `db:seed` | Prisma schema push / idempotent seed (reference content + demo user) — wrapped so the DB always lands at `<repo>/db/custom.db` |
 | Single unit test | `bunx vitest run tests/ics.test.ts` |
 | Single e2e spec | `bunx playwright test tests/e2e/mobile-navigation.spec.ts` |
 
@@ -53,6 +53,8 @@ Order for a clean check: `bun run lint && bun run typecheck && bun run test && b
 ## Environment
 
 `.env.example` documents every variable; `AUTH_SECRET` gates production session signing (`openssl rand -hex 32`). SQLite lives at `db/custom.db` (git-ignored); a RELATIVE `file:` URL resolves against `prisma/schema.prisma` for CLI and runtime alike (`src/lib/db-path.ts`, pinned by `tests/db-path.test.ts`).
+
+**Ambient-env trap (verified the hard way):** process env beats `.env` files, and sandboxed shells may export an absolute `DATABASE_URL` pointing OUTSIDE the repo — silently relocating the dev database. The dev-time scripts (`dev`/`build`/`start`/`db:push`/`db:seed`/`db:migrate`/`db:reset`) run through `scripts/with-repo-db.ts`, which resolves the repo `.env`'s `DATABASE_URL` FIRST (`devDatabaseUrl` in `db-path.ts`) and sets it explicitly for the child process. The application runtime (`src/lib/db.ts`) deliberately keeps 12-factor env-var precedence — never "fix" the wrapper by changing it, and never call the Prisma CLI/seed with an ambient env you don't control.
 
 ## Reference
 

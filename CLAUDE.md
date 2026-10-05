@@ -71,7 +71,7 @@ bun run db:push && bun run db:seed
 |---|---|
 | `bun run dev` | Dev server :3000 |
 | `bun run lint` / `typecheck` | ESLint 9 flat / tsc |
-| `bun run test` | Vitest unit (33) |
+| `bun run test` | Vitest unit (47) |
 | `bun run build` | Standalone production build (27 routes) |
 | `bun run test:e2e` | Playwright Chromium (40 specs; needs build first) |
 | `bun run db:push` / `db:seed` | Schema + reference content |
@@ -82,7 +82,7 @@ Clean-check order: `lint → typecheck → test → build → test:e2e`.
 
 | Level | Tool | Location | Notes |
 |---|---|---|---|
-| Unit | Vitest | `tests/*.test.ts` | db-path, hours, ICS, auth (scrypt/HMAC) — pure seams only |
+| Unit | Vitest | `tests/*.test.ts` | db-path (anchors, dotenv parsing, dev-time env-file-first precedence), hours, ICS, auth (scrypt/HMAC) — pure seams only |
 | E2E | Playwright | `tests/e2e/*.spec.ts` | Production standalone server :3100, isolated `db/e2e.db`, `workers: 1` |
 
 - Import `describe/it/expect` from `vitest` explicitly.
@@ -126,7 +126,7 @@ tests/              unit + e2e
 Route handlers only; no REST for UI mutations beyond the documented endpoints. All bodies validated/narrowed server-side. Auth: httpOnly `ml_session` cookie (HMAC `userId.exp.mac`), 7-day TTL, timing-safe compares.
 
 ### Database / Data Layer
-Prisma 6 + SQLite. `DATABASE_URL="file:../db/custom.db"` resolves against `prisma/schema.prisma` for CLI and runtime (db-path seam, unit-tested). Production: absolute path.
+Prisma 6 + SQLite. `DATABASE_URL="file:../db/custom.db"` resolves against `prisma/schema.prisma` for CLI and runtime (db-path seam, unit-tested). The dev-time scripts (`dev`/`build`/`start`/`db:push`/`db:seed`/`db:migrate`/`db:reset`) run through `scripts/with-repo-db.ts`, which prefers the repo `.env`'s value over any ambient `DATABASE_URL` process variable (sandboxed-shell defense; `devDatabaseUrl` in `src/lib/db-path.ts`). Production: absolute path, standard env-var precedence.
 
 ### Environment Variables
 | Variable | Purpose | Example |

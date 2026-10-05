@@ -2,7 +2,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync } from "node:
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { resolveDatabaseUrl, standaloneRepoRoot } from "@/lib/db-path";
+import { devDatabaseUrl, parseDotenvValue, resolveDatabaseUrl, standaloneRepoRoot } from "@/lib/db-path";
 
 // The db-path contract (docs/parity-remediation-v2.3.md WS-1):
 // a RELATIVE `file:` URL resolves against the first "anchor" directory that
@@ -152,5 +152,114 @@ describe("anchor validation", () => {
     } finally {
       rmSync(repo, { recursive: true, force: true });
     }
+  });
+});
+
+// The dev-time resolution contract (docs/remediation-plan-session-2.md F1):
+// sandboxed/managed environments may export an ambient DATABASE_URL whose
+// absolute path points OUTSIDE the repo (platform noise). For the wrapped
+// dev scripts the repo's own .env file is the source of truth, so its
+// DATABASE_URL wins over the ambient process env; the winner then flows
+// through the standard anchor resolution. The app runtime
+// (resolveProcessDatabaseUrl) is NOT affected — production keeps the
+// 12-factor env-var precedence.
+
+describe("parseDotenvValue", () => {
+  it("reads a plain unquoted value", () => {
+    const content = ["# comment", 'DATABASE_URL=file:../db/custom.db', "OTHER=1"].join("\n");
+    expect(parseDotenvValue(content, "DATABASE_URL")).toBe("file:../db/custom.db");
+  });
+
+  it("strips surrounding double quotes", () => {
+    const content = 'DATABASE_URL="file:../db/custom.db"';
+    expect(parseDotenvValue(content, "DATABASE_URL")).toBe("file:../db/custom.db");
+  });
+
+  it("strips surrounding single quotes", () => {
+    const content = "DATABASE_URL='file:../db/custom.db'";
+    expect(parseDotenvValue(content, "DATABASE_URL")).toBe("file:../db/custom.db");
+  });
+
+  it("ignores commented-out lines", () => {
+    const content = ["# DATABASE_URL=file:../db/old.db", "DATABASE_URL=file:../db/new.db"].join("\n");
+    expect(parseDotenvValue(content, "DATABASE_URL")).toBe("file:../db/new.db");
+  });
+
+  it("ignores keys where the name only shares a prefix", () => {
+    const content = "DATABASE_URL_LEGACY=file:../db/legacy.db\nDATABASE_URL=file:../db/real.db";
+    expect(parseDotenvValue(content, "DATABASE_URL")).toBe("file:../db/real.db");
+  });
+
+  it("returns undefined when the key is absent", () => {
+    expect(parseDotenvValue("AUTH_SECRET=abc\n", "DATABASE_URL")).toBeUndefined();
+  });
+
+  it("returns undefined for empty content", () => {
+    expect(parseDotenvValue("", "DATABASE_URL")).toBeUndefined();
+  });
+
+  it("trims whitespace around the value", () => {
+    const content = "DATABASE_URL =  file:../db/custom.db  ";
+    expect(parseDotenvValue(content, "DATABASE_URL")).toBe("file:../db/custom.db");
+  });
+});
+
+describe("devDatabaseUrl (env-file-first precedence for dev scripts)", () => {
+  let repo: string;
+
+  beforeAll(() => {
+    repo = mkdtempSync(path.join(tmpdir(), "dbpath-dev-repo-"));
+    mkdirSync(path.join(repo, "prisma"));
+    writeFileSync(path.join(repo, "prisma", "schema.prisma"), "// x");
+  });
+
+  afterAll(() => {
+    rmSync(repo, { recursive: true, force: true });
+  });
+
+  it("the .env file value wins over an ambient absolute process URL (F1)", () => {
+    // The platform-ambient case: .env says file:../db/custom.db, the process
+    // env carries an absolute URL pointing outside the repo. The dev flows
+    // must land INSIDE the repo.
+    const out = devDatabaseUrl({
+      envFileUrl: "file:../db/custom.db",
+      processUrl: "file:/home/z/my-project/db/custom.db",
+      anchors: [repo],
+    });
+    expect(toPosix(out)).toBe(`file:${toPosix(path.join(repo, "db", "custom.db"))}`);
+  });
+
+  it("falls back to the process env when .env defines no DATABASE_URL", () => {
+    const out = devDatabaseUrl({
+      envFileUrl: undefined,
+      processUrl: "file:../db/e2e.db",
+      anchors: [repo],
+    });
+    expect(toPosix(out)).toBe(`file:${toPosix(path.join(repo, "db", "e2e.db"))}`);
+  });
+
+  it("passes an absolute .env value through untouched (documented prod-style config)", () => {
+    const out = devDatabaseUrl({
+      envFileUrl: "file:/var/data/custom.db",
+      processUrl: "file:/home/z/my-project/db/custom.db",
+      anchors: [repo],
+    });
+    expect(out).toBe("file:/var/data/custom.db");
+  });
+
+  it("passes a postgres .env value through untouched (the swap story)", () => {
+    const pg = "postgresql://user:pass@localhost:5432/app";
+    const out = devDatabaseUrl({ envFileUrl: pg, processUrl: undefined, anchors: [repo] });
+    expect(out).toBe(pg);
+  });
+
+  it("defaults to <repo>/db/custom.db when neither .env nor process env defines it", () => {
+    const out = devDatabaseUrl({ envFileUrl: undefined, processUrl: undefined, anchors: [repo] });
+    expect(toPosix(out)).toBe(`file:${toPosix(path.join(repo, "db", "custom.db"))}`);
+  });
+
+  it("treats a blank .env value as absent (process env fallback)", () => {
+    const out = devDatabaseUrl({ envFileUrl: "  ", processUrl: "file:../db/e2e.db", anchors: [repo] });
+    expect(toPosix(out)).toBe(`file:${toPosix(path.join(repo, "db", "e2e.db"))}`);
   });
 });

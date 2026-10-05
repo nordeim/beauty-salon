@@ -105,3 +105,67 @@ export function candidateRoots(): string[] {
 export function resolveProcessDatabaseUrl(): string {
   return resolveDatabaseUrl(process.env.DATABASE_URL, candidateRoots());
 }
+
+// ---------------------------------------------------------------------------
+// Dev-time resolution (v2.4, remediation-plan-session-2.md F1)
+//
+// Contract (pinned by tests/db-path.test.ts › devDatabaseUrl): sandboxed or
+// managed environments may export an ambient DATABASE_URL whose absolute path
+// points OUTSIDE the repo (platform noise; process env beats .env files under
+// the standard dotenv precedence). The wrapped dev scripts
+// (scripts/with-repo-db.ts → dev/build/start/db:push/db:seed/db:migrate/
+// db:reset) therefore resolve the URL from the repo's OWN .env file first —
+// the documented source of truth for local development — and fall back to the
+// process environment only when the file defines no DATABASE_URL.
+//
+// This rule is deliberately scoped to the dev scripts. The APPLICATION
+// runtime (db.ts → resolveProcessDatabaseUrl) keeps the 12-factor contract —
+// env-var precedence — so production absolute URLs and the e2e suite's
+// explicit `file:../db/e2e.db` override continue to win there.
+// ---------------------------------------------------------------------------
+
+/**
+ * Minimal dotenv reader: return the value of `key` from dotenv `content`,
+ * or undefined when the key is absent or only commented out. Handles
+ * surrounding quotes (single/double), inline whitespace, comment lines,
+ * and exact key matching (a `DATABASE_URL_LEGACY=…` line must not satisfy
+ * a `DATABASE_URL` lookup).
+ */
+export function parseDotenvValue(content: string, key: string): string | undefined {
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+    const eq = line.indexOf("=");
+    if (eq <= 0) continue;
+    const name = line.slice(0, eq).trim();
+    if (name !== key) continue;
+    let value = line.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"') && value.length >= 2) ||
+      (value.startsWith("'") && value.endsWith("'") && value.length >= 2)
+    ) {
+      value = value.slice(1, -1);
+    }
+    return value;
+  }
+  return undefined;
+}
+
+/**
+ * Pure dev-time resolution rule for the wrapped dev scripts.
+ *
+ * Precedence: the repo .env file's DATABASE_URL (`envFileUrl`) wins over the
+ * ambient process environment (`processUrl`); a blank env-file value counts
+ * as absent. The winner then flows through resolveDatabaseUrl (relative URLs
+ * anchor at the repo; absolute and non-SQLite URLs pass through); when both
+ * inputs are absent the documented default <repo>/db/custom.db applies.
+ */
+export function devDatabaseUrl(input: {
+  envFileUrl: string | undefined;
+  processUrl: string | undefined;
+  anchors: string[];
+}): string {
+  const fromFile = input.envFileUrl?.trim() || undefined;
+  const url = fromFile ?? input.processUrl?.trim() ?? undefined;
+  return resolveDatabaseUrl(url, input.anchors);
+}

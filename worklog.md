@@ -58,3 +58,28 @@ Stage Summary:
 - Remote git@github.com:nordeim/beauty-salon.git main @ acb9532 == local HEAD (VERIFIED)
 - Working tree clean; no secrets tracked; 14 screenshots on the remote
 - FINAL STATE: complete, fully functioning, production-ready clone with green gate (lint/typecheck/unit 33/build 27 routes/e2e 40) and byte-parity mobile navigation
+
+---
+Task ID: 4
+Agent: main (Super Z)
+Task: Session 2 — refresh, Mode C audit, live parity re-verification, remediation (DB location F1), screenshots, docs, skill distillation, push
+
+Work Log:
+- git pull: remote added docs/session_1.md + worklog.md (d593089) — pulled clean; reviewed all four root docs + session log; validated against the codebase (structure, configs, counts all consistent)
+- Mode C audit (skills: code-review-and-audit, code-quality-standards, code-review-checklist): Phase 1 lint+tsc clean; Phase 2 bun audit = 2 dev-only transitive advisories (braces via eslint chain, deepmerge-ts via prisma CLI), no secrets tracked; Phase 3 checklist_runner (filtered skills/) = 3 benign findings in playwright.config.ts; Phase 4 baseline gate green (unit 33, build 27 routes, e2e 40/40)
+- KEY FINDING F1: platform re-injects ambient absolute DATABASE_URL=file:/home/z/my-project/db/custom.db into every shell; process env beats .env → dev/db:push/db:seed/build-SSG silently used a database OUTSIDE the repo (unset does not persist). Proven by controlled probes: explicit-env CLI push → repo/db (schema-anchored); ambient-inherited → workspace/db. e2e was immune (explicit env in playwright.config webServer + global-setup)
+- Live-target parity re-verified via agent-browser: login works (redirects to landing surface; GitHub dashboard image still 404), landing tokens identical, mobile drawer computed styles byte-match the pinned contract (fixed inset-0 z-60, rgb(250,248,245), flex column gap 8px, 48px Cormorant, -1.2px, rgb(26,26,26))
+- Wrote docs/remediation-plan-session-2.md (findings register, root cause, design, plan-vs-codebase validation matrix, TDD ToDo) and validated it against the codebase before executing
+- TDD execution: RED (14 failing tests for parseDotenvValue + devDatabaseUrl) → GREEN (db-path seam v2.4, 47/47 unit) → scripts/with-repo-db.ts wrapper + package.json rewiring (dev/build/start/db:push/db:seed/db:migrate/db:reset wrapped; db:generate/lint/typecheck/test/test:e2e untouched)
+- Acceptance: with ambient var present, db:push+db:seed → <repo>/db/custom.db seeded (8/3/12/4/1), workspace/db absent; dev server health {"status":"ok","db":true} + seeded services rendering; full gate re-green (lint, tsc, unit 47, build 27, e2e 40/40)
+- F2: bun update resolved neither advisory; braces override attempted + reverted (no patched upstream — latest 3.0.3); both documented as accepted dev-only risks; bun-update range churn reverted for minimal diff
+- F3: vitest.config.ts stale ORBITAL comment replaced; F4 documented
+- Re-captured all 14 screenshots on the remediated dev server (pixel-verified mobile drawer: full-screen cream + dark serif content; dev log zero warnings)
+- Docs aligned: .env.example (env-precedence note), README (47/87 counts + wrapper paragraph), AGENTS.md (commands + ambient-env trap), CLAUDE.md, PAD (ADR-002b + inventory 47)
+- Distilled beauty-salon_SKILL.md via skills/distill-codebase-skill + to-distill-project-into-skill (six phases; 20 sections + 4 appendices; paths/counts verified)
+
+Stage Summary:
+- F1 FIXED and proven: the database now lives at <repo>/db/custom.db under all flows; production 12-factor contract untouched (ADR-002b)
+- Gate: lint ✓ · typecheck ✓ · unit 47/47 ✓ · build 27 routes ✓ · e2e 40/40 ✓ (mobile-nav parity intact)
+- New deliverables: scripts/with-repo-db.ts, +14 unit tests, docs/remediation-plan-session-2.md, beauty-salon_SKILL.md, refreshed docs/screenshots (14), aligned docs
+- Next: commit + push to main via docs/ssh_git_wrapper_v3.py
