@@ -160,7 +160,11 @@ The live-measured contract (§2 F5) is recorded in the docs; the inert button st
 
 ## 9. Push evidence (session 11)
 
-- Committed as one atomic commit to `main`; pushed via `docs/ssh_git_wrapper_v3.py` with `--remote git@github.com:nordeim/beauty-salon.git` (the wrapper's default remote is the runbook's task-management origin — the session 8–10 note); remote == local verified post-push; operator key shredded.
+- Committed as one atomic commit **`b463d93`** to `main` (24 files changed + 3 new: `src/proxy.ts`, `tests/e2e/links-parity.spec.ts`, this plan); pushed via `docs/ssh_git_wrapper_v3.py` with `--remote git@github.com:nordeim/beauty-salon.git` (the wrapper's default remote is the runbook's task-management origin — the session 8–10 note).
+- Key fingerprint verified before the push: **`SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU`** (the runbook's paramiko method — matches the session 1–10 record; the same operator key).
+- Dry-run clean (`3f00dcc..b463d93` fast-forward); real push exit 0 with the wrapper's own remote verification **`refs/heads/main @ b463d93 == local HEAD`** + the tracking-ref sync.
+- Independent re-confirmation via `git ls-remote` (shim + key): `b463d93a278421ddf49ea2694b94034fb7a69962 refs/heads/main` — byte-exact == local HEAD.
+- Change-set secret scan clean pre-commit: the single `BEGIN OPENSSH PRIVATE KEY` match in the change set is `docs/session_11.md`'s own scan-description prose (the sessions 8–10 documented pattern); no tracked env/db/key files beyond `.env.example`; the operator key shredded + removed post-push (both the wrapper's temp copy and the workspace materialization).
 
 ## 10. Shipped Artefacts (this remediation)
 
