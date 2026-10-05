@@ -50,7 +50,7 @@ A self-hosted clone of the Maison Luminaire beauty-salon experience: an editoria
 
 ### Tailwind CSS v4 (CSS-first)
 - No `tailwind.config.*`. Tokens + `@utility` customs live in `src/app/globals.css`.
-- Read the trap log (`docs/Tailwind-V4-Validation-Report.md`) before touching theme tokens, the mobile drawer, shadows, or gradients. The six traps: full-`hsl()` theme values; pinned palette; oklab gradients (use arbitrary `bg-[linear-gradient(…)]` for computed parity); `space-y` `:where()` rewrite (the drawer is `gap-2` + `mt-10` by design); pinned `--shadow-sm`; the slate scale pinned to sRGB hex (v4's oklch palette serializes as `lab()`/`oklch()`, not the reference's `rgb()` string).
+- Read the trap log (`docs/Tailwind-V4-Validation-Report.md`) before touching theme tokens, the mobile drawer, shadows, or gradients. The seven traps: full-`hsl()` theme values; pinned palette; oklab gradients (use arbitrary `bg-[linear-gradient(…)]` for computed parity); `space-y` `:where()` rewrite (the drawer is `gap-2` + `mt-10` by design); pinned `--shadow-sm`; the slate scale pinned to sRGB hex (v4's oklch palette serializes as `lab()`/`oklch()`, not the reference's `rgb()` string); the opacity modifier emitting `color-mix(in oklab, …)` → `oklab(L a b / α)` where v3 emitted `rgba()` (pixels identical — assert channels, not strings).
 - Class sets mirror the reference DOM (`tracking-editorial`, `glass`, `prism-gradient`, `breathe` are `@utility` definitions).
 
 ### Data Access
@@ -72,9 +72,9 @@ bun run db:push && bun run db:seed
 |---|---|
 | `bun run dev` | Dev server :3000 |
 | `bun run lint` / `typecheck` | ESLint 9 flat / tsc |
-| `bun run test` | Vitest unit (55) |
+| `bun run test` | Vitest unit (60) |
 | `bun run build` | Standalone production build (27 routes) |
-| `bun run test:e2e` | Playwright Chromium (46 specs; needs build first) |
+| `bun run test:e2e` | Playwright Chromium (58 specs; needs build first) |
 | `bun run db:push` / `db:seed` | Schema + reference content |
 
 Clean-check order: `lint → typecheck → test → build → test:e2e`.
@@ -87,7 +87,7 @@ Clean-check order: `lint → typecheck → test → build → test:e2e`.
 | E2E | Playwright | `tests/e2e/*.spec.ts` | Production standalone server :3100, isolated `db/e2e.db`, `workers: 1` |
 
 - Import `describe/it/expect` from `vitest` explicitly.
-- `mobile-navigation.spec.ts` pins the drawer's computed styles, `login-parity.spec.ts` the auth shell's default font stack + slate-900 read-back (`rgb(15, 23, 42)`), and `not-found-parity.spec.ts` the 404's slate centered card (path-interpolated message, Go Home button) — all against live-measured reference values. If any fails, the code drifted, not the spec.
+- `mobile-navigation.spec.ts` pins the drawer's computed styles, `login-parity.spec.ts` the auth shell's default font stack + slate-900 read-back (`rgb(15, 23, 42)`), `not-found-parity.spec.ts` the 404's slate centered card (path-interpolated message, Go Home button), `service-detail-parity.spec.ts` the detail page's first-sentence heading + check-icon prep grid + exclusive-open FAQ accordion + Ready-to-begin CTA, and `legal-parity.spec.ts` the legal structure (accessibility checklist, note variant, mt-3, br coordinator, privacy/terms hoisting) — all against live-measured reference values. If any fails, the code drifted, not the spec.
 - Never skip/weaken a test to pass the gate; fix the cause or flag the debt.
 
 ## Code Quality Standards
@@ -117,9 +117,9 @@ src/app/(site)/     marketing chrome — landing, services(+[slug]), gallery, te
 src/app/book/       scheduler + confirmation (BookHeader chrome)
 src/app/login/      auth card (standalone slate system)
 src/app/api/        health · auth/{login,logout,me} · appointments · newsletter
-src/components/     layout chrome + client islands (LoginForm, BookingForm, NotFoundBody…) + LegalPage
-src/lib/            content (client-safe) · data (server) · auth · ics · hours · db · site
-prisma/             schema + seed (the content source)
+src/components/     layout chrome + client islands (LoginForm, BookingForm, FaqAccordion, NotFoundBody…) + LegalPage
+src/lib/            content (client-safe, incl. firstSentence) · data (server) · auth · ics · hours · db · site · legal (block model)
+prisma/             schema + seed (the content source — services incl. faqs)
 tests/              unit + e2e
 ```
 

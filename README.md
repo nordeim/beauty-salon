@@ -6,7 +6,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![Prisma](https://img.shields.io/badge/Prisma-6-2d3748?logo=prisma)
 ![SQLite](https://img.shields.io/badge/DB-SQLite-003b57?logo=sqlite)
-![Tests](https://img.shields.io/badge/tests-101_passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-118_passing-brightgreen)
 
 A production-grade, self-hosted clone of the **Maison Luminaire** beauty-salon experience — an editorial cream-and-ink marketing site, a Seamless Scheduler booking flow with ICS calendar downloads, and a cookie-session auth surface — rebuilt as a single Next.js application on Prisma/SQLite with byte-parity design tokens.
 
@@ -25,7 +25,7 @@ The reference app is a base44 SPA serving a hair / skin / nails salon brand: a s
 | 🔐 **Cookie-session auth** | scrypt password hashing, HMAC-signed httpOnly sessions, rate limiting, no account enumeration — and the reference auth shell's own font context (Tailwind's default stack, pinned by e2e) |
 | ✉️ **Newsletter capture** | Idempotent upserts into the database |
 | 🚦 **Open/Closed status** | Day-aware "Open today / Closed today" pill with the reference's breathing amber dot |
-| 🧪 **Evidence-backed parity** | 55 unit tests + 46 Playwright e2e specs, including computed-style assertions against live-extracted reference measurements (mobile drawer, login font context + slate-900 read-back, the 404 slate card) |
+| 🧪 **Evidence-backed parity** | 60 unit tests + 58 Playwright e2e specs, including computed-style assertions against live-extracted reference measurements (mobile drawer, login font context + slate-900 read-back, the 404 slate card, the service detail FAQ/CTA surfaces, the legal page structure) |
 
 ## Architecture
 
@@ -36,7 +36,7 @@ The reference app is a base44 SPA serving a hair / skin / nails salon brand: a s
 | Language | TypeScript 5 (strict) | Type-safe data access + DTOs |
 | Styling | Tailwind CSS 4 (CSS-first `@theme`) | Design tokens + `@utility` customs (`tracking-editorial`, `glass`, `prism-gradient`, `breathe`) |
 | Fonts | next/font (Cormorant Garamond, Mulish) | Self-hosted — no external font requests |
-| Database | Prisma 6 + SQLite | Services, stylists, gallery, testimonials, appointments, subscribers, users |
+| Database | Prisma 6 + SQLite | Services (with FAQ accordion data), stylists, gallery, testimonials, appointments, subscribers, users |
 | Tests | Vitest (unit) + Playwright (e2e, Chromium) | `tests/*.test.ts` + `tests/e2e/*.spec.ts` |
 | Runtime | Bun | Install, scripts, seed, standalone server |
 
@@ -93,10 +93,10 @@ curl -s localhost:3000/api/health
 # {"status":"ok","db":true}
 
 bun run lint && bun run typecheck && bun run test
-# eslint clean · tsc clean · 55 tests passed
+# eslint clean · tsc clean · 60 tests passed
 
 bun run build && bun run test:e2e
-# 27 routes built · 46 e2e specs passed
+# 27 routes built · 58 e2e specs passed
 ```
 
 Demo login (seeded): `sepnetflix2023@outlook.com` / `$Abcd1234` (override at seed time with `DEMO_USER_PASSWORD`).
@@ -114,8 +114,8 @@ Demo login (seeded): `sepnetflix2023@outlook.com` / `$Abcd1234` (override at see
 
 | Layer | Command | Scope |
 |-------|---------|-------|
-| Unit | `bun run test` | 55 Vitest tests: db-path resolution (anchor rules, dotenv parsing, dev-time env-file-first precedence), hours model, ICS builder, scrypt/HMAC auth, repo hygiene (retired-model scan + script-reference guards), canonical-origin resolution |
-| E2E | `bun run test:e2e` | 46 Playwright specs: mobile-navigation parity (the Tailwind v4 trap contract), login parity (the auth shell’s default font stack + the slate-900 sRGB read-back), not-found parity (the reference’s slate centered 404 card with the attempted path interpolated), landing, booking, gallery, auth, route matrix, service details, team |
+| Unit | `bun run test` | 60 Vitest tests: db-path resolution (anchor rules, dotenv parsing, dev-time env-file-first precedence), hours model, ICS builder, scrypt/HMAC auth, repo hygiene (retired-model scan + script-reference guards), canonical-origin resolution, the service-detail first-sentence splitter |
+| E2E | `bun run test:e2e` | 58 Playwright specs: mobile-navigation parity (the Tailwind v4 trap contract), login parity (the auth shell’s default font stack + the slate-900 sRGB read-back), not-found parity (the reference’s slate centered 404 card with the attempted path interpolated), service-detail parity (the first-sentence description heading, the check-icon prep grid, the exclusive-open FAQ accordion, the Ready-to-begin CTA), legal parity (the accessibility checklist + note/mt-3/br conventions, the privacy/terms top-level paragraph hoisting), landing, booking, gallery, auth, route matrix, team |
 
 E2E boots the **production standalone server** on port 3100 with its own scratch database (`db/e2e.db`) — run `bun run build` first. A single spec: `bunx playwright test tests/e2e/mobile-navigation.spec.ts`.
 
@@ -141,13 +141,15 @@ E2E boots the **production standalone server** on port 3100 with its own scratch
 
 ## The Tailwind v4 Trap Log
 
-Porting the v3-built reference to v4 reproduced five engine-level differences, all documented with fixes in `docs/Tailwind-V4-Validation-Report.md` and pinned by tests:
+Porting the v3-built reference to v4 reproduced seven engine-level differences, all documented with fixes in `docs/Tailwind-V4-Validation-Report.md` and pinned by tests:
 
 1. **Bare-HSL transparent theme** — `@theme` tokens must be full `hsl()` values (pinned in `globals.css`)
 2. **oklch palette drift** — the reference palette is pinned, not defaulted
 3. **oklab gradient interpolation** — the login wash uses the arbitrary sRGB `bg-[linear-gradient(…)]` form
 4. **`space-y` selector rewrite** — the mobile drawer uses flex `gap-2` + `mt-10`, engine-stable; computed 48px CTA gap asserted by e2e
 5. **`shadow-sm` scale shift** — `--shadow-sm` pinned to the v3 geometry in `@theme inline`
+6. **oklch palette serialization** — the slate scale is pinned to the reference's sRGB hex in `@theme` so computed-color assertions are deterministic (session 5; the slate-900 digit corrected + read-back contract added session 6)
+7. **opacity-modifier serialization** — v4's `/α` modifier emits `color-mix(in oklab, …)`, which Chrome reports as `oklab(L a b / α)` where v3 emitted `rgba(r, g, b, α)` (e.g. `bg-slate-50/50`, `text-foreground/75`); pixels are identical, so the parity specs assert the resolved lightness + alpha channels, not the string (session 7)
 
 ## Deployment
 

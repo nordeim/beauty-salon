@@ -6,9 +6,9 @@ description: >
   single application with byte-parity design tokens, a computed-style parity
   e2e contract, and a hardened dev-time database-pinning layer. Distilled
   from two build/remediation sessions using the six-phase process.
-version: 1.3.1
+version: 1.4.0
 last_updated: "2026-10-05"
-project_state: "55 unit + 46 e2e tests green; 27 routes; db-path seam v2.4 (env-file-first dev pinning); auth-shell font-context parity (font-shell) + slate-900 sRGB read-back (login-parity); not-found parity (slate card, path-interpolated, NotFoundBody island); slate scale pinned to sRGB (trap 6, slate-900 digit corrected session 6 + read-back contract); repo hygiene guard (scaffold relics removed); metadataBase wiring (site.ts)"
+project_state: "60 unit + 58 e2e tests green; 27 routes; db-path seam v2.4 (env-file-first dev pinning); auth-shell font-context parity (font-shell) + slate-900 sRGB read-back (login-parity); not-found parity (slate card, path-interpolated, NotFoundBody island); service-detail parity (first-sentence H2, check-icon prep grid, exclusive-open FaqAccordion, Ready-to-begin CTA, per-service FAQ data in the faqs column); legal parity (LegalBlock model: accessibility checklist + note variant + mt-3 + br coordinator, privacy/terms top-level hoisting); slate scale pinned to sRGB (trap 6, slate-900 digit corrected session 6 + read-back contract); opacity-modifier oklab serialization documented (trap 7 — assert channels, not strings); repo hygiene guard (scaffold relics removed); metadataBase wiring (site.ts)"
 ---
 
 # beauty-salon_SKILL.md — Maison Luminaire Clone
@@ -384,9 +384,9 @@ Debug order discipline: reproduce with the exact command → read `dev.log` → 
 ```bash
 bun run lint          # eslint clean
 bun run typecheck     # tsc clean
-bun run test          # 55 unit tests green
+bun run test          # 60 unit tests green
 bun run build         # 27 routes; standalone emitted
-bun run test:e2e      # 46 specs green (needs the build)
+bun run test:e2e      # 58 specs green (needs the build)
 ```
 
 **Security sweep:** `git ls-files | grep -E '^\.env$|\.db$|\.key$'` → empty; demo credential only in seed/tests (documented, `DEMO_USER_PASSWORD`-overridable); AUTH_SECRET set for prod.
@@ -644,9 +644,10 @@ Full ADRs with alternatives: `Project_Architecture_Document.md` §1.3.
 | ics | `tests/ics.test.ts` | 6 | Envelope, UTC stamps, rollover, escaping, data-URI |
 | repo hygiene | `tests/repo-hygiene.test.ts` | 3 | No retired scaffold-model references in code dirs; doc-referenced scripts exist; package.json-referenced scripts exist |
 | site-url | `tests/site-url.test.ts` | 5 | `siteUrl()` default/blank fallbacks, well-formed pass-through, malformed + non-absolute fallbacks |
-| e2e | `tests/e2e/*.spec.ts` | 46 | Mobile-nav parity (10), login parity (3 — font context, h1 treatment, the slate-900 sRGB read-back), not-found parity (3 — the 404 slate card, path interpolation, Go Home button), landing (10), booking (5), gallery (5), auth (10) |
+| first-sentence | `tests/first-sentence.test.ts` | 5 | The service-detail description-heading splitter (`. ` boundary, no-boundary, trailing-only, empty) |
+| e2e | `tests/e2e/*.spec.ts` | 58 | Mobile-nav parity (10), login parity (3 — font context, h1 treatment, the slate-900 sRGB read-back), not-found parity (3 — the 404 slate card, path interpolation, Go Home button), service-detail parity (6 — first-sentence H2, check-icon prep grid, exclusive-open FAQ accordion, single-item service, Ready-to-begin CTA, seed-correction read-backs), legal parity (6 — accessibility checklist, note/mt-3/br conventions, privacy hoisting, terms hoisting, refund unchanged, text-correction read-backs), landing (10), booking (5), gallery (5), auth (10) |
 
-Total: **101** (55 unit + 46 e2e). Gate: `lint → typecheck → test → build → test:e2e`.
+Total: **118** (60 unit + 58 e2e). Gate: `lint → typecheck → test → build → test:e2e`.
 
 ## Appendix C: Audit History
 
@@ -658,6 +659,7 @@ Total: **101** (55 unit + 46 e2e). Gate: `lint → typecheck → test → build 
 | 2026-10-05 | Session-4 hygiene audit | F1 14 dead pre-clone scaffold scripts in `scripts/` (MEDIUM → removed, `with-repo-db.ts` retained, pinned by `tests/repo-hygiene.test.ts`); F2 `NEXT_PUBLIC_SITE_URL` documented-but-unused (MEDIUM-LOW → wired to `metadataBase` via `src/lib/site.ts`, pinned by `tests/site-url.test.ts`); F3 DEPLOYMENT.md pre-clone remnants — ORBITAL naming, smoke-test reference, sitemap/robots claim (LOW → fixed); F4 advisories carried (stands); live parity re-verified byte-identical (drawer, login font chain, landing tokens, 8/8 services); gate green 55 unit + 42 e2e |
 | 2026-10-05 | Session-5 parity audit | F1 the 404 surface never live-measured — clone rendered cream-editorial, reference renders a slate centered card (MEDIUM → rebuilt: `NotFoundBody.tsx` island, path via `useSyncExternalStore`, real Go Home button, pinned by `not-found-parity.spec.ts` +3 e2e; auth.spec 404 assertions corrected from clone-authored to live contract); F2 session_5.md transcript (LOW → proper log); F3 advisories carried (stands); trap 6 found: v4's oklch palette serializes as `lab()`/`oklch()` — slate scale pinned to sRGB hex; live parity byte-identical on every other surface (drawer, login, landing, 8/8 services, 3/3 stylists, 12/12 gallery, booking, deep links); gate green 55 unit + 45 e2e |
 | 2026-10-05 | Session-6 audit (the session-5 slate pin) | F1 one-digit transcription error in the trap-6 pin — `--color-slate-900` pinned `#0f172e` vs the reference/v3 `#0f172a`; the login h1 + Sign In button rendered `rgb(15, 23, 46)` vs the live `rgb(15, 23, 42)` (MEDIUM → corrected; the missing read-back contract added to `login-parity.spec.ts` +1 e2e — lesson: every pinned value needs a test that reads it back); F2 session_6.md transcript (LOW → proper log); F3 advisories carried (stands); all nine other slate pins verified correct against live values (50/200/400/500/600 measured live; 300/600/700/800 e2e-pinned); live parity byte-identical everywhere else (drawer, login font context, landing, 404 panel end-to-end, contact content); gate green 55 unit + 46 e2e |
+| 2026-10-05 | Session-7 audit (service detail + legal structure) | F1 the service detail pages (8/8) shipped four of the reference's six sections — FAQ + Ready-to-begin missing, description H2 composed instead of the first sentence of longDescription, prep list numbered instead of check-icon rows (MEDIUM → rebuilt: `firstSentence` helper, `FaqAccordion` exclusive-open island, `faqs` JSON column + seed data extracted live, Ready-to-begin dark CTA, check-icon prep grid; pinned by `service-detail-parity.spec.ts` +6 e2e); F2 the legal pages' structure flattened — accessibility's 8-item checklist/note variant/br coordinator/mt-3 and privacy/terms' top-level paragraph hoisting unrepresentable in the old p/h2 model (MEDIUM → `LegalBlock` model + renderer rework, pinned by `legal-parity.spec.ts` +6 e2e); six session-1 transcription errors corrected (3 longDescriptions, 3 legal texts) with read-back contracts; trap 7 found: v4's opacity modifier serializes as `oklab(L a b / α)` where v3 emitted `rgba()` — pixels identical, specs assert resolved channels (also revealed the login input `bg-slate-50/50` had always computed oklab — a session-6 blind spot, documented); F3 advisories carried (stands); live parity: all 8 service pages + all 4 legal pages text-identical both sides; gate green 60 unit + 58 e2e (118 total) |
 
 ## Appendix D: Live-Site Validation Methodology
 

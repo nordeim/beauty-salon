@@ -351,3 +351,40 @@ session 6, and the auth-shell spec now pins both slate-900 surfaces as exact
 **a pin is only as good as its verification; every pinned value needs a test
 that reads it back**, or transcription errors live in the "protected" layer
 itself.
+
+## Appendix: Project Trap Log — Trap 7: The Opacity-Modifier oklab Serialization (session 7)
+
+**Symptom.** Every opacity-modified theme color (`/α` syntax — `text-foreground/75`,
+`text-foreground/50`, `text-foreground/80`, `border-foreground/10`, `bg-slate-50/50`)
+computes to `oklab(L a b / α)` in this app, while the reference's v3 computed the
+same classes to `rgba(r, g, b, α)`:
+
+- clone `bg-slate-50/50` (login input) → `oklab(0.984146 -0.00124145 -0.00314122 / 0.5)`
+- reference `bg-slate-50/50` → `rgba(248, 250, 252, 0.5)`
+
+**Cause.** v4 implements the opacity modifier as `color-mix(in oklab, <color> α%, transparent)`
+(for v3 it was an alpha-composited rgba). The computed value of a `color-mix()` in the
+oklab gamut serializes as an `oklab()` functional string even when the color is a plain
+sRGB value — the tiny chroma components (`0.00000996…`) are the oklab round-trip of a
+pure gray. **The pixels are identical** (the pinned sRGB token round-trips); only the
+computed string differs. Trap 6 pinned the BASE palette in `@theme` — but the modifier
+path still goes through color-mix, so pinning cannot fix the string.
+
+**Scope note.** This is the generalization of the session-1 observation that
+`border-foreground/5` reports as `color-mix(in oklab, …)` (then thought to be an
+isolated quirk). Session 7 also established that the login input's `bg-slate-50/50`
+had ALWAYS computed oklab in the clone — the session-6 log's "input bg identical"
+claim measured pixels, not strings; no spec had pinned it (the session-6 lesson
+repeating).
+
+**Fix stance (documented, accepted — do not "fix" the classes).** The reference's DOM
+carries the modifier syntax, and class parity is the standing rule; rewriting to
+arbitrary values (`text-[rgb(26_26_26_/_0.75)]`) would trade class parity for string
+parity and gain nothing visually. The parity specs therefore assert the RESOLVED
+channels, not the string: `expectInkAlpha(color, α)` (in
+`tests/e2e/service-detail-parity.spec.ts` + `tests/e2e/legal-parity.spec.ts`) parses
+the `oklab(L a b / α)` string, checks the exact alpha, and bounds the lightness
+channel (`#1a1a1a` ≈ L 0.2178 ∈ (0.20, 0.24)) — the mobile-navigation border-width
+precedent, hardened. Unmodified colors keep their exact `rgb()` string assertions
+(trap 6's slate pins are unaffected: `bg-slate-50` without a modifier still computes
+`rgb(248, 250, 252)`).

@@ -168,6 +168,26 @@
   }
 }
 
+/* FAQ accordion open entrance (the reference animates the answer wrapper
+   height 0→auto + opacity 0→1 over ~660ms; keyframes cannot interpolate to
+   auto, so max-height 0→320px stands in — every answer measures <100px, so
+   the ceiling never clips. The wrapper settles at the reference's own
+   inline height:auto/opacity:1; collapsed items render no wrapper at all.) */
+@keyframes faq-open {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 320px;
+    opacity: 1;
+  }
+}
+
+.faq-open {
+  animation: faq-open 0.6s ease both;
+}
+
 /* Scroll-reveal entrance (elements mount hidden; the Reveal component's
    IntersectionObserver swaps in the visible state). */
 .reveal-hidden {

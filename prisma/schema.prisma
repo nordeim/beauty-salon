@@ -24,6 +24,7 @@ model Service {
   priceCents  Int
   durationMin Int
   prep        String // JSON array of "before your visit" items
+  faqs        String @default("[]") // JSON array of { q, a } — the detail page's "Frequently asked." accordion
   image       String
   sortOrder   Int
   createdAt   DateTime @default(now())

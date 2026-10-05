@@ -8,6 +8,11 @@ import { hashPassword } from "../src/lib/auth";
 const db = new PrismaClient();
 
 const json = (v: string[]) => JSON.stringify(v);
+const jsonFaqs = (v: { q: string; a: string }[]) => JSON.stringify(v);
+
+// FAQ content extracted item-by-item from the live reference's accordion
+// (session 7, agent-browser — exclusive-open disclosure, answers revealed
+// by clicking each question in turn).
 
 const services = [
   {
@@ -28,6 +33,11 @@ const services = [
       "Plan for up to 4 hours in the chair",
     ]),
     image: "/images/service-balayage.png",
+    faqs: jsonFaqs([
+      { q: "How long does balayage last?", a: "Depending on home care, most clients return every 10–14 weeks for a refresh." },
+      { q: "Will it damage my hair?", a: "We use bond-building systems throughout the service to preserve integrity and shine." },
+      { q: "Can I do this on dark hair?", a: "Absolutely — we customize lift levels to create dimension on any base tone." },
+    ]),
     sortOrder: 1,
   },
   {
@@ -37,7 +47,7 @@ const services = [
     tagline: "Architecture for your hair.",
     description: "A considered cut built around your bone structure, texture, and daily rituals.",
     longDescription:
-      "Every Precision Cut begins with a 15-minute consultation to understand your lifestyle, styling routine, and the silhouette you want to live in. Includes shampoo, scalp massage, cut, and a signature blow-dry finish.",
+      "Every Precision Cut begins with a 15-minute consultation to understand your lifestyle, styling routine, and the silhouette you want to live in. Includes shampoo, scalp massage, cut, and a signature blow-dry.",
     priceCents: 12000,
     durationMin: 75,
     prep: json([
@@ -46,6 +56,9 @@ const services = [
       "Bring inspiration — we love collaboration",
     ]),
     image: "/images/service-precision-cut.png",
+    faqs: jsonFaqs([
+      { q: "How often should I cut?", a: "We typically recommend every 8–10 weeks for shape retention." },
+    ]),
     sortOrder: 2,
   },
   {
@@ -63,6 +76,9 @@ const services = [
       "Avoid silicone-heavy products 24 hours prior",
     ]),
     image: "/images/service-balayage.png",
+    faqs: jsonFaqs([
+      { q: "Is it a permanent color?", a: "Gloss is semi-permanent and fades gracefully over 4–6 weeks." },
+    ]),
     sortOrder: 3,
   },
   {
@@ -72,7 +88,7 @@ const services = [
     tagline: "Clinical hydration, editorial glow.",
     description: "A multi-step resurfacing treatment that cleanses, extracts, and infuses skin with potent serums.",
     longDescription:
-      "Our signature 60-minute HydraFacial Ritual includes a lymphatic primer, deep cleanse, gentle exfoliation, painless extractions, antioxidant infusion, and a finishing LED therapy. You'll leave with skin that feels completely renewed.",
+      "Our signature 60-minute HydraFacial Ritual includes a lymphatic primer, deep cleanse, gentle exfoliation, painless extractions, antioxidant infusion, and a finishing LED therapy. You'll leave with skin that feels quieter, brighter, and profoundly hydrated.",
     priceCents: 24500,
     durationMin: 60,
     prep: json([
@@ -82,6 +98,11 @@ const services = [
       "Skip exfoliating acids 48 hours prior",
     ]),
     image: "/images/service-hydrafacial.png",
+    faqs: jsonFaqs([
+      { q: "How often should I get a HydraFacial?", a: "Most clients benefit from a treatment every 4 weeks." },
+      { q: "Is there any downtime?", a: "None — your skin will look radiant immediately after." },
+      { q: "Can I wear makeup after?", a: "We recommend waiting 4–6 hours so serums can fully absorb." },
+    ]),
     sortOrder: 4,
   },
   {
@@ -99,6 +120,9 @@ const services = [
       "Let us know about any recent treatments",
     ]),
     image: "/images/category-skin.png",
+    faqs: jsonFaqs([
+      { q: "Is this good for sensitive skin?", a: "Yes — every protocol is adjusted to your skin's tolerance." },
+    ]),
     sortOrder: 5,
   },
   {
@@ -116,6 +140,9 @@ const services = [
       "Bring a reference if you have one",
     ]),
     image: "/images/service-gel-manicure.png",
+    faqs: jsonFaqs([
+      { q: "How long does gel last?", a: "Typically 2–3 weeks with proper home care." },
+    ]),
     sortOrder: 6,
   },
   {
@@ -125,7 +152,7 @@ const services = [
     tagline: "A ritual of renewal from the ground up.",
     description: "An elevated pedicure experience with warm soak, exfoliation, and meticulous polish.",
     longDescription:
-      "Our 75-minute Signature Spa Pedicure begins with a warm herbal foot soak, followed by expert shaping, cuticle care, a revitalizing sugar scrub, and an extended massage with shea butter. Finished with your choice of polish.",
+      "Our 75-minute Signature Spa Pedicure begins with a warm herbal foot soak, followed by expert shaping, cuticle care, a revitalizing sugar scrub, and an extended massage with shea butter. Finished with your choice of classic or gel polish.",
     priceCents: 9500,
     durationMin: 75,
     prep: json([
@@ -134,6 +161,9 @@ const services = [
       "Let us know of any skin sensitivities",
     ]),
     image: "/images/service-signature-pedicure.png",
+    faqs: jsonFaqs([
+      { q: "How long does a pedicure last?", a: "With gel polish, expect 3–4 weeks of flawless wear." },
+    ]),
     sortOrder: 7,
   },
   {
@@ -152,6 +182,9 @@ const services = [
       "Share your dress neckline",
     ]),
     image: "/images/gallery-bridal-chignon.png",
+    faqs: jsonFaqs([
+      { q: "Do you travel?", a: "Yes, on-location services are available with a travel fee." },
+    ]),
     sortOrder: 8,
   },
 ];

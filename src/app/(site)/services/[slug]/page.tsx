@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
+import { FaqAccordion } from "@/components/FaqAccordion";
 import { Reveal } from "@/components/Reveal";
-import { formatPrice, getService, getServices } from "@/lib/data";
+import { firstSentence, formatPrice, getService, getServices } from "@/lib/data";
 
 export async function generateStaticParams() {
   const services = await getServices();
@@ -91,8 +92,10 @@ export default async function ServiceDetailPage({
       <section className="py-28 px-3 md:px-6">
         <div className="max-w-[1000px] mx-auto">
           <Reveal>
+            {/* The reference renders the FIRST SENTENCE of longDescription as
+                this heading (live-measured 8/8) — not a composed name/tagline. */}
             <h2 className="mt-6 font-serif text-4xl md:text-6xl leading-tight text-balance">
-              {service.name} — {service.tagline.replace(/\.$/, "")}.
+              {firstSentence(service.longDescription)}
             </h2>
           </Reveal>
           <Reveal>
@@ -108,21 +111,38 @@ export default async function ServiceDetailPage({
           <Reveal>
             <h2 className="mt-6 font-serif text-4xl md:text-5xl">Before your visit</h2>
           </Reveal>
-          <ul className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+          <ul className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
             {service.prep.map((item, i) => (
-              <Reveal as="li" key={item} className="flex items-start gap-4" delay={i * 60}>
-                <span className="text-[11px] uppercase tracking-editorial text-foreground/50 mt-1">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="text-foreground/75 leading-[1.7]">{item}</span>
+              <Reveal key={item} delay={i * 60}>
+                <li className="flex items-start gap-4 pb-5 border-b border-foreground/10">
+                  <Check aria-hidden className="h-4 w-4 mt-1 text-secondary flex-shrink-0" />
+                  <span className="text-foreground/80 leading-[1.6]">{item}</span>
+                </li>
               </Reveal>
             ))}
           </ul>
-          <div className="mt-16">
+        </div>
+      </section>
+
+      <section className="py-28 px-3 md:px-6">
+        <div className="max-w-[900px] mx-auto">
+          <Reveal>
+            <h2 className="mt-6 font-serif text-4xl md:text-6xl">Frequently asked.</h2>
+          </Reveal>
+          <FaqAccordion items={service.faqs} />
+        </div>
+      </section>
+
+      <section className="py-24 px-3 md:px-6 bg-foreground text-background">
+        <div className="max-w-[900px] mx-auto text-center">
+          <h2 className="font-serif text-5xl md:text-7xl leading-[0.95]">Ready to begin?</h2>
+          <p className="mt-6 text-background/70 max-w-md mx-auto">
+            Reserve {service.name.toLowerCase()} with the next available stylist.
+          </p>
+          <div className="mt-10">
             <Link className="inline-block" href={`/book?service=${service.slug}`}>
-              <span className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background px-8 py-4 text-[11px] uppercase tracking-editorial hover:bg-secondary transition">
+              <span className="inline-flex items-center justify-center rounded-full font-sans uppercase tracking-editorial transition-colors duration-500 select-none text-xs px-9 py-4 bg-background text-foreground hover:bg-accent">
                 Book this treatment
-                <ArrowRight size={14} aria-hidden />
               </span>
             </Link>
           </div>

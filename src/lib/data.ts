@@ -2,10 +2,10 @@
 // Types + formatPrice live in ./content (client-safe); this module owns the
 // Prisma reads and must never be imported from a client component.
 import { db } from "./db";
-import type { ServiceDto, StylistDto, GalleryDto, TestimonialDto } from "./content";
+import type { FaqItem, ServiceDto, StylistDto, GalleryDto, TestimonialDto } from "./content";
 
-export { formatPrice } from "./content";
-export type { ServiceDto, StylistDto, GalleryDto, TestimonialDto } from "./content";
+export { formatPrice, firstSentence } from "./content";
+export type { FaqItem, ServiceDto, StylistDto, GalleryDto, TestimonialDto } from "./content";
 
 export async function getServices(category?: string): Promise<ServiceDto[]> {
   const rows = await db.service.findMany({
@@ -21,6 +21,7 @@ export async function getServices(category?: string): Promise<ServiceDto[]> {
     priceCents: r.priceCents,
     durationMin: r.durationMin,
     prep: safeParse(r.prep),
+    faqs: safeParseFaqs(r.faqs),
     image: r.image,
   }));
   if (!category || category === "all") return mapped;
@@ -66,6 +67,24 @@ function safeParse(json: string): string[] {
   try {
     const v = JSON.parse(json);
     return Array.isArray(v) ? v.map(String) : [];
+  } catch {
+    return [];
+  }
+}
+
+// The FAQ column mirrors the prep pattern (JSON array in a text column);
+// entries are { q, a } objects — anything else is dropped rather than
+// trusted, per the API-body narrowing convention.
+function safeParseFaqs(json: string): FaqItem[] {
+  try {
+    const v: unknown = JSON.parse(json);
+    if (!Array.isArray(v)) return [];
+    return v.flatMap((item): FaqItem[] => {
+      if (typeof item !== "object" || item === null) return [];
+      const { q, a } = item as Record<string, unknown>;
+      if (typeof q !== "string" || typeof a !== "string") return [];
+      return [{ q, a }];
+    });
   } catch {
     return [];
   }
