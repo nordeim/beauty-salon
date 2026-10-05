@@ -109,7 +109,7 @@ Re-capture the dev-server screenshots on the remediated build (the login capture
 - [x] **T4.** Re-capture the dev-server screenshots on the remediated build; VLM-verify the login + mobile-menu captures. *(All 15 captured; mobile-menu 26124B — byte-identical size to the session-2/3/4/5 verified captures; contact also VLM-checked — the "missing hours" was the viewport fold, hours verified identical in the DOM on both sides.)*
 - [x] **T5.** Documentation aligned: trap log correction note, SKILL v1.3.1, README/AGENTS/CLAUDE/PAD counts, `.env.example` re-verified. *(All applied; `.env.example` unchanged — truthful.)*
 - [x] **T6.** Replace `docs/session_6.md` with the proper session log; append the worklog record (Task ID 9); mark this plan's ToDo results. *(Done.)*
-- [ ] **T7.** Secret scan → commit to `main` → push via `docs/ssh_git_wrapper_v3.py` → verify remote == local.
+- [ ] **T7.** Secret scan → commit to `main` → push via `docs/ssh_git_wrapper_v3.py` → verify remote == local. *(Executed: change-set scan clean (no key material, no tracked env/db/key files); committed as one atomic commit `205e437`; fingerprint verified `SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU` (matches the session-1/2/3/4/5 record); dry-run clean (`ca7e0e9..205e437` fast-forward, remote untouched); real push exit 0 with the wrapper's own remote verification `refs/heads/main @ 205e437 == local HEAD` + tracking-ref sync; operator key shredded.)*
 
 ## 7. Acceptance Criteria (definition of done)
 
