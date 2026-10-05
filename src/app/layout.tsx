@@ -29,6 +29,17 @@ export const metadata: Metadata = {
   },
   description:
     "Boost your natural beauty. Hair, skin, and nails — a quiet practice in lower Manhattan. Book your treatment at Maison Luminaire.",
+  // The reference's head declares its favicon (the same logo asset the
+  // clone self-hosts — the type="image/svg+xml" hint is the reference's
+  // own artifact; it serves a PNG) and a manifest link whose target is
+  // DEAD on the reference (the base44 SPA fallback HTML — an invalid
+  // manifest). The clone mirrors both: the link is declared, the target
+  // 404s — functionally identical "no PWA". Do not add a real manifest
+  // file: it would EXCEED the reference (a divergence the other way).
+  // The og:*/twitter:*/PWA metas on the reference are base44 platform
+  // boilerplate — an accepted divergence (documented, session 10).
+  icons: { icon: { url: "/images/logo.png", type: "image/svg+xml" } },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

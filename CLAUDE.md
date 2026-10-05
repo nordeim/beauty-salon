@@ -50,7 +50,7 @@ A self-hosted clone of the Maison Luminaire beauty-salon experience: an editoria
 
 ### Tailwind CSS v4 (CSS-first)
 - No `tailwind.config.*`. Tokens + `@utility` customs live in `src/app/globals.css`.
-- Read the trap log (`docs/Tailwind-V4-Validation-Report.md`) before touching theme tokens, the mobile drawer, shadows, or gradients. The seven traps: full-`hsl()` theme values; pinned palette; oklab gradients (use arbitrary `bg-[linear-gradient(…)]` for computed parity); `space-y` `:where()` rewrite (the drawer is `gap-2` + `mt-10` by design); pinned `--shadow-sm`; the slate scale pinned to sRGB hex (v4's oklch palette serializes as `lab()`/`oklch()`, not the reference's `rgb()` string); the opacity modifier emitting `color-mix(in oklab, …)` → `oklab(L a b / α)` where v3 emitted `rgba()` (pixels identical — assert channels, not strings).
+- Read the trap log (`docs/Tailwind-V4-Validation-Report.md`) before touching theme tokens, the mobile drawer, shadows, gradients, or transform-bearing surfaces. The eight traps: full-`hsl()` theme values; pinned palette; oklab gradients (use arbitrary `bg-[linear-gradient(…)]` for computed parity); `space-y` `:where()` rewrite (the drawer is `gap-2` + `mt-10` by design); pinned `--shadow-sm`; the slate scale pinned to sRGB hex (v4's oklch palette serializes as `lab()`/`oklch()`, not the reference's `rgb()` string); the opacity modifier emitting `color-mix(in oklab, …)` → `oklab(L a b / α)` where v3 emitted `rgba()` (pixels identical — assert channels, not strings); and the individual-transform properties (`scale-*` writes the `scale` property, not `transform` — a v3-era inline `transform: none` does not neutralize it; the hero's settled state needs `scale: none`).
 - Class sets mirror the reference DOM (`tracking-editorial`, `glass`, `prism-gradient`, `breathe` are `@utility` definitions).
 
 ### Data Access
@@ -74,7 +74,7 @@ bun run db:push && bun run db:seed
 | `bun run lint` / `typecheck` | ESLint 9 flat / tsc |
 | `bun run test` | Vitest unit (61) |
 | `bun run build` | Standalone production build (27 routes) |
-| `bun run test:e2e` | Playwright Chromium (70 specs; needs build first) |
+| `bun run test:e2e` | Playwright Chromium (81 specs; needs build first) |
 | `bun run db:push` / `db:seed` | Schema + reference content |
 
 Clean-check order: `lint → typecheck → test → build → test:e2e`.
@@ -87,7 +87,7 @@ Clean-check order: `lint → typecheck → test → build → test:e2e`.
 | E2E | Playwright | `tests/e2e/*.spec.ts` | Production standalone server :3100, isolated `db/e2e.db`, `workers: 1` |
 
 - Import `describe/it/expect` from `vitest` explicitly.
-- `mobile-navigation.spec.ts` pins the drawer's computed styles, `login-parity.spec.ts` the auth shell's default font stack + slate-900 read-back (`rgb(15, 23, 42)`), `not-found-parity.spec.ts` the 404's slate centered card (path-interpolated message, Go Home button), `service-detail-parity.spec.ts` the detail page's first-sentence heading + check-icon prep grid + exclusive-open FAQ accordion + Ready-to-begin CTA, `legal-parity.spec.ts` the legal structure (accessibility checklist, note variant, mt-3, br coordinator, privacy/terms hoisting), `booking-parity.spec.ts` the booking form's nested-grid structure + Notes placeholder + Calendar icon + the decoded-ICS fixed 90-minute block, and `icon-parity.spec.ts` the lucide icon layer on every route (class sizing — never `size` props, the sage stars, hover-rotate arrows, footer/Reach-us/MapPin/login icon sets, no eye toggle) — all against live-measured reference values. If any fails, the code drifted, not the spec.
+- `mobile-navigation.spec.ts` pins the drawer's computed styles, `login-parity.spec.ts` the auth shell's default font stack + slate-900 read-back (`rgb(15, 23, 42)`), `not-found-parity.spec.ts` the 404's slate centered card (path-interpolated message, Go Home button), `service-detail-parity.spec.ts` the detail page's first-sentence heading + check-icon prep grid + exclusive-open FAQ accordion + Ready-to-begin CTA, `legal-parity.spec.ts` the legal structure (accessibility checklist, note variant, mt-3, br coordinator, privacy/terms hoisting), `booking-parity.spec.ts` the booking form's nested-grid structure + Notes placeholder + Calendar icon + the decoded-ICS fixed 90-minute block, `icon-parity.spec.ts` the lucide icon layer on every route (class sizing — never `size` props, the sage stars, hover-rotate arrows, footer/Reach-us/MapPin/login icon sets, no eye toggle), `confirmation-parity.spec.ts` the confirmation route (the flower2 watermark at responsive class sizing + stroke 0.5, the invisible decorative ring, the /contact policy link with its trailing arrow), `head-parity.spec.ts` the head layer (the declared favicon + the declared-but-dead manifest link), and the landing.spec.ts session-10 contracts the hero's settled proportion (the scale-125 class neutralized — the v4 individual-scale trap — with the img at 1.08) + the category images' computed 150ms default-ease hover zoom — all against live-measured reference values. If any fails, the code drifted, not the spec.
 - Never skip/weaken a test to pass the gate; fix the cause or flag the debt.
 
 ## Code Quality Standards

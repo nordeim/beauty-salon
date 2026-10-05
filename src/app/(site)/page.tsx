@@ -70,7 +70,24 @@ export default async function LandingPage() {
             </h1>
           </div>
           <div className="md:col-span-5 relative">
-            <div className="relative aspect-[3/4] overflow-hidden scale-125 origin-center">
+            {/* The reference's animation framework neutralizes the scale-125
+                class at settle (inline transform: none — live-measured
+                session 10: the box renders at its layout size 457×610
+                @1280 / 366×488 @390) while the IMG itself settles at
+                scale(1.08), cropped by the overflow-hidden. The settled
+                inline styles below replicate that rest state; the class
+                attribute keeps scale-125 (the reference's DOM carries it
+                too). TRAP 8 (session 10): v4's scale-125 writes the
+                INDIVIDUAL `scale` property, not `transform` — so
+                replicating the reference's inline `transform: none` alone
+                would NOT neutralize it (the box would stay 25% too
+                large). `scale: "none"` is the v4-side neutralization; the
+                other two properties replicate the reference's settled
+                string verbatim. Do not remove either. */}
+            <div
+              className="relative aspect-[3/4] overflow-hidden scale-125 origin-center"
+              style={{ opacity: 1, filter: "blur(0px)", transform: "none", scale: "none" }}
+            >
               <Image
                 src="/images/hero-portrait.png"
                 alt="Luminous portrait"
@@ -78,6 +95,7 @@ export default async function LandingPage() {
                 priority
                 sizes="(max-width: 768px) 100vw, 40vw"
                 className="object-cover"
+                style={{ transform: "scale(1.08)" }}
               />
               <div className="absolute inset-0 ring-1 ring-inset ring-foreground/5" aria-hidden />
             </div>
@@ -119,12 +137,20 @@ export default async function LandingPage() {
               <div key={card.name} className="bg-background">
                 <Link className="group block relative overflow-hidden" href={card.href}>
                   <div className="relative aspect-[4/5] overflow-hidden">
+                    {/* `duration-s]` below is the REFERENCE'S OWN corrupted
+                        class token (a template-literal artifact — it generates
+                        no CSS in the base44 build), so transition-transform's
+                        built-in default stands: 150ms + the default ease curve
+                        (live-measured session 10). The dead-on-live ease-[…]
+                        sibling token is dropped — it WOULD generate in the
+                        clone's v4 build and change the computed timing.
+                        Do not "fix" duration-s] to duration-700. */}
                     <Image
                       src={card.image}
                       alt={card.alt}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
+                      className="object-cover transition-transform duration-s] group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                   </div>

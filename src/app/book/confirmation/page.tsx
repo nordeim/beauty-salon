@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Calendar, CalendarPlus } from "lucide-react";
+import { ArrowRight, Calendar, Flower2 } from "lucide-react";
 import { BookHeader } from "@/components/layout/BookHeader";
 import { buildIcs, icsDataUri } from "@/lib/ics";
 
@@ -48,14 +48,21 @@ export default async function ConfirmationPage({
       <BookHeader />
       <main className="flex-1">
         <section className="min-h-screen pt-28 pb-20 prism-gradient relative overflow-hidden">
+          {/* The reference's decorative watermark — lucide flower2, class-sized
+              (responsive 256/384px) with stroke-width 0.5, settling at sage/30.
+              The settled inline styles on the circle below replicate the
+              reference's animation-framework rest state (live-measured,
+              session 10): the ring is INVISIBLE at rest (opacity 0 — only a
+              wasted scale loop runs beneath it on the reference). */}
           <div
             className="absolute top-28 left-1/2 -translate-x-1/2 text-secondary/30"
             aria-hidden
           >
-            <CalendarPlus size={96} strokeWidth={0.75} />
+            <Flower2 strokeWidth={0.5} className="h-64 w-64 md:h-96 md:w-96" />
           </div>
           <div
             className="absolute top-28 left-1/2 -translate-x-1/2 h-64 w-64 md:h-96 md:w-96 rounded-full border border-secondary/30"
+            style={{ opacity: 0 }}
             aria-hidden
           />
 
@@ -110,11 +117,15 @@ export default async function ConfirmationPage({
                 We kindly ask for at least 24 hours&apos; notice for cancellations or
                 rescheduling. Late cancellations may be subject to a 50% service fee, and no-shows
                 will be charged in full. You can reach us at{" "}
+                {/* The reference's policy link is a ROUTE link to /contact —
+                    not a mailto — with the trailing arrow-right at h-3 w-3
+                    (live-measured session 10). */}
                 <a
-                  href="mailto:concierge@maisonluminaire.com"
-                  className="underline underline-offset-4 hover:text-foreground"
+                  href="/contact"
+                  className="underline hover:text-foreground inline-flex items-center gap-1"
                 >
-                  concierge@maisonluminaire.com
+                  concierge@maisonluminaire.com{" "}
+                  <ArrowRight className="h-3 w-3" aria-hidden />
                 </a>
               </p>
             </div>
