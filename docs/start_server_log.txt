@@ -5,10 +5,12 @@ NEXT_PUBLIC_SITE_URL=https://beauty-salon.jesspete.shop
 AUTH_SECRET="<redacted-session-13 — a real key was pasted here when the log was committed; rotate the deployed instance's secret>"
 
 $ bun install
-[57.39ms] ".env"
+[0.07ms] ".env"
 bun install v1.3.14 (0d9b296a)
 
-24 packages installed [7.51s]
+Checked 482 installs across 576 packages (no changes) [7.79s]
+
+$ rm -rf db/custom.db .next/
 
 $ bun run db:push
 $ bun scripts/with-repo-db.ts prisma db push --accept-data-loss
@@ -18,14 +20,19 @@ Datasource "db": SQLite database "custom.db" at "file:/Home1/project/beauty-salo
 
 SQLite database custom.db created at file:/Home1/project/beauty-salon/db/custom.db
 
-🚀  Your database is now in sync with your Prisma schema. Done in 1.77s
+🚀  Your database is now in sync with your Prisma schema. Done in 1.92s
 
-✔ Generated Prisma Client (v6.19.3) to ./node_modules/@prisma/client in 354ms
-
-
-$ ls -l db/
-total 84
--rw-r--r-- 1 pete pete 81920 Oct  5 22:39 custom.db
+✔ Generated Prisma Client (v6.19.3) to ./node_modules/@prisma/client in 728ms
+┌─────────────────────────────────────────────────────────┐
+│  Update available 6.19.3 -> 8.0.0-rc.19                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
 
 $ bun run db:seed
 $ bun scripts/with-repo-db.ts bun prisma/seed.ts
@@ -39,21 +46,21 @@ $ bun scripts/with-repo-db.ts bun prisma/seed.ts
 
 $ ls -l db/
 total 92
--rw-r--r-- 1 pete pete 90112 Oct  5 22:39 custom.db
+-rw-r--r-- 1 pete pete 90112 Oct  6 05:37 custom.db
 
 $ bun run build
 $ bun scripts/with-repo-db.ts next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/
 ▲ Next.js 16.3.8 (Turbopack)
 - Environments: .env
-✓ Running next.config.ts took 39ms
+✓ Running next.config.ts took 175ms
 
   Creating an optimized production build ...
-✓ Compiled successfully in 7.9s
+✓ Compiled successfully in 36.1s
   Skipping validation of types
-✓ Finished TypeScript config validation in 5ms    
-✓ Collecting page data using 3 workers in 732ms    
-✓ Generating static pages using 3 workers (27/27) in 1127ms
-✓ Finalizing page optimization in 3.8s    
+✓ Finished TypeScript config validation in 112ms    
+✓ Collecting page data using 3 workers in 4.3s    
+✓ Generating static pages using 3 workers (27/27) in 649ms
+✓ Finalizing page optimization in 4.5s    
 
 Route (app)
 ┌ ○ /
@@ -89,12 +96,11 @@ Route (app)
 ●  (SSG)      prerendered as static HTML (uses generateStaticParams)
 ƒ  (Dynamic)  server-rendered on demand
 
-
 $ bun run start
 $ NODE_ENV=production bun scripts/with-repo-db.ts bun .next/standalone/server.js 2>&1 | tee server.log
 ▲ Next.js 16.3.8
 - Local:         http://localhost:3000
 - Network:       http://0.0.0.0:3000
 ✓ Ready in 0ms
-✓ Running next.config took 4ms
+✓ Running next.config took 18ms
 
