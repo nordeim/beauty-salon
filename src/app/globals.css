@@ -75,6 +75,19 @@
   --color-slate-700: #334155;
   --color-slate-800: #1e293b;
   --color-slate-900: #0f172a;
+
+  /* The reds the reference's login error card uses — pinned to its exact
+     sRGB values (v3 hex) for the same trap-6 reason as the slate scale
+     above: the reference's platform shell computes bg-red-50/70 as
+     rgba(254, 242, 242, 0.7), border-red-200 as rgb(254, 202, 202), and
+     text-red-700 as rgb(185, 28, 28) — v4's default oklch reds would
+     serialize differently. The /70 modifier serializes as oklab channels
+     on the clone (trap 7 — pixels identical; form-parity.spec.ts asserts
+     the resolved lightness + alpha). Read-back contract: the F6 group in
+     tests/e2e/form-parity.spec.ts. */
+  --color-red-50: #fef2f2;
+  --color-red-200: #fecaca;
+  --color-red-700: #b91c1c;
 }
 
 @theme inline {
@@ -111,6 +124,21 @@
     font-family: var(--font-serif);
     letter-spacing: -0.01em;
   }
+}
+
+/* The reference's date/time inputs render 2px taller than their text
+   siblings (content box = line-height + 2px → 48px vs 46px at the booking
+   form's metrics). Live-measured session 12; the mechanism is
+   unattributable — no author CSS on the reference's single stylesheet, no
+   font dependency, no transform/zoom, and a fresh all:initial date input
+   reproduces it on the reference's page but not on the clone's (same
+   browser session). This padding on the UA's inner editor replicates the
+   exact heights while keeping min-height 0px (intrinsic behavior
+   preserved: lh 18 → 46, lh 22 → 50, matching the reference's curve).
+   Pinned by the F2 group in tests/e2e/form-parity.spec.ts. */
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit {
+  padding: 1px 0;
 }
 
 /* ============================================================================

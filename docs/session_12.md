@@ -1,114 +1,64 @@
-I'll start by checking the current workspace state, then refresh via git pull as instructed.
-The workspace exists. Let me refresh it with git pull and check the current state.
-Workspace refreshed — session 10 work was completed and pushed, and `docs/session_11.md` just came in. Let me set up my task list and review the key documents.
-Session 10 is complete and pushed. `docs/session_11.md` currently holds session-10's raw transcript (to be replaced with a proper session-11 record per convention). Let me review the remediation plan and worklog.
-Now let me refresh the core docs — checking versions and key sections (they were aligned in session 10).
-AGENTS.md aligned with session-10 state. Let me check CLAUDE.md, PAD session ledger, and SKILL.md project state.
-All docs aligned with session-10 state (v1.7.0, 142 total tests). Now let me validate against the codebase — the session-10 diff and key invariants.
-Environment intact. Let me verify the session-10 code invariants in the source files.
-All session-10 invariants verified in code. Now let me check the skills catalog for the audit tooling, and run the baseline gates.
-Now let me run the Mode C audit baseline — Phase 1 (lint + typecheck) and Phase 2 (security) in parallel.
-Phase 2 clean (same 2 accepted advisories; secret-scan matches all documented). Now Phase 3 (lightweight checklist) and Phase 4 (unit tests).
-Unit 61/61 ✓. Now the production build and full e2e suite.
-Build ✓ 27/27. Now the full e2e suite (81 expected).
-**Baseline fully green** — lint ✓ · tsc ✓ · unit 61/61 · build 27/27 · e2e 81/81 (142 total), matching the documented state exactly. Let me update progress and load agent-browser for the live parity work.
-agent-browser loaded. Let me start the dev server and open the live reference in parallel.
-A server already responds on :3000 (likely a prior session's daemon — the new instance hit EADDRINUSE). Let me verify it serves the current build.
-A stale dev server from before the session-10 commit is still running. Let me restart it fresh to eliminate any stale HMR state.
-Fresh dev server running. Now let me open the live reference and log in with the task credentials.
-Logged in — redirects to `/` (consistent). Now the session-11 deep sweep: **the links/redirect census** (session-10's suggested candidate). Let me extract every `<a href>` from the live landing page first.
-Live links extracted — note `/refund` in the legal footer. Now the local side.
-**Landing links: IDENTICAL both sides** (33/33). Let me sweep the remaining routes systematically.
-The diff reveals a real finding: the live `/services` has an **extra `/book` link** (28 links vs 27). Let me verify this directly.
-The live `/services` has a **`BOOK AN APPOINTMENT` CTA section** (`mt-20 text-center`) that the local page lacks entirely. Let me extract its full structure.
-Now let me check the local `/services` page bottom structure.
-**Finding F1: the local `/services` grid page is missing the `BOOK AN APPOINTMENT` CTA** entirely. Let me continue the census across all remaining routes.
-**Finding on `/accessibility`: the live has an extra `#` link.** Let me inspect it.
-**Finding F2: the accessibility page's article title is a dead `#` link on the live** (class `underline hover:text-foreground`), plain text locally. Continuing the census — service detail + confirmation.
-The confirmation "divergence" is only the per-load UID/DTSTAMP timestamps — the ICS contract holds. Let me complete the census with the remaining 7 service detail pages.
-All routes censused. **Two findings: F1 (missing services CTA) + F2 (accessibility `#` link).** Let me extract the exact live HTML contracts for both.
-The fix location is clear. Now let me extract the exact live HTML for F2 (the accessibility link).
-I have both fix contracts. Now the second suggested candidate — **the login OAuth surface behavior** on the live reference.
-**The live's Google button works** — it navigates to Google OAuth via base44's platform (`client_id=185178814199-...`, `redirect_uri=https://app.base44.com/api/apps/auth/callback`, state carrying the reference's own domain + app_id). Let me check what the clone's button does.
-The clone's button is inert (documented stance — now with the live contract measured precisely). Now the standing **mobile drawer check** @390×844 on both sides.
-The drawer was found (cream z-60 ✓) but I measured the wrong link element. Let me target the giant link list precisely.
-Live drawer contract holds. Now the local side.
-Drawer identical both sides. Quick tap-through check (close + navigate).
-The eval-click was intercepted. Let me use the proper agent-browser click flow.
-Tap-through verified. Let me also diff the full `/services` innerText to check for any content beyond the missing CTA link.
-The 20-char delta = exactly the missing CTA text ("BOOK AN APPOINTMENT" + newline). Let me complete the redirect half of the census — trailing slashes and unknown paths.
-`/nonexistent-page` and `/SERVICES` return 200 on live (SPA fallback) vs 404 locally. Let me check what the live actually RENDERS on those paths.
-The live SPA router is **case-insensitive** (`/SERVICES` renders the services page, URL preserved) while the clone 404s. Let me verify the extent of this behavior.
-The live matches routes case-insensitively on ALL routes (URL preserved, title derived from the raw path — `startCase(pathSegment)`). Let me check how the accepted-divergence register documents the SPA-vs-SSR routing differences.
-The divergence register documents SPA-substrate differences. Before deciding scope, let me verify the case-insensitivity extends to detail pages and deep paths.
-Key nuance: `/SERVICES/BALAYAGE` renders an in-page **"Service not found"** state (route matched case-insensitively, but the slug lookup is case-sensitive). Let me check how both sides handle unknown slugs — lowercase too.
-**Finding F3: the live has a dedicated "Service not found" state** for unknown slugs (h1 "Service not found" + "RETURN TO THE ALMANAC" link) vs the clone's generic 404. Let me extract the full contract.
-I grabbed the wrong element — the page seems to have transitioned. Let me re-examine the current state carefully.
-My session was pointing at the local page. Let me redo the live extraction properly.
-The live contract is clear: a dedicated "Service not found" section in the site chrome. Let me read the clone's detail page handling.
-The detail page calls `notFound()` (line 33) — the fix site is clear. Let me probe a few more edge paths to complete the routing-behavior census.
-All edge behavior mapped. Before writing the plan, let me check which existing specs touch the surfaces I'll change (unknown-slug 404s, services page, legal pages).
-No conflicts with existing specs. Let me check the current middleware/config state before designing the fix.
-Let me review the spec conventions from a recent parity spec, then write the remediation plan.
-Conventions clear. Now let me write the session-11 remediation plan.
-Plan saved. Now **T1 (RED)** — writing the new spec. Let me check the legal-parity spec's conventions first.
-Spec written. Let me verify the confirmation h1 text before the RED run.
-Now the **RED run** — the new spec against the pre-fix build (the standalone server from the baseline build is what test:e2e boots).
-10 actionable tests RED as predicted. But two guards failed that should have passed — let me inspect them (spec-side issues).
-The gallery has 20 links (tiles are buttons, not links) and the 404 page includes its own footer. Fixing both guards.
-**RED confirmed: 8 failed (all actionable) + 3 guards green** — exactly as the plan predicted. Now **T2 (GREEN)** — applying the fixes. F1 first:
-F2 — the legal link model + renderer:
-Now the `Paragraph` renderer in LegalPage.tsx:
-F3 — the service detail page's "Service not found" state:
-Now **T3** — the middleware (F4):
-All four fixes applied. Early verification — lint + typecheck:
-Clean. Rebuild + run the new spec (GREEN check):
-10/11 green — only the trailing-slash test fails. Let me debug what the server does with `/services/balayage/`.
-Two findings: the 308 happens **before** middleware (needs `skipTrailingSlashRedirect`), and **Next 16 deprecates `middleware` in favor of `proxy`**. Fixing both:
-**GREEN — 11/11.** Now **T4** — the full gate with the complete e2e suite.
-**FULL GATE GREEN — lint ✓ · tsc ✓ · unit 61/61 · build 27/27 · e2e 92/92 (153 total)**, all pre-existing contracts untouched. Now **T5** — live re-verification. Restarting dev (config change needs it):
-Routing fixes live. Now the value-by-value verification of the content fixes against the live-measured contracts.
-CTA verified value-by-value (innerText 1942 = live exact). Now the accessibility link + the service-not-found state:
-Both match the live contracts exactly (the color oklab serialization is the documented trap-7 family). Final routing matrix on local:
-All routing matches the live behavior. Now the screenshot re-capture — checking the existing canonical set first.
-All 15 captured — mobile-menu 26124B byte-identical signal holds. But some untouched surfaces changed size notably; let me verify the capture dimensions are the canonical ones.
-Dimensions are canonical (1280×900 / 390×844). Let me VLM-verify the key captures render correctly.
-The CTA is below the fold in a 900px viewport (the 8-service grid fills it). Let me re-capture 02 scrolled to the CTA to document the remediation visually.
-The VLM hallucinated HTML (the known session-7/10 failure mode). Discarding that pass — re-prompting with a constrained question.
-CTA confirmed in the capture. Let me verify the other size-delta captures (04, 06, 14) with constrained prompts.
-All captures verified — **T5 complete**. Now **T6** — documentation alignment. Starting with README:
-README aligned. Now AGENTS.md — the new invariants + contract lines:
-Let me add the proxy-deprecation quirk to the Framework quirks list:
-Now CLAUDE.md — counts + parity list:
-Now the PAD — §7 inventory + session-11 ledger:
-PAD aligned. Now `beauty-salon_SKILL.md` → v1.8.0:
-Now Appendix B (the e2e inventory row) and Appendix C (the session-11 audit-history row):
-Now Appendix C — the session-11 audit-history row:
-SKILL.md v1.8.0 aligned. Verify `.env.example` truthfulness (no env-relevant change this session):
-`.env.example` truthful. Now the proper session log (replacing the transcript in `docs/session_11.md`):
-Now marking the plan's ToDo results (following the session-10 convention):
-Now the worklog record (Task ID 14):
-Now **T7** — the push sequence. First the change-set review + secret scan:
-The match is the log's own scan-description prose (the documented pattern) — clean. Committing now:
-Committed as `b463d93`. Let me review the SSH push runbook essentials and check the shim:
-Shim ready. Materializing the operator key outside the repo + verifying the fingerprint:
-My hash used the private blob. Let me use the runbook's exact fingerprint method:
-**Fingerprint verified** — matches the session 1–10 record. Dry-run with the correct remote:
-Dry-run clean (fast-forward `3f00dcc..b463d93`). Real push:
-**PUSH VERIFIED** — remote main @ `b463d93` == local HEAD. Final independent verification + key-shred confirmation:
-Remote == local confirmed byte-exact. Shredding the operator key:
-Key shredded. Now the follow-up commit — recording the concrete push evidence in the plan (the sessions 8–10 pattern):
-**Follow-up push verified** — remote main @ `7900130` == local HEAD, key shredded. Final cleanup:
-**Session 11 complete** ✅ — all work committed and pushed to `main` (`b463d93` + `7900130`, remote == local verified, keys shredded).
+# Session 12 — Audit: The Form-Control Census + the POST-Failure States (2026-10-05)
 
-**What this session found & fixed** (the first-ever both-sides **links/redirect census** — every `<a href>` on all 16 routes, the session-10 suggested candidates):
+**Baseline:** remote `main` @ `da96302` · **Deliverable commit:** the form-control state layer — the fire-and-forget POST behavior (newsletter `catch → success` + booking swallow-and-navigate), the live's success/loading texts (`You're in. Check your inbox…` · `Sending...` · `Signing in...` · `Reserving...` with the arrows always rendered), the login's red shadcn Alert error card (the reds pinned to sRGB), the non-resizable Notes textarea, and the date/time inputs' +2px height (`::-webkit-datetime-edit` padding) — +12 e2e (165 total), docs + screenshots refresh
 
-1. **Services grid CTA** — the reference's bottom "Book an appointment" pill was missing entirely (innerText delta was exactly those 20 chars).
-2. **Accessibility article link** — now the reference's own dead `#` link inside the text-identical sentence.
-3. **"Service not found" state** — unknown slugs now render the reference's dedicated in-chrome state (HTTP 200), not the generic 404.
-4. **SPA routing replicated** — case-insensitive route matching + trailing-slash preservation via `src/proxy.ts` (discovered: Next 16 deprecates `middleware` for `proxy`, and the router's 308 fires *before* the proxy).
-5. **OAuth measured** — the live button goes through base44 platform OAuth; the clone's inert stance re-verified correct.
+**Method:** Mode C audit (`skills/code-review-and-audit` pipeline — Phase 3 as a targeted lightweight checklist; `skills/` excluded) + live parity verification with `skills/agent-browser` (login, the mobile drawer @390×844, and **the first-ever both-sides form-control census** — every input/select/textarea/label on every form-bearing route with their option sets and computed metrics, plus **the state layer** — the loading/success/failure behavior of all three forms, deobfuscated from the reference's bundle and measured live — the two session-11 suggested candidates) + TDD remediation per `docs/remediation-plan-session-12.md`.
 
-**Gate:** lint ✓ · tsc ✓ · unit 61/61 · build 27/27 · e2e **92/92** (**153 total**) · mobile drawer verified both sides (no v4 regression) · 15 screenshots re-captured (mobile-menu byte-identical signal holds).
+> Note: this file previously held the raw process transcript of session 11 (committed at `da96302`). It has been replaced by this proper session-12 record — the same convention sessions 4–11 applied to their own transcript files.
 
-**Next steps:** visit `/services` and scroll to the bottom for the new CTA, or try typing `/SERVICES` or `/services/unknown` to see the replicated SPA routing. If a session 12 is desired, candidate directions: a form-control/placeholder census (inputs, selects, textareas both sides), or the newsletter/`POST` surface behavior under error paths.
+## What this session set out to do
+
+Clone the workspace fresh (the sandbox had been reset), re-validate the documented architecture against the codebase (the session-11 diff — the services CTA, the article link, the Service-not-found state, the proxy — all verified in code), run the Mode C audit baseline, then execute the session-11 log's suggested candidates: **(a) a form-control/placeholder census** — inputs, selects, textareas, both sides — and **(b) the newsletter/POST surface behavior under error paths** (widened to the booking and login forms' error paths too). Remediate everything found via TDD, re-capture screenshots, align documentation, push to `main`.
+
+## Audit results (all phases)
+
+- **Phase 1 (lint + typecheck):** clean — ESLint 0 errors, `tsc --noEmit` clean.
+- **Phase 2 (security):** `bun audit` shows the same two dev-only transitive advisories as sessions 2–11 (`braces`, `deepmerge-ts`) — the accepted-risk stance re-verified unchanged. Secret scan clean: the `BEGIN OPENSSH PRIVATE KEY` matches are the wrapper's redacted placeholder constant, the runbook's own check command, and the session logs' scan-description prose (all verified). Tracked env/db/key files: only `.env.example`.
+- **Phase 3 (lightweight checklist):** the targeted greps reproduce the established noise register exactly — `console.log`/TODO absent from `src/`; `scripts/` = exactly `with-repo-db.ts`; zero client `data.ts` imports.
+- **Phase 4 (tests):** baseline fully green — unit 61/61, build 27/27 pages, e2e 92/92 (153 total) — matching the documented session-11 state exactly.
+- **Session-11 diff re-review:** the services grid's bottom CTA (the `mt-20 text-center` wrapper + `a.inline-block` + the pill), the accessibility article's dead `#` link (the `LegalPBlock.link` field), the "Service not found" state, and `src/proxy.ts` + `skipTrailingSlashRedirect` all match the documented design.
+
+## Live parity verification (agent-browser)
+
+The form-control census — every control on `/`, `/contact` (no forms!), `/book`, `/login` enumerated and diffed (types, placeholders, ids, required flags, class strings, option lists, computed fonts/colors/metrics), then deepened into the state layer (what each form renders while submitting, on success, and on failure — measured live AND deobfuscated from the reference's 581KB bundle) and the POST-failure behavior of all three forms. The static census came back nearly identical (the documented trap-7 oklab and next/font fallback-string families aside); the state layer diverged materially — nine actionable findings (F1–F9), three INFO registrations (F10–F12), and a verified-holding census (F13):
+
+- **F1 (LOW-MEDIUM):** the Notes textarea lacked `resize-none` — the live computes `resize: none`; the clone showed the resize handle at 670px width.
+- **F2 (LOW-MEDIUM):** the live's date/time inputs render **48/48** vs the clone's 46/46.7 (fractional on time) — the live's content box = line-height + 2px. The mechanism resisted exhaustive attribution: no author CSS (the single same-origin stylesheet's 913 rules contain zero date/picker/datetime selectors — verified by recursive walk AND raw-file grep), no adoptedStyleSheets, no shadow DOM, no font dependency (Arial/Georgia/font-size overrides leave it), no transform/zoom/DPR delta, no `!important`; and a fresh `all:initial` date input with identical inline metrics measures 48 appended to the live's `body` but 46 appended to the clone's — in the SAME browser session. Replicated exactly via `::-webkit-datetime-edit { padding: 1px 0 }` (min-height stays 0px; the lh 18→46 / lh 22→50 curve preserved).
+- **F3 (HIGH):** the newsletter success state was entirely clone-authored — "Welcome to the atelier — your 15% code is on its way." in a `/70`-ink plain `<p>` vs the live's sage `inline-flex items-center gap-3 text-[11px] uppercase tracking-editorial text-secondary` row with the lucide **Check h-4 w-4** and the text `" You're in. Check your inbox for your 15% code."` (leading space included). The success state requires a real submission — no prior census instrument ever covered it.
+- **F4 (MEDIUM-HIGH):** the newsletter POST failure renders SUCCESS on the live — its bundle's `catch { → success }`; no error UI exists anywhere in the chunk ("went wrong"/"try again" absent). The clone showed an error message.
+- **F5 (MEDIUM):** the booking POST failure still navigates to the confirmation on the live — `try { Booking.create(...) } catch {} → router.push('/book/confirmation?…')`. The clone blocked navigation with an error.
+- **F6 (MEDIUM):** the login error is the platform shell's **shadcn Alert card** — `bg-red-50/70 border-red-200 rounded-xl` with the inert `[&>svg]` arbitrary variants, the inner `[&_p]:leading-relaxed text-red-700 text-sm` div, computed `rgba(254,242,242,.7)` / `rgb(254,202,202)` / `rgb(185,28,28)`, radius 12px, padding 16px, 54px tall, visually above the Sign In button (VLM-verified) — vs the clone's plain `text-red-600` paragraph (and the API's message carried a trailing period the live's toast lacks).
+- **F7–F9 (LOW):** the loading states — "Signing in..." with **both inputs disabled**; "Sending..."/"Reserving..." with the submit arrows rendered in BOTH states — all ASCII three-dot forms where the clone used U+2026 ellipses, hid the arrows while loading, and left the login inputs enabled.
+- **F10–F12 (INFO, registered):** the live's newsletter payload carries `source: "homepage_15off"` (server-side, invisible); the reveal wrapper's 150ms vs the clone's 100ms delay (transient, the settled session-1 family); the newsletter input's `aria-label` (the clone's documented invisible-a11y family — the live's input is fully unlabeled; now an explicit register member).
+- **F13 (verified holding):** the login inputs byte-identical (types/placeholders/ids/classes); `/contact` has no form controls; the book field census identical (8 controls, order/types/required); both selects' option lists identical; the labels identical (the live's trailing-space artifacts — the documented inert family); computed styles identical (the oklab/fallback-string families); the newsletter pill 54×307 both sides; native validation identical; **the mobile drawer @390×844 re-verified both sides — gap 8px, 48px Cormorant lh 48, ls −1.2px, ink/CTA colors — no Tailwind v4 regression** (the task brief's emphasis).
+
+## Findings and the TDD fixes
+
+All nine actionable findings fixed per the plan across 5 files + 1 new spec:
+
+- **F1** (`src/components/BookingForm.tsx`): the textarea takes `` `${inputClass} resize-none` `` — appended, exactly as the live's own class string orders it.
+- **F2** (`src/app/globals.css`): the pinned `::-webkit-datetime-edit { padding: 1px 0 }` rule (both input types) — with the full root-cause investigation recorded in the plan §2.
+- **F3 + F4 + F8** (`src/components/NewsletterForm.tsx`): the live's exact state machine — `idle | loading | success`, `catch → success` (the error state and its UI removed entirely), the sage success row with the Check icon and the leading-space text, "Sending..." with the arrow always rendered.
+- **F5 + F9** (`src/components/BookingForm.tsx`): fire-and-forget — the POST result no longer changes the UI; the navigation runs unconditionally; the error state/UI removed (the API route keeps its full server-side validation); "Reserving..." with the arrow always rendered.
+- **F6 + F7** (`src/components/LoginForm.tsx`, `src/app/globals.css`, `src/app/api/auth/login/route.ts`): the Alert card (the exact live class set, `role="alert"`, above the Sign In button), the 401 message's trailing period dropped (`Invalid email or password` — one source of truth), the red-50/200/700 pinned to sRGB in `@theme` (the trap-6 slate precedent; `bg-red-50/70` serializes as oklab channels per trap 7 — pixels identical), "Signing in..." with `disabled={loading}` on both inputs.
+
+**Engine fact discovered:** React omits the default `type="text"` attribute — `<input type="text">` renders as `<input>` (the `.type` PROPERTY still reads "text"; the live's DOM is identical). Consequence: `input[type=text]` attribute selectors match NOTHING on either site — the census reads the property by position. Recorded in AGENTS.md's quirks.
+
+**RED evidence:** the new spec failed 9/9 actionable groups exactly as the plan predicted, after two spec-side shapings (the newsletter pill's class-order regex; the date/time census switched from attribute selectors to positional property reads — the React type-omission fact above) with all census guards green. One pre-existing assertion corrected to the live contract: `landing.spec.ts`'s newsletter text (`/Welcome to the atelier/` → `/You're in\. Check your inbox/` — the session-5 auth.spec precedent for correcting clone-authored assertions). **GREEN:** 12/12 after the fixes; the full gate — lint ✓ · typecheck ✓ · unit 61/61 · build 27/27 · e2e **104/104 (165 total)** — with every other pre-existing contract untouched.
+
+## Everything else shipped this session
+
+- **Post-fix live/dev re-verification:** the textarea `resize: none`; the date/time heights 46/48/48; the newsletter success value-by-value (the text with the leading space, sage `rgb(75,93,79)`, gap 12px, `inline-flex`, the `lucide-check h-4 w-4` at sage stroke); the login Alert card (no-period text, oklab bg channels, `rgb(254,202,202)` border, `rgb(185,28,28)` inner, radius 12px, padding 16px, 54px, above the button); "Signing in..." + both inputs disabled + button disabled (via a slowed fetch); "Sending..." + arrow + disabled; "Reserving..." + arrow + disabled; the fire-and-forget paths pinned by the e2e route-abort tests.
+- 15 dev-server screenshots re-captured on the remediated build (canonical viewport-only style, absolute paths; the full-page 03). **The mobile-menu capture is 26124B — byte-identical to every prior verified session** (the pixel-consistency signal); 10-landing-mobile also byte-identical. Capture-process fixes this session: 03 re-taken `--full` (the session-11 convention), 13's lightbox pixel-verified (the first pass had captured the plain grid — a click that hit the hidden menu button instead of a tile, and a lightbox check whose compound selector matched the hidden drawer; the recapture confirmed the dark backdrop at all four corners). VLM-verified: 02 (the services CTA), 08 (the Notes textarea — **no resize handle**, the F1 visual), 13 (pixel-level), 14 (the flower + calendar; the policy link DOM-verified after the VLM misread the 12px arrow — the documented failure mode).
+- Documentation aligned: README (badge 165, 61/104 counts, the form-layer feature row, the trap-6 reds note), AGENTS.md (the fire-and-forget invariants + the Alert card + the textarea/height rules + the React type-omission quirk + the form-parity contract line), CLAUDE.md (counts + the parity list), PAD (§7 inventory 61/104 + the session-12 ledger), `beauty-salon_SKILL.md` **v1.9.0** (project_state, Appendix B 104/165, Appendix C — the session-12 row). `.env.example` re-verified truthful (unchanged — the fixes read no env).
+- The remediation plan (`docs/remediation-plan-session-12.md`) with its findings register, plan-vs-codebase validation matrix, and executed ToDo results; this session log; the worklog record.
+
+## The lesson (recorded in SKILL v1.9.0 + PAD)
+
+**State-parity is invisible to every census that reads the settled DOM.** All eleven prior instruments measured pages at rest — but a form's loading text, its success state, and its failure behavior only exist *after* interaction, and no prior session ever submitted a live form and read back what rendered. F3/F4/F5/F7–F9 are exactly that layer (and F3's clone-authored success text had been green for eleven sessions because the assertion that pinned it — landing.spec.ts:80 — pinned the CLONE's text, not the live's). F2 is the session-10 pattern at a finer grain: two inputs with identical computed styles render different heights because the difference lives below `getComputedStyle(input)`, in the UA's inner editor — only reachable (and pinnable) at the pseudo-element level. Each unmeasured layer needs its own instrument; this session's were the form census, the bundle deobfuscation, and the interaction-driven contracts (route-abort + delayed-fulfill interception), now pinned by `form-parity.spec.ts`.
+
+## Carried / accepted (unchanged + extended)
+
+- `braces` and `deepmerge-ts` advisories — dev-only transitive chains, no upstream fix / not safe to force; documented in `docs/remediation-plan-session-2.md` §4.4 and re-verified in sessions 3–12.
+- The clone's invisible a11y additions (**extended this session**: the newsletter input's `aria-label` — the live's input is fully unlabeled — registered as an explicit member), the per-page `document.title`, the login shell's `<body>` overscroll difference, the in-memory rate limiter, the inert Google OAuth, notice-only Forgot-password/Sign-up, the lucide-react alias class token, the og/twitter/PWA head metas (base44 boilerplate), the opacity-modifier oklab serialization (trap 7), the individual-transform properties (trap 8), the reveal timing family (the 150ms-vs-100ms newsletter delay registered), and the remaining PAD §10 deferred items — by design, mirroring the reference.
+- The reference's own inconsistencies replicated faithfully: the NY-pointing map embed under the SF address, the ICS's New York LOCATION, the trailing-space class artifacts, the raw-comma ICS text, the favicon's svg-type hint over a PNG, the inert `duration-s]` token, the dead manifest declaration, the dead `#` article link — **and now the fire-and-forget POST forms** (a real UX robustness regression replicated deliberately; documented in AGENTS.md so a future agent doesn't "fix" it back).

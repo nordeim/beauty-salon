@@ -75,7 +75,13 @@ test.describe("landing page", () => {
     const email = `e2e-${Date.now()}@maisonluminaire.test`;
     await page.getByPlaceholder("Your email").fill(email);
     await page.getByRole("button", { name: /Claim 15% off/ }).click();
-    await expect(page.getByText(/Welcome to the atelier/)).toBeVisible({ timeout: 10_000 });
+    // Session-12 correction: the reference's success text (live-measured +
+    // deobfuscated from its bundle) — the prior assertion pinned the
+    // clone-authored "Welcome to the atelier" text, never measured on the
+    // live reference (the session-5 auth.spec precedent).
+    await expect(page.getByText(/You're in\. Check your inbox/)).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test("footer: statement, hours, contact, legal links", async ({ page }) => {

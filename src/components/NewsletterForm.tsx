@@ -1,43 +1,48 @@
 "use client";
 
-// Newsletter form — POSTs to /api/newsletter, success state mirrors the
-// reference's inline confirmation behavior.
+// Newsletter form — POSTs to /api/newsletter. The state machine mirrors the
+// reference exactly (live-measured session 12 + deobfuscated from its
+// bundle): idle | loading | success, with the POST's FAILURE rendered as
+// SUCCESS (the reference's `catch { → success }` — no error UI exists
+// anywhere in its bundle). Do not "fix" this back to an error state.
 import * as React from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 
 export function NewsletterForm() {
   const [email, setEmail] = React.useState("");
-  const [state, setState] = React.useState<"idle" | "loading" | "done" | "error">("idle");
+  const [state, setState] = React.useState<"idle" | "loading" | "success">("idle");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (state === "loading") return;
+    if (!email || state === "loading") return;
     setState("loading");
     try {
-      const res = await fetch("/api/newsletter", {
+      await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      if (!res.ok) throw new Error(`status ${res.status}`);
-      setState("done");
     } catch {
-      setState("error");
+      // The reference swallows POST failures and renders the success state.
     }
+    setState("success");
   }
 
-  if (state === "done") {
+  if (state === "success") {
     return (
       <div className="mt-12">
-        <p className="text-[11px] uppercase tracking-editorial text-foreground/70">
-          Welcome to the atelier — your 15% code is on its way.
-        </p>
+        <div className="inline-flex items-center gap-3 text-[11px] uppercase tracking-editorial text-secondary">
+          <Check className="h-4 w-4" aria-hidden />
+          {" You're in. Check your inbox for your 15% code."}
+        </div>
       </div>
     );
   }
 
   return (
     <form className="mt-12 flex flex-col sm:flex-row gap-3 max-w-lg mx-auto" onSubmit={onSubmit}>
+      {/* The aria-label is the clone's documented invisible-a11y addition —
+          the reference's input is fully unlabeled (its own a11y failure). */}
       <input
         type="email"
         required
@@ -52,14 +57,9 @@ export function NewsletterForm() {
         disabled={state === "loading"}
         className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background px-7 py-4 text-[11px] uppercase tracking-editorial hover:bg-secondary transition disabled:opacity-60"
       >
-        {state === "loading" ? "Claiming…" : "Claim 15% off"}
-        {state === "loading" ? null : <ArrowRight className="h-3.5 w-3.5" aria-hidden />}
+        {state === "loading" ? "Sending..." : "Claim 15% off"}
+        <ArrowRight className="h-3.5 w-3.5" aria-hidden />
       </button>
-      {state === "error" && (
-        <p role="status" className="text-sm text-foreground/70 sm:absolute sm:-bottom-8">
-          Something went wrong — please try again.
-        </p>
-      )}
     </form>
   );
 }

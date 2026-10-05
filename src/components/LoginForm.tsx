@@ -98,6 +98,7 @@ function LoginForm() {
               placeholder="you@example.com"
               autoComplete="email"
               required
+              disabled={loading}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={fieldClass}
@@ -119,6 +120,7 @@ function LoginForm() {
               placeholder="••••••••"
               autoComplete="current-password"
               required
+              disabled={loading}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={fieldClass}
@@ -128,9 +130,17 @@ function LoginForm() {
       </div>
 
       {error && (
-        <p role="alert" className="text-sm text-red-600 font-medium">
-          {error}
-        </p>
+        // The reference's error surface is its platform shell's shadcn
+        // Alert card (live-measured session 12): the exact class set —
+        // the [&>svg] arbitrary variants are inert without an svg child
+        // (the live renders none) and are replicated verbatim — with the
+        // red scale pinned to the reference's sRGB in @theme (trap 6).
+        <div
+          role="alert"
+          className="relative w-full border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground text-foreground bg-red-50/70 border-red-200 rounded-xl"
+        >
+          <div className="[&_p]:leading-relaxed text-red-700 text-sm">{error}</div>
+        </div>
       )}
       {notice && (
         <p role="status" className="text-sm text-slate-500">
@@ -144,7 +154,7 @@ function LoginForm() {
           disabled={loading}
           className="inline-flex items-center justify-center gap-1 whitespace-nowrap text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 px-3 py-2 w-full h-11 sm:h-12 bg-slate-900 hover:bg-slate-800 text-white font-medium shadow-sm rounded-xl transition-all duration-200"
         >
-          {loading ? "Signing in…" : "Sign in"}
+          {loading ? "Signing in..." : "Sign in"}
         </button>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
           <button

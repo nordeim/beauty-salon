@@ -40,15 +40,20 @@ export function BookingForm({
   const [time, setTime] = React.useState("");
   const [notes, setNotes] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
 
+  // The reference's submit is fire-and-forget (live-measured session 12,
+  // deobfuscated from its bundle): `try { await Booking.create(...) }
+  // catch {} → router.push('/book/confirmation?…')` — POST failures are
+  // swallowed and the navigation runs REGARDLESS. No error UI exists on
+  // the reference's booking form. The API route keeps its full server-side
+  // validation (garbage never persists) — only the UI stance matches the
+  // reference here. Do not "fix" this back to an error state.
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
     setSubmitting(true);
-    setError(null);
     try {
-      const res = await fetch("/api/appointments", {
+      await fetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -62,20 +67,12 @@ export function BookingForm({
           notes: notes || null,
         }),
       });
-      if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(body?.error ?? `status ${res.status}`);
-      }
-      const params = new URLSearchParams({ name, date, time, service });
-      router.push(`/book/confirmation?${params.toString()}`);
-    } catch (err) {
-      setError(
-        err instanceof Error && err.message !== "Failed to fetch"
-          ? err.message
-          : "We couldn't submit your request — please try again.",
-      );
-      setSubmitting(false);
+    } catch {
+      // The reference swallows POST failures (catch {}) and navigates
+      // anyway — see the comment above.
     }
+    const params = new URLSearchParams({ name, date, time, service });
+    router.push(`/book/confirmation?${params.toString()}`);
   }
 
   return (
@@ -201,7 +198,7 @@ export function BookingForm({
           placeholder="Anything we should know — inspiration, allergies, previous treatments..."
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className={inputClass}
+          className={`${inputClass} resize-none`}
         />
       </label>
 
@@ -214,16 +211,10 @@ export function BookingForm({
           disabled={submitting}
           className="inline-flex items-center gap-3 rounded-full bg-foreground text-background px-8 py-4 text-[11px] uppercase tracking-editorial hover:bg-secondary transition disabled:opacity-60"
         >
-          {submitting ? "Requesting…" : "Request appointment"}
-          {!submitting && <ArrowRight className="h-4 w-4" aria-hidden />}
+          {submitting ? "Reserving..." : "Request appointment"}
+          <ArrowRight className="h-4 w-4" aria-hidden />
         </button>
       </div>
-
-      {error && (
-        <p role="alert" className="mt-4 text-sm text-destructive">
-          {error}
-        </p>
-      )}
     </form>
   );
 }

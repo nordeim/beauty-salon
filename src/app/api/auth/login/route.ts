@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   // Always respond identically for unknown user vs wrong password (no
   // account enumeration).
   if (!user || !verifyPassword(password, user.passwordHash)) {
-    return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+    return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
   }
 
   const { token, maxAge } = createSessionToken(user.id);
