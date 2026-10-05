@@ -138,8 +138,7 @@ export default async function LandingPage() {
                         <div className="italic text-foreground/70 mt-2">{card.tagline}</div>
                       </div>
                       <ArrowUpRight
-                        size={20}
-                        className="mt-1 shrink-0 text-foreground/40"
+                        className="h-5 w-5 mt-2 text-foreground/40 transition-all group-hover:rotate-45 group-hover:text-foreground"
                         aria-hidden
                       />
                     </div>
@@ -180,7 +179,7 @@ export default async function LandingPage() {
               href="/about"
             >
               Read our full story
-              <ArrowRight size={14} aria-hidden />
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
           </Reveal>
         </div>
@@ -215,7 +214,7 @@ export default async function LandingPage() {
               rel="noreferrer"
               className="inline-flex items-center gap-2 text-[11px] uppercase tracking-editorial text-foreground/70 hover:text-foreground"
             >
-              <Instagram size={14} aria-hidden />
+              <Instagram className="h-4 w-4" aria-hidden />
               Follow along
             </a>
           </div>
@@ -237,7 +236,10 @@ export default async function LandingPage() {
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/30 transition-colors duration-500 flex items-center justify-center">
-                    <Instagram size={20} className="text-background" aria-hidden />
+                    <Instagram
+                      className="h-6 w-6 text-background opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      aria-hidden
+                    />
                   </div>
                 </a>
               </Reveal>

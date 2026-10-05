@@ -79,7 +79,7 @@ export function ServicesExperience({
                     <h3 className="font-serif text-3xl md:text-4xl">{s.name}</h3>
                     <div className="italic text-foreground/70 mt-2">{s.tagline}</div>
                   </div>
-                  <ArrowUpRight size={20} className="mt-1 shrink-0 text-foreground/40" aria-hidden />
+                  <ArrowUpRight className="h-5 w-5 text-foreground/40 group-hover:rotate-45 group-hover:text-foreground transition-all duration-500" aria-hidden />
                 </div>
                 <p className="text-sm text-foreground/70 leading-[1.7] truncate">{s.description}</p>
                 <div className="mt-8 pt-6 border-t border-foreground/10 flex items-center justify-between text-[11px] uppercase tracking-editorial text-foreground/60">

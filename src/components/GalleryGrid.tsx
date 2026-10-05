@@ -111,7 +111,7 @@ export function GalleryExperience({ items }: { items: GalleryDto[] }) {
             className="absolute top-6 right-6 h-10 w-10 rounded-full border border-background/30 flex items-center justify-center text-background"
             onClick={() => setLightbox(null)}
           >
-            <X size={16} aria-hidden />
+            <X className="h-4 w-4" aria-hidden />
           </button>
           <button
             type="button"
@@ -123,7 +123,7 @@ export function GalleryExperience({ items }: { items: GalleryDto[] }) {
               )
             }
           >
-            <ChevronLeft size={20} aria-hidden />
+            <ChevronLeft className="h-5 w-5" aria-hidden />
           </button>
           <button
             type="button"
@@ -131,7 +131,7 @@ export function GalleryExperience({ items }: { items: GalleryDto[] }) {
             className="absolute right-6 md:right-10 h-12 w-12 rounded-full border border-background/30 text-background flex items-center justify-center hover:bg-background hover:text-foreground transition"
             onClick={() => setLightbox((i) => (i === null ? null : (i + 1) % filtered.length))}
           >
-            <ChevronRight size={20} aria-hidden />
+            <ChevronRight className="h-5 w-5" aria-hidden />
           </button>
           <div className="max-w-[90vw] max-h-[85vh]">
             <img

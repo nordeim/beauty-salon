@@ -40,7 +40,7 @@ export default async function ServiceDetailPage({
             className="inline-flex items-center gap-2 text-[11px] uppercase tracking-editorial text-foreground/60 hover:text-foreground mb-12"
             href="/services"
           >
-            <ArrowLeft size={14} aria-hidden />
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
             Back to services
           </Link>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">

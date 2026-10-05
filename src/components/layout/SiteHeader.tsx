@@ -86,7 +86,7 @@ export function SiteHeader() {
               className="lg:hidden h-10 w-10 flex items-center justify-center rounded-full border border-foreground/20"
               onClick={() => setOpen(true)}
             >
-              <Menu size={16} strokeWidth={2} aria-hidden />
+              <Menu className="h-4 w-4" strokeWidth={2} aria-hidden />
             </button>
           </div>
         </div>
@@ -104,7 +104,7 @@ export function SiteHeader() {
               className="h-10 w-10 flex items-center justify-center rounded-full border border-foreground/20"
               onClick={() => setOpen(false)}
             >
-              <X size={16} strokeWidth={2} aria-hidden />
+              <X className="h-4 w-4" strokeWidth={2} aria-hidden />
             </button>
           </div>
           <div className="h-full flex flex-col lg:flex-row">

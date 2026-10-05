@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { getStylists } from "@/lib/data";
 
@@ -61,11 +61,11 @@ export default async function TeamPage() {
                     <p>{s.bio2}</p>
                   </div>
                   <Link
-                    className="mt-6 inline-flex items-center justify-between w-full gap-2 rounded-full border border-foreground/20 px-5 py-3 text-[11px] uppercase tracking-editorial hover:bg-foreground hover:text-background transition-colors duration-500"
+                    className="mt-6 inline-flex items-center justify-between w-full gap-2 group/btn rounded-full border border-foreground/20 px-5 py-3 text-[11px] uppercase tracking-editorial hover:bg-foreground hover:text-background transition-colors duration-500"
                     href={`/book?stylist=${s.slug}`}
                   >
                     Book with {s.name.split(" ")[0]}
-                    <ArrowRight size={14} aria-hidden />
+                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover/btn:rotate-45" aria-hidden />
                   </Link>
                 </div>
               </article>

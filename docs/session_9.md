@@ -1,153 +1,67 @@
-I'll continue the task. Let me first check the current workspace state and refresh it with `git pull`.
-The workspace seems to have been reset or is different. Let me check the git config and state.
-The workspace has been reset — this is not the beauty-salon repo (no remote, just an initial commit). Per the task instructions, I'll clone the repo fresh.
-工作区已重置 —— 我需要克隆 `beauty-salon` 仓库。现在让我来执行此操作。
-仓库克隆成功。历史记录确认会话 4–7 已完成并推送。现在我来验证一下任务书中引用的会话文档。
-All required files exist, including `docs/session_8.md` (likely a stub/plan for the current session). Let me read the core documents. First, check file sizes to plan reading.
-Let me read the PAD directly in chunks.
-Now let me read the skill doc and session docs.
-Now let me read `docs/session_8.md` — based on convention, it likely holds the session-7 transcript that I'll need to replace with a proper session-8 record.
-`docs/session_8.md` holds session 7's raw transcript — per convention, this run is **Session 8**. Let me check the latest commit and review the remediation-plan-session-7 execution state.
-Now I have the full picture: **this run is Session 8**, baseline remote main @ `3d49bbc`. Session 7 flagged the next candidates: `/book` form validation branches + gallery lightbox keyboard details. Let me finish reading the SKILL doc and skills catalog.
-Let me read the skills catalog and the remaining key SKILL.md sections (Appendices B/C).
-The catalog confirms the key skills. Let me skim the core audit skill files used by prior sessions (code-review-and-audit, agent-browser, tdd).
-Documentation review complete. Now let me set up the environment (bun install, .env, DB) and validate the codebase state.
-`.env` created. There's an ambient `DATABASE_URL` in the sandbox (as documented — the wrapper defends against it). Now push schema and seed.
-The documented ambient-env trap in action — direct script runs pick up the ambient `DATABASE_URL`. Let me set it explicitly.
-DB fully seeded (8 services with FAQ data). Now let me validate the codebase structure and re-review the session-7 diff (the recent changes to audit).
-Structure matches docs. Let me spot-check the component inventory (SKILL says GalleryExperience but I see GalleryGrid.tsx — possible doc drift or known naming).
-SKILL says `GalleryGrid.tsx` (correct), but README's hierarchy mentions `GalleryExperience`. Let me verify this potential doc drift.
-Found minor doc drift (README/PAD say `GalleryExperience`, actual file is `GalleryGrid.tsx`) — noted for the plan. Now let me deep-review the session-7 diff (the recent changes to audit).
-Session-7 diff matches the documented design. Let me verify the service page + LegalPage rework quickly, then start the audit gates.
-Codebase matches the documented design. Now running the **Mode C audit** — Phase 1 (lint + typecheck):
-第一阶段 ✓ (eslint 无问题，tsc 无问题)。第二阶段（安全 + secret 扫描）：
-The matches need verification — let me confirm they're documentation mentions, not actual key material.
-Phase 2 ✓ (same 2 documented dev-only advisories, no tracked secrets — matches are docs placeholders). Phase 3 (lightweight checklist):
-Phase 3 ✓ (noise register unchanged). Phase 4 (baseline gate — unit, build, e2e):
-Unit 60/60 ✓. Now the build:
-Build ✓ (27/27 pages). Now e2e:
-**ALL AUDIT PHASES GREEN** — lint ✓ · tsc ✓ · unit 60/60 · build 27/27 · e2e 58/58 (118 total). Now the live parity verification. Let me boot the dev server and load the agent-browser skill.
-Dev server healthy. Now the live parity verification — first, login to the live reference site:
-Logged in — post-login redirects to `/` (consistent with prior sessions). Let me first spot-check the pinned mobile drawer contract at 390×844 on live, then deep-sweep the session-8 candidates.
-CTA mt 40px ✓, cream/z-60/fixed ✓. The first `a` measured was the logo — let me measure the actual 48px nav links:
-Live drawer contract re-verified (48px Cormorant links, gap 8px, mt-10 40px). Now the local side:
-Local drawer matches live byte-identically. Quick tap-behavior check, then the session-8 deep sweep begins:
-Known issue — text locator hits covered desktop links. Using the ref method:
-Drawer behavior ✓ (tap → close + navigate). Now the **session-8 deep sweep** — the booking form on live:
-The live form uses custom date/time pickers (not native inputs). Let me see the full form and then compare with local:
-The live DOM uses native `input[type=date]/[type=time]` (matches the clone). Now let me capture the live form's exact labels/classes and test validation behavior — the session-8 focus:
-Live form classes captured. Now the key test — **submit empty form on live** to observe the validation behavior:
-No visible custom errors. Let me check whether the live form relies on native HTML5 validation (novalidate? form attributes):
-Live form: native HTML5 validation blocks submit (no custom error UI). Let me now run the live happy path — full valid submission:
-Live happy-path → `/book/confirmation?name=&date=&time=&service=` (no stylist param — matches ADR-007). Let me verify the live confirmation page content:
-Live ICS contract captured (PRODID, UID format, UTC stamps, 90-min duration, SUMMARY/DESCRIPTION/LOCATION). Now the local clone — same flow:
-Local form structure matches live exactly. Now test the local validation branch + happy path:
-Local URL contract identical. Now compare local confirmation + ICS:
-**PARITY GAP FOUND (F1):** Local ICS `DTEND:…T180000Z` (14:30+210min) vs live `DTEND:…T160000Z` (14:30+90min — balayage's actual duration). Also: live does NOT escape commas in LOCATION; the clone does. Let me inspect the ICS builder:
-The builder takes `durationMin` — so the confirmation page passed 210 instead of 90. Let me check the confirmation page:
-The page uses `serviceRow?.durationMin ?? 60` — but local DTEND implies 210 min. Let me check the seeded durations:
-The seed says balayage = 210 min, but the live ICS computed 90 min. Let me check the live treatment card to see the advertised duration:
-Live card says 210 min (seed correct) — but live ICS was 90 min. The live ICS doesn't use the advertised duration. Let me book a second service on live to identify the pattern:
-**Pattern found:** gel-manicure (advertised 60) also gets a 90-min ICS block — live uses a **fixed 90-minute DTEND**, not the service duration. Let me test one more variable: a name containing a comma (to check live's escaping behavior):
-**Live ICS contract fully characterized (3 data points):**
-- DTEND = DTSTART + **fixed 90 min** (balayage 210→90, gel-manicure 60→90, bridal 180→90)
-- **Zero RFC escaping**: commas unescaped in both DESCRIPTION (`Anna Marx, Jr..`) and LOCATION
+# Session 9 — Audit: The Icon Layer + the Contact Structure (2026-10-05)
 
-The clone diverges on both (uses durationMin=210; escapes LOCATION commas). Let me check the unit tests pinning the current behavior:
-Session-1 tests pinned assumptions (210-min, escaped commas) — today's live measurements (3 consistent samples) prove otherwise. This is the session-5 lesson again: specs written against the clone, not the reference. Now let me verify deep-link preselection on live:
-Deep-link branches match. Now the second candidate — **gallery lightbox keyboard details** on live:
-Now the keyboard details — the session-8 focus. Test ArrowRight/ArrowLeft/Escape on live:
-Keyboard nav works on live. Let me test the wrap-around edge behavior (ArrowLeft from first item):
-Live wraps around (item 0 → ArrowLeft → last item "LED Therapy"). Now the local lightbox — same tests:
-Local ArrowRight sequence matches (2 presses → Architectural Bob). Now wrap-around + Escape on local:
-Wrap-around matches. Now the filter-interaction test on live (lightbox scope with an active filter):
-Live: with SKIN filter active, 4×ArrowRight cycles back to start — **navigation is scoped to the filtered set**. Same test on local:
-Filter-scoped navigation matches. But I noticed an a11y-name difference: live = "Radiance Facial SKIN Radiance Facial", local = "Radiance Facial — skin". Let me compare the card DOM:
-Found differences: live has NO aria-label; local adds one. Let me get the local overlay's complete caption block:
-DOM identical except the clone's added `aria-label`. Let me check GalleryGrid.tsx:
-Let me check the live filter pills for `aria-pressed` and review the gallery e2e spec:
-Live pills lack `aria-pressed` (clone a11y addition — invisible). Let me check the remaining booking details (notes placeholder, live API validation branches):
-Live has no public `/api/appointments` (405 — base44 internal API; the clone's endpoint is documented substrate, not a parity surface). Checking local placeholder:
-**F3 FOUND:** Live Notes textarea has placeholder `“Anything we should know — inspiration, allergies, previous treatments...”` — local has none. Let me check BookingForm and the label-class details:
-Two more gaps: Notes placeholder missing + live Notes label carries `mt-5`. Let me measure the live form grid layout precisely:
-Live Notes label: `block mt-5` (single cell, 20px margin) — local spans 2 columns. Let me verify the live rendered geometry + button wrapper:
-Notes spans full width despite `grid-column:auto` — suggesting it sits OUTSIDE the grid div. Let me verify the live form's child structure:
-Live structure mapped: grid div (7 fields) + Notes label outside (mt-5) + button row outside (mt-10). Let me read the local BookingForm fully:
-Local form IS the grid; live nests it. Let me measure the live form shell + exact gaps to see the visual deltas:
-40px confirmed (label line-height explains the 6px). Let me capture the remaining live details — submit button classes, icon, policy line, label span classes:
-Booking form contract complete. Let me also compare the Add-to-calendar link attributes on both sides:
-Icon size differs (24 vs 14 in attrs). Let me check computed sizes — CSS may constrain:
-**F5 FOUND:** Live uses `Calendar` icon (h-4 w-4, 16px) — clone uses `CalendarPlus` at 14px. Let me check the decorative background icon too:
-Conflicting measurements (Calendar 16px vs CalendarPlus 14px on different loads). Let me re-measure carefully with waits:
-Two stable loads show `Calendar h-4 w-4` (16px). Earlier I caught a 14px CalendarPlus — possible hydration race on the live SPA. Let me check the settled state across more reloads:
-5/5 settled loads = `Calendar h-4 w-4`. Let me catch the pre-settle state to complete the picture:
-审计扫描结果汇总。让我检查一下 booking e2e 规范的 ICS 断言（该规范锁定了当前错误的行为）：
-The e2e assertion is loose — needs the read-back contract. Let me get the exact placeholder bytes + textarea attrs from live:
-占位符字节数已精确捕获（U+2014 破折号，三个 ASCII 句点）。进行最后一次稳定性检查 —— 已固定的表单结构：
-Audit sweep complete. The settled live contract is stable. Let me check the screenshot tooling from prior sessions, then write the remediation plan:
-Now writing the session-8 remediation plan:
-Plan saved and validated. Now **T1 (RED)** — rewriting the unit tests to the live-measured contract:
-Now the new e2e parity spec:
-Running the RED phase — unit tests first:
-Unit RED confirmed (3 failed / 4 passed). Let me see exactly which failed:
-Unit RED as predicted (the comma-name test passes — the clone's DESCRIPTION was never escaped, matching the analysis). Now e2e RED against the current build:
-**RED confirmed exactly as predicted** — 4/4 e2e + 3 unit. Now **T2 (GREEN — ICS builder)**:
-ICS builder fixed. Now the confirmation page — drop the dead `getService` lookup (T2) + fix the icon (T4):
-I introduced a broken import (`components/layout/BookHeader` missing the `@/` prefix). Fixing:
-Import fixed. Now **T3 (GREEN — BookingForm restructure)**:
-All GREEN changes applied. Early verification — lint + typecheck + unit:
-Unit 7/7 GREEN. Fixing my spec's type error (getByRole needs `{ name: … }`):
-3/4 green — the ICS decode test still fails. Let me see why:
-My arithmetic error in the spec — 14:30 + 90min = 16:00 (the live measurement itself!). Fixing:
-**4/4 GREEN.** Now **T5 — the full gate**:
-**FULL GATE GREEN** — lint ✓ · tsc ✓ · unit 61/61 · build 27/27 · e2e 62/62 (**123 total**). Now **T6 — live re-verification** of the remediated surfaces:
-Local ICS now matches live byte-for-byte. Verify the form:
-Form matches live exactly. Quick submission smoke test through the restructured form:
-Smoke test passes end-to-end. Now the **screenshot re-capture** — all 15 canonical captures:
-Mobile-menu capture = **26124B — byte-identical to all prior verified sessions**. Capturing 14-15:
-All 15 captured — 9 byte-identical sizes to session-7 (unchanged surfaces), mobile-menu 26124B signal holds. Let me verify which files actually changed vs git:
-Screenshots show as unchanged in git — but 08/14 should differ. Let me compare HEAD sizes directly:
-Byte-identical to HEAD — but HEAD's 08 predates this session's form changes. Something's off. Let me check when 08 last changed and VLM-verify the capture:
-The captures never landed in the repo — agent-browser saves relative to its daemon cwd, not my shell. Let me find them:
-Found — but sizes are way off: prior sessions used viewport-only captures for most (not `--full`). Let me check the repo images' dimensions to replicate exactly:
-Canonical style = viewport-only (except 03 full-page). Re-capturing correctly with absolute paths:
-All 15 captured correctly now (11-mobile-menu = 26124B signal holds; 09/10 byte-identical; 07 contact drifts from the live Maps iframe as in prior sessions; 13 shows a different lightbox subject than session 7). Let me VLM-verify the key captures:
-VLM-verifying the key captures with the CLI:
-Viewport-only style — Notes is below the fold (as in all prior sessions; the placeholder is pinned by the e2e spec + live DOM check). Verifying 12-book-mobile (may show the Notes field) + 14:
-12-book-mobile documents the placeholder fix visually ✓. Now the standing 11-mobile-menu check:
-All VLM checks pass. **T6 complete.** Now **T7 — documentation alignment**. Starting with README:
-One straggler at line 96:
-Now AGENTS.md — the booking contract invariant:
-Those rows live in CLAUDE.md:
-Now the PAD — ADR-007, GalleryGrid name, §7 inventory + ledger:
-Now the PAD §7 inventory + session-8 ledger:
-PAD done. Now `beauty-salon_SKILL.md` → v1.5.0:
-Two more SKILL.md spots — line 389 + the Appendix C session-8 row:
-SKILL v1.5.0 done. Re-verifying `.env.example` truthfulness (no env change this session — expected unchanged):
-Now **T8** — the proper session-8 log (replacing the transcript):
-Now marking the plan's ToDo results and appending the worklog record:
-Now appending the worklog record:
-Now **T9 — the push sequence**. Reading the SSH runbook first:
-Runbook internalized. Pre-commit: secret scan + full changeset review:
-The one match is my own log text describing the scan — clean. Committing:
-Committed as `8b841b4`. Now the push sequence — materialize the key outside the repo:
-Fingerprint matches the session 1–7 record. Now deploying the paramiko ssh shim (no OpenSSH in this sandbox):
-Shim deployed (correctly refuses no-command case, as designed). Dry-run:
-The wrapper defaults to the wrong repo (task-management — the runbook's origin). Re-running with the correct remote:
-Dry-run clean (`3d49bbc..8b841b4` fast-forward). Real push:
-**PUSH VERIFIED** — remote main @ `8b841b4` == local HEAD. Shredding the operator key:
-Following the session-4–7 pattern — mark T9 executed and push the follow-up:
-**SESSION 8 COMPLETE** — remote main @ `20fa947` == local HEAD, tree clean. Final cleanup:
-**Session 8 complete** — all work committed and pushed to `main` (`8b841b4` + `20fa947`, remote == local verified, keys shredded).
+**Baseline:** remote `main` @ `dcdea6a` · **Deliverable commit:** see `git log` (the icon class layer rebuilt to the live-measured census across 12 files, the contact Hours status-pill row, the login eye toggle removed, docs + screenshots refresh)
+**Method:** Mode C audit (`skills/code-review-and-audit` pipeline — Phase 3 as a targeted lightweight checklist; `skills/` excluded) + live parity verification with `skills/agent-browser` (login, all 13 routes, the drawer @390×844, the gallery lightbox, and a first-ever **both-sides icon census** — every `svg.lucide` glyph/class/computed size/color/margin extracted from the live reference and compared against the local DOM page by page) + TDD remediation per `docs/remediation-plan-session-9.md`.
 
-**本次会话核心进展：** 审计基准全绿（lint/tsc/60 单元/27 路由/58 e2e）后，按会话 7 建议深测了预订表单分支与画廊 lightbox，并**首次解码了参考站的 ICS 日历下载**，发现五处真实差距：
+> Note: this file previously held the raw process transcript of session 8 (committed at `dcdea6a`). It has been replaced by this proper session-9 record — the same convention sessions 4–8 applied to their own transcript files.
 
-1. **ICS 时长（F1）**——参考站下载固定 **90 分钟事件块**（210/60/180 分钟服务实测均为 90），克隆却用服务时长（balayage 变成 3.5 小时）
-2. **ICS 转义（F2）**——参考站完全不转义逗号，克隆按 RFC 5545 转义了 LOCATION
-3. **Notes 占位符（F3）**缺失 + **表单 DOM 结构（F4）**（块级卡片+嵌套 grid+外置 mt-5/mt-10 兄弟节点）+ **图标（F5）**（Calendar h-4 w-4，非 CalendarPlus@14）
+## What this session set out to do
 
-画廊 lightbox 键盘、循环、筛选作用域**双向完全一致**。全部以 TDD 修复，新契约 `booking-parity.spec.ts`（+4 e2e）。
+Refresh the workspace (continuation session — the environment, `.env`, and seeded DB were intact; `git pull` brought in `docs/session_9.md`), re-validate the documented architecture against the codebase, audit the session-8 changes, then — following the session-8 log's suggested candidates — verify the contact page's map embed and widen the sweep to the one DOM layer no prior audit had ever measured: **the lucide icon layer**. Remediate everything found via TDD, re-capture screenshots, align documentation, push to `main`.
 
-**门禁：** lint ✓ · tsc ✓ · 单元 **61/61** · 构建 27/27 · e2e **62/62**（共 **123**）。修复后本地 ICS 与线上**逐字节一致**；15 张截图重拍（mobile-menu 26124B 信号保持）；文档对齐（SKILL v1.5.0）。
+## Audit results (all phases)
 
-**下一步建议：** 访问 `/book` 查看新表单结构与占位符，或提交预订后解码 "Add to calendar" 验证 90 分钟块；如需会话 9，剩余候选为联系页地图嵌入的自托管化或性能类深测。
+- **Phase 1 (lint + typecheck):** clean — ESLint 0 errors, `tsc --noEmit` clean.
+- **Phase 2 (security):** `bun audit` shows the same two dev-only transitive advisories as sessions 2–8 (`braces`, `deepmerge-ts`) — the accepted-risk stance re-verified unchanged. Secret scan clean: the single `BEGIN OPENSSH PRIVATE KEY` match is the wrapper's redacted placeholder constant (`[REDACTED:ssh_private_key]`, verified). Tracked env/db/key files: only `.env.example`.
+- **Phase 3 (lightweight checklist):** the targeted greps reproduce the established noise register exactly — `console.log`/TODO absent from `src/`; `scripts/` = exactly `with-repo-db.ts`; zero client `data.ts` imports.
+- **Phase 4 (tests):** baseline fully green — unit 61/61, build 27/27 pages, e2e 62/62 (123 total).
+- **Session-8 diff re-review:** the ICS `APPOINTMENT_BLOCK_MIN` constant, the raw-comma LOCATION, the confirmation page's dead-`getService` removal, the `Calendar h-4 w-4` icon, and the BookingForm nested-grid restructure all match the documented design; the codebase validates against every doc claim.
+
+## Live parity verification (agent-browser)
+
+**The contact map embed — this session's first candidate — VERIFIED HOLDING byte-identical:** the iframe's src URL (`!4v1700000000000` placeholder and all — the reference's own URL), `title="Map"`, `w-full h-full`, the inline `border: 0px; filter: grayscale(0.2) contrast(1.05);`, `loading="lazy"`, `referrerpolicy`, and the parent `aspect-[4/5] md:aspect-[5/6] overflow-hidden rounded-sm border border-foreground/10 bg-muted` all match exactly. **The session-8 log's "self-hosting the map" suggestion is rejected**: the reference itself loads the external Google Maps embed — replacing it would be a divergence, not a fix. The known screenshot drift is Google's per-load tile variance (inherent, accepted).
+
+**The widened sweep — the first-ever both-sides icon census** — found the real gap family: the session-1 surfaces render icons via lucide `size={N}` attributes with authored class fragments; the reference uses class-based sizing with per-surface class sets including hover animations. The census (every `svg.lucide` on every route) found 19 divergent icon sites, several plainly visible:
+
+- **F1a (MEDIUM — the testimonial stars):** live renders **sage** (`h-3.5 w-3.5 fill-secondary text-secondary`, computed `rgb(75, 93, 79)` — the same sage pin as the service-detail check icons); the clone rendered **ink** (`fill-foreground text-foreground`). A visible color divergence on the landing page.
+- **F1b (MEDIUM-LOW):** the follow-along Instagram icon computes 16px live vs 14px in the clone.
+- **F1c (MEDIUM — the gallery-preview hover icons):** live renders 24px icons that **fade in on hover** (`h-6 w-6 text-background opacity-0 group-hover:opacity-100 transition-opacity duration-500`); the clone rendered 20px icons **permanently visible** over the tile images.
+- **F1d (MEDIUM — the services card arrows):** live carries `h-5 w-5 … transition-all group-hover:rotate-45 group-hover:text-foreground` (landing variant `mt-2` = 8px; grid variant no-mt + `duration-500`); the clone had **no hover animation** and `mt-1` (4px).
+- **F1e (MEDIUM — the team Book-with buttons):** live uses the **arrow-up-right** glyph with a **named group** (`group/btn` on the anchor, `group-hover/btn:rotate-45` on the icon); the clone used arrow-right with no group.
+- **F1f (MEDIUM — the contact Get-directions glyph):** live renders **MapPin** at `h-3.5 w-3.5`; the clone rendered ArrowUpRight at `size={14}`.
+- **F1g (MEDIUM — the footer Contact column, every page):** live renders phone/mail/Instagram icons at `h-3.5 w-3.5` inside the three contact links; the clone had **none** (the links' `inline-flex items-center gap-2` classes existed for these icons all along).
+- **F1h (MEDIUM — the contact Reach-us block):** live renders phone/mail/Instagram at `h-4 w-4 text-foreground/60` inside the serif anchors; the clone had none.
+- **F1i (MEDIUM-LOW — the login input icons):** live `absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500` (computed left 12px, `rgb(100, 116, 139)`); the clone `left-3.5` (14px) in `text-slate-400` — 2px off, one shade light.
+- **F1j (MEDIUM — the login eye toggle):** the clone rendered a password visibility toggle the reference does not have — an undocumented **visible** divergence (the live password wrapper has no right-side element at all). Removed: parity outranks the UX nicety; the invisible additions (`autoComplete`, `aria-*`) stay per the session-8 F6 precedent.
+- **F1k–F1m (class-set alignments, computed identical):** the book submit arrow (`h-4 w-4`), the header menu/X + lightbox X/chevrons + story/newsletter arrows + detail back-arrow (`h-3.5 w-3.5`/`h-4 w-4`/`h-5 w-5`), and the login GoogleIcon's missing wrapper `div.transition-transform.duration-200.-ml-4` + `xmlns`.
+- **F2 (MEDIUM — the contact Hours section):** live wraps the Hours eyebrow and a **StatusPill** in `flex items-center justify-between mb-4`; the hours ul carries **no margin**. The clone rendered a bare eyebrow + `mt-3` on the ul and no pill — a 13-char innerText delta (exactly `CLOSED TODAY\n`).
+- **F3 (INFO — verified holding):** the map embed (above). Also verified holding: the mobile drawer (every pinned value + the drawer X icon at 16px), the login font context + slate-900 read-back, the booking/ICS/Calendar contracts (session 8), the gallery lightbox icons + keyboard + wrap-around + filter scoping, the session-7 service-detail icons (the check/chevron class sets match exactly — the one surface this family spares, because session 7 extracted them live), the stars wrapper, the follow-along anchor classes, and every page's innerText (except the contact 13-char delta, now closed).
+- **F4 (carried):** the `braces` + `deepmerge-ts` advisories stand.
+
+## Findings and the TDD fixes
+
+All 19 icon sites + the Hours row fixed per the plan across 12 files:
+
+- **The icon class layer:** every session-1 icon converted from `size` props to the reference's exact class sets (see the plan's §4.1 table) — the sage stars, the hover-gated 24px gallery-preview icons, the hover-rotating service arrows (both variants), the team `group/btn` + arrow-up-right, the MapPin directions link + the icon-text space byte, the footer + Reach-us icon sets, the login `left-3 text-slate-500` icons + the eye-toggle removal + the GoogleIcon wrapper, and the class-sizing alignments (book/header/lightbox/detail/story/newsletter/carousel).
+- **The contact Hours row:** restructured to the `flex items-center justify-between mb-4` row with the existing `StatusPill` client island; the ul's `mt-3` dropped (the row's `mb-4` provides the 16px gap). The contact page's innerText now measures **808/808 — exact parity**.
+
+**RED evidence:** the new `tests/e2e/icon-parity.spec.ts` failed **8/8** against the pre-fix build, exactly as the plan predicted (every assertion group red). **GREEN:** 8/8 after the fixes. Two spec-side shapings mid-run, both documented in the spec comments: (1) the Reach-us selector needed scoping to the `gap-3` variants (the header logo is also `font-serif text-xl`); (2) the book submit arrow's computed-width assertion was replaced by the class + `width="24"`-attr read-back — the svg is a flex item inside the inline-flex button, so its **used** width shrinks with the row layout (live-measured 15.3125px at desktop width — NOT the nominal 16px; the clone computes the identical shrunk value, so only the class pin is stable across viewports — the session-8 "settle-state" lesson in a new guise: assert what the engine actually computes, not the nominal).
+
+## Everything else shipped this session
+
+- **Full gate green with the expanded suite:** lint ✓ · typecheck ✓ · unit **61/61** · build 27/27 pages ✓ · e2e **70/70** ✓ (**131 total**) — every pre-existing parity contract untouched; no assertion weakened.
+- **Post-fix live re-verification:** the both-sides icon census re-run — **every route's icon list now fully identical** (landing 23/23, services 12/12, gallery 4/4, team 7/7, about 4/4, book 1/1, login 2/2, contact 8/8 — the last straggler, the testimonial carousel chevrons, caught by the census re-run and fixed). The contact Hours row verified in-DOM (row mb-4 16px, pill `CLOSED TODAY`, ul mt 0px); the contact innerText 808/808.
+- 15 dev-server screenshots re-captured on the remediated build (canonical viewport-only style, absolute paths; the full-page 03). The mobile-menu capture is **26124B — byte-identical to every prior verified session** (the pixel-consistency signal). VLM-verified: the contact capture (Reach-us icons + MapPin confirmed; the Hours pill row confirmed in a scrolled capture), the landing footer icons + the sage stars (VLM read the 14px sage as "charcoal" — pixel-sampled the capture to confirm sage `(80, 97, 83)` and the DOM computed value is the pinned `rgb(75, 93, 79)`), and the standing mobile-menu check (cream overlay, serif links, CTA separation, close X, no glitches).
+- Documentation aligned: README (badge 131, 61/70 counts, the icon-layer feature row + testing table), AGENTS.md (the icon invariant + the icon-parity contract line), CLAUDE.md (counts + the parity line), PAD (§7 inventory 61/70 + the session-9 ledger), `beauty-salon_SKILL.md` **v1.6.0** (project_state, §14 icon best-practice, Appendix B/C — the icon-layer lesson). `.env.example` re-verified truthful (unchanged — no env-relevant change this session).
+- The remediation plan (`docs/remediation-plan-session-9.md`) with its findings register, plan-vs-codebase validation matrix, and executed ToDo results; this session log; the worklog record.
+
+## The lesson (recorded in SKILL v1.6.0 + PAD)
+
+**InnerText parity is blind to the icon layer.** Eight green sessions compared text (landing 1198/1198, legal 1822/2053/3372/1629, confirmation 525/525…) and pinned computed styles on the elements prior sessions touched — but svg class sets never appear in innerText, and lucide's `size` prop renders right-sized pixels through the wrong DOM (attribute sizing, no hover classes). The glyph choice, color token, opacity behavior, and hover animations were invisible to every instrument. The icon layer needed its own extraction pass (this session's census) and its own read-back contract (`icon-parity.spec.ts`) — extending the session-6 (pins need read-backs) and session-8 (decode the download) lessons: **every DOM layer that text comparisons flatten needs a dedicated census + spec.** Session 8's Calendar finding was a single instance of what was really a whole unmeasured layer.
+
+## Carried / accepted (unchanged)
+
+- `braces` and `deepmerge-ts` advisories — dev-only transitive chains, no upstream fix / not safe to force; documented in `docs/remediation-plan-session-2.md` §4.4 and re-verified in sessions 3–9.
+- The clone's invisible a11y additions (`aria-hidden` on icons, `aria-label` on the stars wrapper/gallery tiles/filter pills, `autoComplete` on inputs) and the per-page `document.title` — deliberate improvements, documented divergences. The eye toggle is NOT in this family (it was visible + behavioral) — removed.
+- The reference's own inconsistencies replicated faithfully: the NY-pointing map embed under the SF address, the ICS's New York LOCATION, the trailing-space class artifacts (`block `, `text-foreground/70 `), the raw-comma ICS text.
+- The opacity-modifier oklab serialization (trap 7), the login shell's `<body>` overscroll difference, the in-memory rate limiter, the inert Google OAuth, notice-only Forgot-password/Sign-up, and the remaining PAD §10 deferred items — by design, mirroring the reference.

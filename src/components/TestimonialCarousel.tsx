@@ -46,7 +46,7 @@ export function TestimonialCarousel({ items }: { items: TestimonialDto[] }) {
         >
           <div className="flex justify-center gap-1 mb-8" aria-label="5 out of 5 stars">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} size={14} className="fill-foreground text-foreground" aria-hidden />
+              <Star key={i} className="h-3.5 w-3.5 fill-secondary text-secondary" aria-hidden />
             ))}
           </div>
           <blockquote className="font-serif text-3xl md:text-5xl leading-[1.15] text-balance italic">
@@ -64,7 +64,7 @@ export function TestimonialCarousel({ items }: { items: TestimonialDto[] }) {
           className="h-10 w-10 rounded-full border border-foreground/20 flex items-center justify-center hover:bg-foreground hover:text-background transition"
           onClick={() => goTo(index - 1)}
         >
-          <ChevronLeft size={16} aria-hidden />
+          <ChevronLeft className="h-4 w-4" aria-hidden />
         </button>
         <div className="flex gap-2">
           {items.map((_, i) => (
@@ -86,7 +86,7 @@ export function TestimonialCarousel({ items }: { items: TestimonialDto[] }) {
           className="h-10 w-10 rounded-full border border-foreground/20 flex items-center justify-center hover:bg-foreground hover:text-background transition"
           onClick={() => goTo(index + 1)}
         >
-          <ChevronRight size={16} aria-hidden />
+          <ChevronRight className="h-4 w-4" aria-hidden />
         </button>
       </div>
     </div>

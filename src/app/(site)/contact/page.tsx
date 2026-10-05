@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { MapPin, Phone, Mail, Instagram } from "lucide-react";
 import { HOURS, formatDayHours } from "@/lib/hours";
+import { StatusPill } from "@/components/StatusPill";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -38,8 +39,7 @@ export default function ContactPage() {
                 rel="noreferrer"
                 className="mt-3 inline-flex items-center gap-2 text-[11px] uppercase tracking-editorial text-foreground/70 hover:text-foreground"
               >
-                <ArrowUpRight size={14} aria-hidden />
-                Get directions
+                <MapPin className="h-3.5 w-3.5" aria-hidden /> {"Get directions"}
               </a>
             </div>
 
@@ -52,12 +52,14 @@ export default function ContactPage() {
                   href="tel:123-456-7890"
                   className="flex items-center gap-3 font-serif text-xl hover:text-secondary transition"
                 >
+                  <Phone className="h-4 w-4 text-foreground/60" aria-hidden />
                   123-456-7890
                 </a>
                 <a
                   href="mailto:info@mysite.com"
                   className="flex items-center gap-3 font-serif text-xl hover:text-secondary transition"
                 >
+                  <Mail className="h-4 w-4 text-foreground/60" aria-hidden />
                   info@mysite.com
                 </a>
                 <a
@@ -66,16 +68,20 @@ export default function ContactPage() {
                   rel="noreferrer"
                   className="flex items-center gap-3 font-serif text-xl hover:text-secondary transition"
                 >
+                  <Instagram className="h-4 w-4 text-foreground/60" aria-hidden />
                   @maisonluminaire
                 </a>
               </div>
             </div>
 
             <div>
-              <div className="text-[10px] uppercase tracking-editorial text-foreground/50">
-                Hours
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-[10px] uppercase tracking-editorial text-foreground/50">
+                  Hours
+                </div>
+                <StatusPill />
               </div>
-              <ul className="divide-y divide-foreground/10 border-y border-foreground/10 mt-3">
+              <ul className="divide-y divide-foreground/10 border-y border-foreground/10">
                 {HOURS.map((d) => (
                   <li key={d.label} className="flex items-center justify-between py-3 text-sm">
                     <span>{d.label}</span>

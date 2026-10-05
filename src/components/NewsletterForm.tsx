@@ -53,7 +53,7 @@ export function NewsletterForm() {
         className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background px-7 py-4 text-[11px] uppercase tracking-editorial hover:bg-secondary transition disabled:opacity-60"
       >
         {state === "loading" ? "Claiming…" : "Claim 15% off"}
-        {state === "loading" ? null : <ArrowRight size={14} aria-hidden />}
+        {state === "loading" ? null : <ArrowRight className="h-3.5 w-3.5" aria-hidden />}
       </button>
       {state === "error" && (
         <p role="status" className="text-sm text-foreground/70 sm:absolute sm:-bottom-8">

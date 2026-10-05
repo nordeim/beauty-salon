@@ -1,6 +1,7 @@
 // Site footer — dark (bg-foreground) with the big serif statement, Visit
 // links, hours list, contact column, and the legal bottom bar.
 import Link from "next/link";
+import { Instagram, Mail, Phone } from "lucide-react";
 import { HOURS, formatDayHoursCompact, statusForDay } from "@/lib/hours";
 
 const VISIT_LINKS = [
@@ -79,11 +80,13 @@ export function SiteFooter() {
             <ul className="space-y-3 text-sm text-background/80">
               <li>
                 <a href="tel:123-456-7890" className="inline-flex items-center gap-2 hover:text-background">
+                  <Phone className="h-3.5 w-3.5" aria-hidden />
                   123-456-7890
                 </a>
               </li>
               <li>
                 <a href="mailto:info@mysite.com" className="inline-flex items-center gap-2 hover:text-background">
+                  <Mail className="h-3.5 w-3.5" aria-hidden />
                   info@mysite.com
                 </a>
               </li>
@@ -94,6 +97,7 @@ export function SiteFooter() {
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 hover:text-background"
                 >
+                  <Instagram className="h-3.5 w-3.5" aria-hidden />
                   Instagram
                 </a>
               </li>

@@ -215,7 +215,7 @@ export function BookingForm({
           className="inline-flex items-center gap-3 rounded-full bg-foreground text-background px-8 py-4 text-[11px] uppercase tracking-editorial hover:bg-secondary transition disabled:opacity-60"
         >
           {submitting ? "Requesting…" : "Request appointment"}
-          {!submitting && <ArrowRight size={14} aria-hidden />}
+          {!submitting && <ArrowRight className="h-4 w-4" aria-hidden />}
         </button>
       </div>
 
