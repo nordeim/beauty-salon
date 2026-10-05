@@ -423,3 +423,20 @@ Stage Summary:
 - Docs aligned: README (badge 191, 66/125 counts, the scroll feature row), AGENTS.md (the scroll-policy invariant + the scroll-parity contract line + the ICS negative-pin note + counts), CLAUDE.md (counts + parity list), PAD (§7 inventory + the session-15 ledger), beauty-salon_SKILL.md v1.12.0 (project_state, Appendix B, Appendix C session-15 row); .env.example re-verified truthful (unchanged); proper docs/session_15.md replaced the transcript; the plan's executed results recorded
 - Screenshots: 15 re-captured on the remediated dev build — the mobile-menu capture 26124B byte-identical (md5-confirmed), 08/09/10/12/14 also byte-identical (git-confirmed — the form surfaces + the confirmation route untouched by the changes exactly as designed); 02 + 14 VLM-verified; 13's lightbox DOM-verified open
 - Next: final gate re-verification (docs changed — the hygiene test scans them) -> secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 18-FINAL
+Agent: main (Super Z)
+Task: Session 15 final push verification and wrap-up
+
+Work Log:
+- Committed as one atomic commit 9e9d502 to main (32 files: 12 code files for the scroll-policy sweep + the new DeadHashLink island + LegalPage wiring + the new scroll-parity spec + the extended ics.test.ts + 6 docs + the new plan + the session log + worklog + 8 re-captured screenshots)
+- Pushed via docs/ssh_git_wrapper_v3.py with --remote git@github.com:nordeim/beauty-salon.git (the paramiko shim from the runbook's Appendix A at /home/z/my-project/bin/shim/ssh, outside the repo)
+- Key fingerprint verified pre-push (SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU — the sessions 1-14 record, the same operator key) and shredded post-push (the wrapper's temp copy shreds itself on every run)
+- Dry-run clean (ea159ef..9e9d502 fast-forward); real push exit 0 with the wrapper's own remote verification + the tracking-ref sync
+- Independent re-confirmation via git ls-remote (shim + key): 9e9d502c69758a8fd1b62b4b166f2d31a3d203dd refs/heads/main — byte-exact == local HEAD
+- Change-set secret scan clean pre-commit: no AUTH_SECRET hex32+ material in any tracked file; no tracked env/db/key files beyond .env.example; the 3 doc hits for "BEGIN OPENSSH PRIVATE KEY" are the runbook's own documentation examples (tracked for 10+ sessions, hygiene-scan-clean)
+
+Stage Summary:
+- Session 15 delivered and pushed: the navigation scroll policy (scroll={false} everywhere + { scroll: false } on router.push — the reference's SPA kept-and-clamped behavior), the dead-# click semantics (the DeadHashLink island), the ICS negative pins (no STATUS/no TRANSP/field-order census), 6 new e2e + 3 unit pins (191 total, full gate green), full docs alignment (SKILL v1.12.0), 15 screenshots (mobile-menu 26124B byte-identical, 7 total byte-identical)
+- Final state: branch up to date with origin/main, working tree clean, remote == local verified byte-exact
