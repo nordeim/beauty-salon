@@ -6,7 +6,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![Prisma](https://img.shields.io/badge/Prisma-6-2d3748?logo=prisma)
 ![SQLite](https://img.shields.io/badge/DB-SQLite-003b57?logo=sqlite)
-![Tests](https://img.shields.io/badge/tests-142_passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-153_passing-brightgreen)
 
 A production-grade, self-hosted clone of the **Maison Luminaire** beauty-salon experience — an editorial cream-and-ink marketing site, a Seamless Scheduler booking flow with ICS calendar downloads, and a cookie-session auth surface — rebuilt as a single Next.js application on Prisma/SQLite with byte-parity design tokens.
 
@@ -26,9 +26,10 @@ The reference app is a base44 SPA serving a hair / skin / nails salon brand: a s
 | ✨ **The icon layer** | Every lucide icon mirrors the reference's exact class set — class-based sizing (`h-4 w-4`…), the sage testimonial stars, hover-rotate arrows under named groups (`group/btn`), the footer/contact phone-mail-instagram icons, and the MapPin directions link — censused live on both sides and pinned by e2e |
 | 🌸 **The confirmation watermark + settled states** | The reference's large pale `flower2` watermark (responsive class sizing, stroke 0.5, sage/30) over an invisible decorative ring, and the landing hero's animation-settled proportion (the `scale-125` class neutralized at rest — the Tailwind v4 individual-`scale` trap) — both live-measured and pinned by e2e |
 | 🧭 **The head layer** | The reference's declared favicon (the self-hosted logo, with the reference's own svg-type artifact) and its declared-but-dead manifest link — the one browser-visible `<head>` surface, pinned by e2e |
+| 🔗 **The links layer + SPA routing behavior** | Every route's `<a href>` census verified both sides (the services grid's bottom `Book an appointment` CTA, the accessibility article's dead `#` link), the reference's dedicated **"Service not found"** state for unknown slugs (inside the site chrome, HTTP 200 — not the generic 404), and its **case-insensitive route matching + trailing-slash preservation** (a `src/proxy.ts` rewrite — the Next 16 proxy convention) — pinned by `tests/e2e/links-parity.spec.ts` |
 | ✉️ **Newsletter capture** | Idempotent upserts into the database |
 | 🚦 **Open/Closed status** | Day-aware "Open today / Closed today" pill with the reference's breathing amber dot |
-| 🧪 **Evidence-backed parity** | 61 unit tests + 81 Playwright e2e specs, including computed-style assertions against live-extracted reference measurements (mobile drawer, login font context + slate-900 read-back, the 404 slate card, the service detail FAQ/CTA surfaces, the legal page structure, the booking form structure + decoded-ICS contract, the icon layer — glyph/class/size/color on every route, the confirmation decorative layer + policy link, the hero settled state, and the head layer) |
+| 🧪 **Evidence-backed parity** | 61 unit tests + 92 Playwright e2e specs, including computed-style assertions against live-extracted reference measurements (mobile drawer, login font context + slate-900 read-back, the 404 slate card, the service detail FAQ/CTA surfaces, the legal page structure, the booking form structure + decoded-ICS contract, the icon layer — glyph/class/size/color on every route, the confirmation decorative layer + policy link, the hero settled state, the head layer, and the links/routing census — href sequences, the unknown-service state, case-insensitive routing) |
 
 ## Architecture
 
@@ -99,7 +100,7 @@ bun run lint && bun run typecheck && bun run test
 # eslint clean · tsc clean · 61 tests passed
 
 bun run build && bun run test:e2e
-# 27 routes built · 81 e2e specs passed
+# 27 routes built · 92 e2e specs passed
 ```
 
 Demo login (seeded): `sepnetflix2023@outlook.com` / `$Abcd1234` (override at seed time with `DEMO_USER_PASSWORD`).

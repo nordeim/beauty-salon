@@ -1,133 +1,58 @@
-I'll continue the task from the previous session. Let me set up a task list and start by refreshing the workspace.
-The workspace exists with the repo intact. Let me check git status and pull the latest changes.
-`git pull` brought in `docs/session_10.md` — the new session briefing. Let me read the key session documents and worklog.
-Now the remediation plan and worklog:
-Let me read the full persisted outputs for these documents.
-I now have the session history. This is **Session 10** — `docs/session_10.md` holds the session-9 raw transcript (to be replaced with a proper record, per convention). Session 9 completed the icon-layer census (19 fixes, e2e 70/70). Suggested session-10 candidates: performance deep-test (LCP/images) or favicon/PWA layer verification.
+# Session 11 — Audit: The Links/Redirect Census + the Unknown-Service State + Case-Insensitive Routing (2026-10-05)
 
-Let me read the full session-9 remediation plan, then the core docs.
-Now let me refresh the core docs (updated to v1.6.0 in session 9). Checking sizes first:
-Now let me check the PAD session ledger and SKILL.md project state (the latest sections):
-Core docs refreshed. Now let me validate understanding against the codebase — environment state, key invariants, and the session-9 diff.
-Environment intact (deps, `.env`, seeded DBs). Now let me re-review the session-9 code diff (the "recent changes" this session audits) and verify the icon invariants in code:
-The session-9 invariants all hold in code. But I spot one remaining `size=` prop — `CalendarPlus size={96}` on the confirmation page. Let me examine that surface:
-This `CalendarPlus size={96}` decorative icon on the confirmation page is a **session-1 authored element** — the session-9 census counted `/book` (1 icon = submit arrow) but I need to verify whether `/book/confirmation` was ever censused. This is a potential session-10 finding. Let me note it and run the baseline audit gates now.
-Lint ✓ · tsc ✓. Now unit tests + security audit:
-Client/server module discipline holds. Now secret scan + production build:
-Build ✓ (27/27 pages). Now the full e2e baseline:
-**Baseline fully green** — lint ✓ · tsc ✓ · unit 61/61 · build 27/27 · e2e 70/70 (131 total). Now the live parity verification. Let me load the agent-browser skill:
-agent-browser loaded. Let me start the dev server and open the live reference in parallel:
-Logged in (redirects to `/` — consistent). Now the session-10 deep sweep. **First target: the confirmation page's decorative layer** (the `CalendarPlus size={96}` I flagged). Let me book through the live site to reach a real confirmation URL:
-The live uses native date/time segments. Since the confirmation page is a pure function of the query string (session-8 verified), let me navigate directly:
-**Session-10 FINDINGS on the live confirmation page:**
-1. The big decorative icon is **`lucide-flower2` at `h-64 w-64 md:h-96 md:w-96` (stroke-width 0.5)** — the clone renders `CalendarPlus size={96} strokeWidth={0.75}` — wrong glyph, wrong size, wrong stroke!
-2. The cancellation-policy mailto link carries an **`arrow-right h-3 w-3`** icon — the clone's link has none.
+**Baseline:** remote `main` @ `3f00dcc` · **Deliverable commit:** the services grid's bottom CTA + the accessibility article link + the dedicated "Service not found" state + case-insensitive routing with trailing-slash preservation (`src/proxy.ts`), +11 e2e (153 total), docs + screenshots refresh
 
-The session-9 census never covered `/book/confirmation` ("book 1/1" was `/book`). Let me extract the full decorative layer + link structure:
-The live decorative layer: wrapper `absolute top-28 left-1/2 -translate-x-1/2 text-secondary/30` (with reveal settled-state inline styles), containing `flower2` at responsive `h-64 w-64 md:h-96 md:w-96`, `stroke-width="0.5"`. The circle matches the clone. Now the mailto link:
-**More findings!** The live link's `href` is **`/contact`** (internal route), not `mailto:` — plus the `inline-flex items-center gap-1` classes and the arrow icon. Let me get the live page's full innerText + the local side for comparison:
-innerText 536/536 — parity holds. Now the local side's svg census + link structure:
-Full link contract extracted. Now the **head layer** (favicon/PWA/meta) — the second deep-sweep target:
-The live head carries an **icon link** (to the base44-hosted `logo.png` — the same image the clone has self-hosted) and a **`/manifest.json`**. Let me fetch the manifest and check the local head:
-The live `manifest.json` is a **dead link** (SPA fallback HTML, `text/html` content type) — the reference's own inconsistency. The local `src/app/` has **no icon file at all** — the head layer was never built. Let me read the local layout:
-The local head lacks the icon + manifest + og/twitter layers entirely. Let me get the complete live head meta census (including title/description/theme-color):
-Complete head census extracted. The browser-visible gap: **favicon + manifest link**. The og/twitter/PWA meta is base44 platform boilerplate (scraper-facing — belongs in the accepted-divergence register). Now the third target — the **hero/LCP image layer** (session-9's suggested performance candidate):
-Key findings on the hero layer: the local `hero-portrait.png` is **512×512** while the live serves **1024×1024** — a resolution/quality gap on the LCP image. Let me check the hero code and inventory image natural sizes on both sides:
-The file is actually 1024×1024 — the `512` natural reading was a `sizes`-driven derivative (40vw @1280 viewport = 512px), not a resolution gap. Good. Let me confirm both viewports match for a fair comparison:
-Viewports match, but the hero image renders **494×659 live vs 572×762 local** — both keep the 3/4 ratio but at different widths. Let me extract the hero grid structure on both sides:
-The live aspect div reports **457** (scale-125 seemingly inactive) while local reports **572** (scaled). And the live img (494) is *wider than its parent*. Let me get the computed transforms and pre/post-transform widths:
-The live neutralizes the parent's `scale-125` (computed `transform: none`) and instead scales the **img itself by 1.08**. Let me verify stability (continuous zoom vs settled state) and check the inline styles:
-**Stable settled-state divergence found.** The live's animation framework neutralizes the parent's `scale-125` with inline `transform: none` and scales the img to 1.08 — so the live hero box is **457×610** while the clone renders the full `scale-125` → **572×762**. The clone's hero portrait is 25% larger than the reference's. Let me read the clone's hero code and the Reveal component:
-The live grid class was truncated at 110 chars in my extraction. Let me get the full class list:
-The live grid classes match the clone exactly (my earlier extraction was truncated). The hero divergence is isolated to the **transform layer**. Let me check the live's *initial* state on reload to understand the full animation contract:
-Third data point confirms the settled contract. Now let me sweep for other `scale-` classes that the live might neutralize the same way:
-The hero is the only non-hover scale. But I spotted a curious artifact: `duration-s]` in the live class strings. Let me extract those img classes fully on both sides:
-The live carries a **corrupted class artifact**: `duration-s]` (invalid Tailwind → instant hover-zoom) on 3 images vs clean `duration-700` on 6 others. Let me compare the local side's img classes:
-**F4 found**: the live's 3 category images carry the corrupted `duration-s]` class (instant hover zoom) — the clone "fixed" it to `duration-700` (700ms glide), a behavioral divergence. Let me verify the live's computed transition behavior:
-0 matches via `indexOf` but 3 in the object-key census — something's odd with the characters. Let me dump char codes of the category img's className:
-Logically impossible unless the shell mangled the string. Let me test directly:
-The class is actually `duration-[12...` — an arbitrary-value class that my earlier truncation mangled. Let me get the full untruncated classes:
-`duration-s]` in the class but computed **0.15s** — suspicious. Let me read the raw attribute:
-The live's computed result: **150ms + default ease** (the invalid `duration-s]` leaves `transition-transform`'s built-in 150ms default active; the `ease-[...]` also generates no CSS). The clone renders 700ms + editorial ease — a real hover-behavior divergence. Let me check how the clone handled the reference's prior class artifacts (the trailing-space precedent):
-The `duration-s]` artifact is inert on live (no CSS) but its sibling `ease-[...]` is equally dead there while it WOULD generate in the clone — computed behavior is the contract. Let me now read the Reveal component to design the hero fix:
-Reveal adds a wrapper — not suitable for the hero (would change DOM structure). The settled-state inline-style replication is the minimal faithful fix. Let me try to catch the live's hero entrance (best effort, 2 attempts):
-已及时锁定。现在进行移动端抽屉的常规检查 + 移动端宽度下的 hero。正在两个会话中设置移动端视口（390×844）：
-Mobile hero divergence confirmed (458 vs 366 wide). Now the standing **mobile drawer check** @390×844 on live:
-That matched the wrong element. Let me find the actual drawer (z-[60], giant serif links):
-Live drawer contract fully holds (gap-2 8px, CTA mt-10 40px, 48px/-1.2px serif, cream z-60, no scroll lock). Now the local side:
-All drawer values match both sides. Quick tap-through check (link click → close + navigate):
-Drawer works perfectly. Final sweep item — the story image container:
-The story image parent matches. One more detail on F1 — the live decorative circle's settled state (it showed `opacity: 0` earlier — transient or settled?):
-The circle is still moving (scale changed) — a slow animation. Let me sample it repeatedly to determine its end-state:
-The circle settles at **opacity 0** (invisible) with a wasted infinite scale loop — the live page shows only the flower2, no circle border. The clone renders the circle visible. Let me confirm visually with a screenshot:
-Sage flower confirmed visible on live; circle invisible. The sweep is complete. Let me verify `Flower2` availability and check for any existing favicon infrastructure:
-All prerequisites verified. Let me review the existing spec conventions to design the TDD specs:
-I have the complete picture. Let me update todos and write the session-10 remediation plan:
-Fixing a typo in the plan header:
-Plan validated. Now **T1 (RED)** — writing the new specs. Let me check the booking-parity spec's confirmation conventions first:
-Now writing the new confirmation-parity spec (RED phase):
-Now the head-parity spec:
-Now extending `landing.spec.ts` with the hero settled-state + category hover contracts:
-I need to fix the category-img locator — both category images AND gallery tiles carry `group-hover:scale-110`. Let me check for `aspect-[3/4]` uniqueness too:
-The hero locator is safe (`.first()` + only one on landing). Fixing the category-img locator to use the attribute-contains selector:
-Now running the **RED phase** against the current (pre-fix) build. Predicted: 9 of 13 new tests red (the 4 guards stay green):
-**RED confirmed** — 7 failed exactly as the plan predicted (all guards green). Now **T2 (GREEN)** — applying the fixes. First the confirmation page:
-Now the landing page fixes — hero settled state + category hover timing:
-I made a JSX syntax error — a comment can't sit between props. Fixing:
-Now the layout.tsx head-layer fix:
-All fixes applied. Early verification — lint + typecheck:
-4 tests still red — let me inspect the failure details:
-Two spec-side shapings needed: (1) the sage/30 color serializes as oklab in v4 (trap 7 — assert channels, not strings); (2) `text-underline-offset` computes to `auto` (not 0px). Let me check the existing oklab-assertion pattern:
-Applying the two spec-side shapings (the trap-7 oklab pattern + the `auto` offset):
-Now the two landing failures — let me see their details:
-The category fix IS live (150ms + default ease passed) — the property assertion needs the v4 serialization (`transform, translate, scale, rotate`). But the hero width mystery needs direct measurement. Let me check the dev server:
-**Root cause found — a new Tailwind v4 trap (trap 8):** v4's `scale-125` writes the **individual `scale` property** (`scale: 1.25`), not `transform` — so the reference's v3-era neutralization (inline `transform: none`) doesn't neutralize it in v4. The box's `offsetWidth` is 457 (layout correct) but the rect is still 572. The fix needs `scale: none`:
-Now updating the two spec-side shapings (the hero box check + the v4 transition-property serialization):
-Verifying the fix on dev before rebuilding:
-**Hero now matches live exactly** — box 457×610, img 494×659 at scale 1.08. Rebuilding and running the full new-spec set:
-**GREEN — 21/21.** Now **T3** — the full gate with the complete e2e suite:
-**FULL GATE GREEN — lint ✓ · tsc ✓ · unit 61/61 · build 27/27 · e2e 81/81 (142 total)**, all 70 pre-existing contracts untouched. Now **T4** — live re-verification. Checking the local confirmation page against the live-measured contract:
-Every value matches the live contract (the extra `lucide-flower-2` alias token is a lucide-react version artifact — dead class, no CSS — the accepted substrate family). Now the mobile hero check:
-Mobile hero matches live exactly (366×488 / 395×527). Now re-capturing the canonical 15 screenshots. Checking the existing capture format first:
-All 15 captured — **mobile-menu 26124B byte-identical signal holds**; untouched surfaces (08/09/12) byte-identical. Now VLM-verifying the key captures:
-The VLM claims a visible ring — let me pixel-probe the capture to check whether the ring is actually rendered:
-No sage ring pixels — only cream background (the VLM conflated the flower's round petals; the computed `opacity: 0` + pixel probe are authoritative). Now the landing + mobile-menu VLM checks:
-Mobile-menu standing check ✓ (byte-identical 26124B — the dev-mode N badge was always in the dev captures). Checking the lightbox capture (its size changed vs prior session):
-The VLM hallucinated HTML (the session-7 known failure mode) — but it leaked the content: the lightbox IS open showing "Radiance Facial". Let me re-verify with a constrained prompt:
-**T4 complete.** Now **T5** — documentation alignment. Starting with README:
-The first call partially applied. Let me check the current state of all README targets:
-README aligned. Now AGENTS.md:
-Now CLAUDE.md:
-Now the PAD — §5.5 trap log + §7 ledger:
-Now the PAD §7 session-10 ledger:
-Updating the PAD §7 e2e inventory row (70 → 81):
-Now `beauty-salon_SKILL.md` → v1.7.0. Checking the sections to update:
-SKILL.md §4.5 lags at 5 traps (a drift from sessions 6/7 — they documented 6/7 in project_state/appendices only). Bringing it to the full 8 + version bump:
-Now Appendix B + C in the SKILL.md:
-Docs aligned. Verifying `.env.example` truthfulness (no env-relevant change this session):
-`.env.example` truthful — unchanged. Now **T6** — the proper session log (replacing the transcript in `docs/session_10.md`):
-Now marking the plan's ToDo results and appending the worklog record:
-Now appending the worklog record (Task ID 13, session 10):
-Worklog appended. Now **T7** — the push sequence. Let me review the SSH runbook and check the change set:
-One match in session_10.md — verifying it's the scan-description prose, not key material:
-Clean — it's the log's own scan-description prose (the sessions 8–9 known pattern). Now the SSH push. Let me re-read the runbook essentials and check the shim:
-Runbook + shim ready. Committing the session-10 deliverable:
-Committed as `b315845`. Now materializing the operator key outside the repo and verifying its fingerprint:
-My hand-rolled fingerprint skipped the 4-byte length prefix. Let me fix and cross-check with the wrapper's own report:
-The session-record fingerprint is over the full public-key wire blob, not the raw 32 bytes. Computing properly:
-**Fingerprint verified** — `SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU` matches the session 1–9 record. Dry-run with the correct remote:
-Dry-run clean (`f0f0298..b315845` fast-forward). Real push:
-**PUSH VERIFIED** — remote main @ `b315845` == local HEAD. Shredding the operator key + final verification:
-Push verified. Following the session 4–9 pattern — recording the concrete push evidence in the plan and pushing the follow-up:
-**Follow-up push verified** — remote main @ `8703f18`. Final cleanup and verification:
-**Session 10 complete** ✅ — all work committed and pushed to `main` (`b315845` + `8703f18`, remote == local verified, keys shredded).
+**Method:** Mode C audit (`skills/code-review-and-audit` pipeline — Phase 3 as a targeted lightweight checklist; `skills/` excluded) + live parity verification with `skills/agent-browser` (login, the mobile drawer @390×844, and **the first-ever both-sides links/redirect census** — every `<a href>` on all 16 routes — plus the routing edge matrix: case-variant URLs, trailing slashes, unknown slugs, unknown categories, and the login OAuth surface; the two session-10 suggested candidates) + TDD remediation per `docs/remediation-plan-session-11.md`.
 
-**What this session found & fixed** (3 never-measured DOM layers):
+> Note: this file previously held the raw process transcript of session 10 (committed at `3f00dcc`). It has been replaced by this proper session-11 record — the same convention sessions 4–10 applied to their own transcript files.
 
-1. **Confirmation page** — the decorative watermark was `CalendarPlus@96`; the reference renders a large pale **`flower2`** (responsive 256/384px, stroke 0.5, sage/30). Also: the decorative ring is **invisible** on the reference (opacity 0), and the policy link is a **`/contact` route link** with a trailing arrow — not a `mailto:`.
-2. **Hero settled state** — the reference's animation framework *neutralizes* `scale-125` at rest; the clone was 25% too large. Fixed via settled inline styles — discovering **Tailwind trap 8**: v4's `scale-*` writes the individual `scale` property, which `transform: none` cannot neutralize.
-3. **Head layer** — added the declared favicon (self-hosted logo) + the reference's declared-but-dead manifest link; plus the category images' true 150ms hover timing.
+## What this session set out to do
 
-**Gate:** lint ✓ · tsc ✓ · unit 61/61 · build 27/27 · e2e **81/81** (142 total) · mobile drawer verified working both sides · 15 screenshots re-captured (mobile-menu byte-identical signal holds).
+Refresh the workspace (`git pull` brought in `docs/session_11.md`, the session-10 transcript), re-validate the documented architecture against the codebase (the session-10 diff — the flower2 confirmation layer, the hero settled state, the head layer — all verified in code), run the Mode C audit baseline, then execute the session-10 log's suggested candidates: **(a) a links/redirect census** — an instrument no prior session had built — and **(b) the login OAuth surface**. Remediate everything found via TDD, re-capture screenshots, align documentation, push to `main`.
 
-**Next steps:** hover the landing category cards (instant zoom, as the reference) or book any service to see the flower watermark confirmation. If a session 11 is desired, candidate directions: the login page's OAuth surface behavior, or a links/redirect census (all `href` targets both sides).
+## Audit results (all phases)
+
+- **Phase 1 (lint + typecheck):** clean — ESLint 0 errors, `tsc --noEmit` clean.
+- **Phase 2 (security):** `bun audit` shows the same two dev-only transitive advisories as sessions 2–10 (`braces`, `deepmerge-ts`) — the accepted-risk stance re-verified unchanged. Secret scan clean: the `BEGIN OPENSSH PRIVATE KEY` matches are the wrapper's redacted placeholder constant, the runbook's own check command, and the session logs' scan-description prose (all verified). Tracked env/db/key files: only `.env.example`.
+- **Phase 3 (lightweight checklist):** the targeted greps reproduce the established noise register exactly — `console.log`/TODO absent from `src/`; `scripts/` = exactly `with-repo-db.ts`; zero client `data.ts` imports.
+- **Phase 4 (tests):** baseline fully green — unit 61/61, build 27/27 pages, e2e 81/81 (142 total).
+- **Session-10 diff re-review:** the confirmation decorative layer (flower2 at responsive class sizing + stroke 0.5 + the invisible circle + the `/contact` policy link with its trailing arrow), the hero settled state (`transform: none` + `scale: none` + the img at 1.08), the category images' inert `duration-s]` token, and the head layer (favicon + the dead manifest link) all match the documented design exactly; `confirmation-parity.spec.ts`, `head-parity.spec.ts`, and the landing session-10 contracts pin them.
+
+## Live parity verification (agent-browser)
+
+The links/redirect census — every `<a href>` enumerated and diffed on all 16 routes (landing, services grid, 8 service details, gallery, team, about, contact, book, confirmation, login, 4 legal): **14/16 identical**. The two divergent routes plus the widened routing sweep yielded the session's findings:
+
+- **F1 (MEDIUM — visible content gap):** the `/services` grid page was missing its bottom CTA. The live's `pb-28` section has two children — the grid plus a `mt-20 text-center` wrapper holding `a.inline-block href="/book"` → the standard dark pill span ("Book an appointment"; the live's span carries its own trailing-space class artifact + a settled `transform: none`, both inert — omitted per the established conventions). The clone rendered only the grid. The services innerText measured **1942 (live) vs 1922 (clone) — the 20-char delta is exactly the missing `BOOK AN APPOINTMENT\n`.**
+- **F2 (LOW-MEDIUM — link markup inside a text-identical paragraph):** the accessibility page's article title. The live wraps `"Accessibility: Adding an Accessibility Statement to Your Site"` in a dead `<a href="#" class="underline hover:text-foreground">` inside the unchanged sentence (computed 16px Mulish, `rgba(26,26,26,0.75)`, underline, offset auto); the clone rendered the title as plain text.
+- **F3 (MEDIUM — a dedicated unknown-slug state):** `/services/not-a-real-service` (any unknown slug) renders, on the live, a **"Service not found"** state INSIDE the site chrome — title `Services | Beauty Salon`, `<section class="pt-40 px-6 max-w-3xl mx-auto text-center">` with `h1.font-serif.text-4xl.mb-6` and the `text-[11px] uppercase tracking-editorial underline` "Return to the almanac" link — HTTP 200. The clone fell through `notFound()` to the generic slate 404.
+- **F4 (LOW — SPA routing behavior):** the live's router matches routes **case-insensitively** with the URL preserved — `/SERVICES`, `/SeRvIcEs`, `/TEAM`, `/Gallery`, `/BOOK`, `/PRIVACY`, `/BOOK/CONFIRMATION` all render their pages — while case-variant *slugs* still fail their (case-sensitive) lookup → the F3 state (`/SERVICES/BALAYAGE` → "Service not found"). Trailing slashes are preserved (`/services/balayage/` renders, no redirect). The clone 404'd case variants and 308-normalized trailing slashes. The live's per-page `<title>` on case-variant URLs derives from the raw path (`startCase` — `/SeRvIcEs` → "Se Rv Ic Es | Beauty Salon") — registered as accepted divergence (the per-page-title family).
+- **F5 (INFO — the OAuth surface measured precisely):** the live's "Continue with Google" navigates to Google via **base44 platform OAuth** — `client_id=185178814199-6a35e9aqcmlm15ig0upncg07c91av8do.apps.googleusercontent.com`, `redirect_uri=https://app.base44.com/api/apps/auth/callback`, `response_type=code`, state carrying the reference's own `{domain, from_url, app_id}`. The clone's inert-button stance re-verified correct: replicating the navigation would authenticate the clone's users against the *reference's* base44 app and land them back on the reference's domain — a live dependency on the reference platform. Now documented with the measurement instead of an assertion.
+- **Verified holding:** the confirmation ICS contract (the census diff = per-load UID/DTSTAMP only); the **mobile drawer @390×844 both sides** — every pinned value (gap 8px, 48px Cormorant lh 48 ls −1.2px, CTA mt 40px, cream z-60, no scroll lock) plus tap-through close+navigate; **no Tailwind v4 regression** (the task brief's emphasis); gallery unknown-category → the All fallback (12 tiles both sides); `/book/unknown-sub` + `/team/unknown` → the 404 view both sides (HTTP 200 vs 404 — the documented SPA-fallback substrate divergence).
+
+## Findings and the TDD fixes
+
+All four actionable findings fixed per the plan across 5 files + 1 new spec:
+
+- **F1** (`src/components/ServicesExperience.tsx`): the `mt-20 text-center` wrapper added as the last child of the `pb-28` section — `Link.inline-block` → the standard pill span (the same class set as the contact page's "Reserve an appointment"). The services innerText is now 1942, the live exact.
+- **F2** (`src/lib/legal.ts` + `src/components/LegalPage.tsx`): a new optional `LegalPBlock.link` field (`{ text, href, className }`) + a Paragraph split-renderer that wraps the link text substring in an `<a>` — the sentence text is unchanged. The accessibility block declares the dead `#` link with `underline hover:text-foreground`.
+- **F3** (`src/app/(site)/services/[slug]/page.tsx`): `notFound()` replaced with the live-measured "Service not found" section (the `generateMetadata` fallback title corrected `Service` → `Services`). A deliberate soft-404-for-parity — the reference behaves identically; AGENTS.md now warns against "fixing" it back.
+- **F4** (`src/proxy.ts` new + `next.config.ts`): a rewrite-only proxy (never a redirect — the URL bar stays as typed) that (1) lowercases any uppercase-bearing path — except under `/services/…`, where only the first segment is lowercased so case-variant slugs still fail their lookup and render the F3 state (the reference's exact split behavior); (2) rewrites trailing-slash paths to slashless. **Two engine facts verified the hard way:** Next 16 deprecates the `middleware` filename (the build warns; the convention is `src/proxy.ts` with an exported `proxy()`), and **the router's trailing-slash 308 fires BEFORE the proxy runs** — preserving slash URLs requires `skipTrailingSlashRedirect: true` so the request actually reaches the proxy. Both are now in AGENTS.md's quirks list.
+
+**RED evidence:** the new spec failed 8/8 actionable tests exactly as the plan predicted (2 spec-side shapings on the guards first: the gallery census is 20 links — the 12 tiles are buttons, not anchors — and the generic-404 marker is the slate card, since the 404 page carries its own site chrome), with all three regression guards green (the landing 33-href census, the gallery census, the generic-404 contract). **GREEN:** 11/11 after the fixes; the full gate — lint ✓ · typecheck ✓ · unit 61/61 · build 27/27 · e2e **92/92 (153 total)** — with every pre-existing contract untouched.
+
+## Everything else shipped this session
+
+- **Post-fix live re-verification:** the services CTA value-by-value (the DOM structure, the link's computed 16px Mulish ink inline-block, the pill span's computed bg/color/radius/px/py, the section's 2 children, mt-20 → 80px, `/book` ×3, innerText 1942); the accessibility link (paragraph HTML identical, computed underline + offset auto; the color serializes as `oklab(… / 0.75)` — the trap-7 family, pixels identical); the unknown-service state (HTTP 200, title, section HTML identical, site chrome present); the routing matrix (`/SERVICES/BALAYAGE` → Service not found with the URL preserved; `/BOOK/CONFIRMATION?…` → the confirmation; `/TEAM` → team; `/definitely-not-a-page` → the generic 404).
+- 15 dev-server screenshots re-captured on the remediated build (canonical viewport-only style, absolute paths; the full-page 03). **The mobile-menu capture is 26124B — byte-identical to every prior verified session** (the pixel-consistency signal); 10-landing-mobile + 12-book-mobile also byte-identical. 02 re-captured scrolled to the new CTA (it sits below the fold at 900px) to document the remediation. VLM-verified: the services CTA capture (a constrained re-prompt after discarding one hallucinated-HTML pass — the documented session-7/10 VLM failure mode), the confirmation (the flower watermark present), the gallery grid, and the about page.
+- Documentation aligned: README (badge 153, 61/92 counts, the links/routing feature row), AGENTS.md (the services-CTA + service-not-found + article-link invariants, the proxy-convention + 308-before-proxy quirks, the links-parity contract line), CLAUDE.md (counts + the parity list), PAD (§7 inventory 61/92 + the session-11 ledger), `beauty-salon_SKILL.md` **v1.8.0** (project_state, Appendix B 92/153, Appendix C — the session-11 row). `.env.example` re-verified truthful (unchanged — the proxy reads no env).
+- The remediation plan (`docs/remediation-plan-session-11.md`) with its findings register, plan-vs-codebase validation matrix, and executed ToDo results; this session log; the worklog record.
+
+## The lesson (recorded in SKILL v1.8.0 + PAD)
+
+**The session-10 rule generalizes one step further.** innerText parity is blind not just to icon class sets and head elements but to **link MARKUP**: F2's divergence sits inside a paragraph whose text is identical on both sides — only an href enumeration sees it. And **route-matrix parity is blind to the router's RESOLUTION behavior**: both sites "have" `/services/[slug]`, but the SPA resolves paths case-insensitively, falls back in-page, and never canonicalizes trailing slashes — three behaviors a file-based router does not share and no existing spec could see. Each unmeasured layer needs its own census instrument; this session's were the both-sides href enumeration and the routing edge matrix, both now pinned by `links-parity.spec.ts`.
+
+## Carried / accepted (unchanged)
+
+- `braces` and `deepmerge-ts` advisories — dev-only transitive chains, no upstream fix / not safe to force; documented in `docs/remediation-plan-session-2.md` §4.4 and re-verified in sessions 3–11.
+- The clone's invisible a11y additions, the per-page `document.title` (**extended this session**: the reference's case-variant URLs derive the title from the raw path via `startCase` — registered in the same family), the login shell's `<body>` overscroll difference, the in-memory rate limiter, the inert Google OAuth (**re-verified with the live measurement this session**), notice-only Forgot-password/Sign-up, the lucide-react alias class token, the og/twitter/PWA head metas (base44 boilerplate), the opacity-modifier oklab serialization (trap 7), the individual-transform properties (trap 8), and the remaining PAD §10 deferred items — by design, mirroring the reference.
+- The reference's own inconsistencies replicated faithfully: the NY-pointing map embed under the SF address, the ICS's New York LOCATION, the trailing-space class artifacts, the raw-comma ICS text, the favicon's svg-type hint over a PNG, the inert `duration-s]` token, the dead manifest declaration — **and now the dead `#` article link** (new).

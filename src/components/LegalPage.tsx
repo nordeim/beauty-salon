@@ -46,6 +46,25 @@ const variantClass: Record<NonNullable<LegalPBlock["variant"]>, string> = {
 };
 
 function Paragraph({ block, className }: { block: LegalPBlock; className?: string }) {
+  // The inline link (accessibility article link): render the link text as
+  // an <a> INSIDE the paragraph, splitting on the substring — the sentence
+  // text is unchanged (live-measured session 11: the reference wraps the
+  // quoted title in a dead "#" link with underline hover:text-foreground).
+  const link = block.link;
+  let content: React.ReactNode = block.text;
+  if (link && block.text.includes(link.text)) {
+    const [before, ...rest] = block.text.split(link.text);
+    const after = rest.join(link.text);
+    content = (
+      <>
+        {before}
+        <a href={link.href} className={link.className}>
+          {link.text}
+        </a>
+        {after}
+      </>
+    );
+  }
   return (
     <p className={cn(variantClass[block.variant ?? "plain"], className)}>
       {block.br
@@ -55,7 +74,7 @@ function Paragraph({ block, className }: { block: LegalPBlock; className?: strin
               {i < lines.length - 1 && <br />}
             </span>
           ))
-        : block.text}
+        : content}
     </p>
   );
 }

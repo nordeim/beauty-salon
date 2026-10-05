@@ -92,6 +92,18 @@ export function ServicesExperience({
             </div>
           ))}
         </div>
+        {/* The reference's bottom CTA (live-measured session 11 — the
+            links census found the section carries a SECOND child after the
+            grid). The span omits the reference's own trailing-space class
+            artifact and its settled transform: none (computed-identical
+            to default — the session-10 settled-state rule). */}
+        <div className="mt-20 text-center">
+          <Link className="inline-block" href="/book">
+            <span className="inline-flex items-center justify-center rounded-full font-sans uppercase tracking-editorial transition-colors duration-500 select-none text-xs px-9 py-4 bg-foreground text-background hover:bg-secondary">
+              Book an appointment
+            </span>
+          </Link>
+        </div>
       </section>
     </>
   );

@@ -18,6 +18,10 @@ export interface LegalPBlock {
   hoist?: boolean;
   /** render newline-separated text with <br> separators (the coordinator block) */
   br?: boolean;
+  /** an inline <a> rendered around a SUBSTRING of text — the accessibility
+   *  page's article link (the reference's own dead "#" href, live-measured
+   *  session 11; replicated faithfully like the dead manifest declaration) */
+  link?: { text: string; href: string; className?: string };
 }
 
 export interface LegalH2Block {
@@ -70,7 +74,7 @@ const legalAccessibilityStatement: LegalPageData = {
   blocks: [
     { kind: "p", text: "The purpose of the following template is to assist you in writing your accessibility statement. Please note that you are responsible for ensuring that your site's statement meets the requirements of the local law in your area or region." },
     { kind: "p", text: "*Note: This page currently has several sections. Once you complete editing the Accessibility Statement below, you need to delete this section.", variant: "note" },
-    { kind: "p", text: "To learn more about this, check out our article \"Accessibility: Adding an Accessibility Statement to Your Site\"." },
+    { kind: "p", text: "To learn more about this, check out our article \"Accessibility: Adding an Accessibility Statement to Your Site\".", link: { text: "\"Accessibility: Adding an Accessibility Statement to Your Site\"", href: "#", className: "underline hover:text-foreground" } },
     { kind: "h2", text: "Accessibility Statement" },
     { kind: "p", text: "This statement was last updated on [enter relevant date]." },
     { kind: "p", text: "We at [enter organization / business name] are working to make our site [enter site name and address] accessible to people with disabilities." },

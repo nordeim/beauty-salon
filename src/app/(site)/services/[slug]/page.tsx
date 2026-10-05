@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ArrowLeft, Check } from "lucide-react";
 import { FaqAccordion } from "@/components/FaqAccordion";
 import { Reveal } from "@/components/Reveal";
@@ -19,7 +18,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const service = await getService(slug);
-  if (!service) return { title: "Service" };
+  // The reference's title for the unknown-slug state is the SERVICES page
+  // title ("Services | Beauty Salon", live-measured session 11).
+  if (!service) return { title: "Services" };
   return { title: service.name, description: service.tagline };
 }
 
@@ -30,7 +31,21 @@ export default async function ServiceDetailPage({
 }) {
   const { slug } = await params;
   const service = await getService(slug);
-  if (!service) notFound();
+  // The reference's unknown-slug state (live-measured session 11): a
+  // DEDICATED "Service not found" section inside the site chrome — not
+  // the generic slate 404. HTTP 200, the SERVICES page title, h1 + the
+  // Return-to-the-almanac link. Deliberate soft-404-for-parity (the
+  // reference behaves identically) — do not "fix" back to notFound().
+  if (!service) {
+    return (
+      <section className="pt-40 px-6 max-w-3xl mx-auto text-center">
+        <h1 className="font-serif text-4xl mb-6">Service not found</h1>
+        <Link className="text-[11px] uppercase tracking-editorial underline" href="/services">
+          Return to the almanac
+        </Link>
+      </section>
+    );
+  }
 
   return (
     <>

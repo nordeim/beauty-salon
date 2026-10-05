@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Preserve trailing-slash URLs (the reference's SPA never canonicalizes
+  // them — live-measured session 11). The router's default 308 fires BEFORE
+  // src/proxy.ts runs, so it must be disabled here; the proxy rewrites
+  // "/services/balayage/" to "/services/balayage" (URL bar preserved).
+  skipTrailingSlashRedirect: true,
   // Pin file tracing to this project so the standalone server always lands
   // at .next/standalone/server.js — even when the repo is cloned inside a
   // parent workspace that has its own lockfile.
