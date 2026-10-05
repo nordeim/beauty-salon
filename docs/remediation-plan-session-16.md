@@ -106,7 +106,7 @@ The 15 canonical screenshots re-captured on the remediated dev build (the mobile
 - [x] **T3.** Full gate: `lint → typecheck → unit → build → test:e2e` — every pre-existing spec green (expected 66 + 133 = 199 total). *(Executed: lint ✓ · tsc ✓ · unit 66/66 ✓ · build 27/27 ✓ · e2e **133/133** ✓ — **199 total**; every pre-existing contract untouched.)*
 - [x] **T4.** The 15 canonical screenshots re-captured on the remediated dev build (the mobile-menu byte-identity signal re-checked). *(Executed: all 15 re-captured — **byte-identical to the committed session-15 versions** [git-confirmed zero changes in docs/screenshots/; the mobile-menu capture 26124B, the landing-mobile 350126B] — the test-only changes are invisible to the rendered app exactly as designed; 13's lightbox DOM-verified open; 02 at the footer scroll per the session-11 convention.)*
 - [x] **T5.** Documentation aligned (README, AGENTS.md, CLAUDE.md, PAD, SKILL v1.13.0 — incl. the F4 phrasing fix + the F5 live-measurement note — `.env.example` re-verified, the proper `docs/session_16.md`, the worklog entry, this plan's executed results). *(All applied; `.env.example` unchanged — the pins read no env.)*
-- [ ] **T6.** Secret scan → commit to `main` → push via `docs/ssh_git_wrapper_v3.py` → verify remote == local.
+- [x] **T6.** Secret scan → commit to `main` → push via `docs/ssh_git_wrapper_v3.py` → verify remote == local. *(Executed — see the push evidence in §9.)*
 
 ## 10. Shipped Artefacts (this remediation)
 

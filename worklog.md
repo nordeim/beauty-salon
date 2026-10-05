@@ -475,3 +475,22 @@ Stage Summary:
 - F5 DOCUMENTED: the Escape asymmetry + the no-trap/no-restore posture live-measurements in the a11y-addition family register
 - Gate: lint ✓ · typecheck ✓ · unit 66/66 ✓ · build 27/27 pages ✓ · e2e 133/133 ✓ (199 total; all pre-existing parity contracts untouched)
 - Next: final gate re-verification (docs changed — the hygiene test scans them) -> secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 19-FINAL
+Agent: main (Super Z)
+Task: Session 16 final push verification and wrap-up
+
+Work Log:
+- Final gate re-verified after all doc changes: lint (0 errors) + typecheck + unit 66/66 + build 27/27 pages + e2e 133/133 = 199 total green (the hygiene test scans the changed docs — clean)
+- Change-set secret scan clean pre-commit: no AUTH_SECRET hex32+ material in any tracked file or the staged diff; no tracked env/db/key files beyond .env.example; the single "BEGIN OPENSSH" text hit in worklog.md is prose referencing the runbook's documentation examples, not key material
+- Committed as one atomic commit 4d2cad0 to main (10 files: the 2 new pin specs + 6 docs + the new plan + the worklog)
+- Pushed via docs/ssh_git_wrapper_v3.py with --remote git@github.com:nordeim/beauty-salon.git (the paramiko shim from the runbook's Appendix A at /home/z/my-project/bin/shim/ssh, outside the repo — redeployed since session 15, still present)
+- Key fingerprint verified pre-push (SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU — the sessions 1-15 operator key record, the same operator key) and shredded post-push (the wrapper's temp copy shreds itself on every run)
+- Dry-run clean (da01810..4d2cad0 fast-forward); real push exit 0 with the wrapper's own remote verification + the tracking-ref sync
+- Independent re-confirmation via git ls-remote (shim + key): 4d2cad0556e528036daf5d6928795ef798af2c02 refs/heads/main — byte-exact == local HEAD
+- Push evidence recorded in the plan's T6 + section 9; this final worklog entry; the T6-executed follow-up commit
+
+Stage Summary:
+- Session 16 delivered and pushed: the focus-order Tab-walk census pinned (FO1-FO5 — every interactive surface's focus order identical both sides, the drawer's no-trap posture replicated), the screen reduced-motion stance pinned (RM1-RM3 — the deliberate a11y divergence vs the live's RM-ignoring rAF animation), the Escape asymmetry + the a11y-family register live-measurements documented, the "collapses to opacity" doc drift fixed (SKILL v1.13.0), 8 new e2e pins (199 total, full gate green), all 15 screenshots byte-identical
+- Final state: branch up to date with origin/main, working tree clean, remote == local verified byte-exact at 4d2cad0
