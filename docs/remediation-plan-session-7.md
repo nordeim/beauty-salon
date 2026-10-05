@@ -171,7 +171,7 @@ Used the Accessibility Wizard to find and fix potential accessibility issues · 
 - [x] **T6.** Live re-verification of the remediated surfaces (local vs the live reference) + re-capture the 15 screenshots on the remediated dev build; VLM-verify service-detail + mobile-menu. *(All 8 service pages exact text-length matches; all 4 legal pages raw-innerText IDENTICAL; service-detail capture now full-page (scroll-through first — below-fold reveals stay hidden otherwise); mobile-menu 26124B byte-identical size to prior verified captures; VLM verified both.)*
 - [x] **T7.** Documentation aligned (README/AGENTS/CLAUDE/PAD/SKILL v1.4.0 + trap-7 appendix); `.env.example` re-verified. *(All applied; `.env.example` unchanged — truthful.)*
 - [x] **T8.** Replace `docs/session_7.md` with the proper session log; append the worklog record; mark this plan's ToDo results. *(Done.)*
-- [ ] **T9.** Secret scan → commit to `main` → push via `docs/ssh_git_wrapper_v3.py` → verify remote == local. *(Pending.)*
+- [x] **T9.** Secret scan → commit to `main` → push via `docs/ssh_git_wrapper_v3.py` → verify remote == local. *(Executed: change-set scan clean (no key material, no tracked env/db/key files); committed as one atomic commit `af928bd`; fingerprint verified `SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU` (matches the session-1/2/3/4/5/6 record); dry-run clean (`e8dfe94..af928bd` fast-forward, remote untouched); real push exit 0 with the wrapper's own remote verification `refs/heads/main @ af928bd == local HEAD` + tracking-ref sync; operator key shredded.)*
 
 ## 8. Acceptance Criteria (definition of done)
 
