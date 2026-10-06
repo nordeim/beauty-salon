@@ -524,3 +524,22 @@ Stage Summary:
 - CALENDAR-SURFACED SPEC FLAKE FIXED: the final-gate re-run after midnight (Tuesday — the suite's first-ever OPEN day) tripped links-parity's services-1942 innerText census at 1938 — the day-aware StatusPill rendered twice shifts "Closed today" → "Open today" = −4 chars exactly; sessions 1-16 all ran on closed days (Sat/Sun/Mon). The spec now derives the expectation from the same unit-tested statusForDay model the pill reads (1942 closed / 1938 open) — day-aware, not weakened
 - Final gate re-verified fully green after the fix: lint + typecheck + unit 80/80 + build 29/29 + e2e 140/140 = 220 total
 - Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 20-FINAL
+Agent: main (Super Z)
+Task: Session 17 final push verification and wrap-up
+
+Work Log:
+- Final gate re-verified after the day-flake fix and all doc changes: lint (0 errors) + typecheck + unit 80/80 + build 29/29 routes + e2e 140/140 = 220 total green (the hygiene test scans the changed docs — clean)
+- Change-set secret scan clean pre-commit: no AUTH_SECRET hex32+ material in any tracked file or the staged diff; no tracked env/db/key files beyond .env.example; the "BEGIN OPENSSH" text hits are the runbook/plan documentation of the method itself, not key material
+- Committed as one atomic commit 9f50f39 to main (29 files: the 2 ICS/confirmation code fixes + the 3 SEO-layer files + the day-aware links-parity fix + the 4 new/extended test files + the 10 refreshed screenshots + the 8 doc alignments + the plan/session-log/worklog)
+- Pushed via docs/ssh_git_wrapper_v3.py with --remote git@github.com:nordeim/beauty-salon.git (the paramiko shim from the runbook's Appendix A at /home/z/my-project/bin/shim/ssh, outside the repo — redeployed from the prior sessions)
+- Key fingerprint verified pre-push (SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU — the sessions 1-16 operator key record, the same operator key) and shredded post-push (the wrapper's temp copy shreds itself on every exit; the operator copy at /tmp/ml-deploy-s17.key overwritten with random bytes then removed)
+- Dry-run clean (1ed957f..9f50f39 fast-forward); real push exit 0 with the wrapper's own remote verification + the tracking-ref sync
+- Independent re-confirmation via git ls-remote (shim + key): 9f50f399c070445abc57d324f67589ce8058dc62 refs/heads/main — byte-exact == local HEAD
+- Push evidence recorded in the plan's T6 + section 10; this final worklog entry; the T6-executed follow-up commit
+
+Stage Summary:
+- Session 17 delivered and pushed: the owner's gap analysis validated end-to-end (F04 pinned-not-a-code-issue, F05 parity-bound-rejection + the REAL no-params fallback bug FIXED, F07 the SEO layer BUILT), the day-aware innerText census hardening, 7 new e2e pins + 14 new unit contracts, docs aligned to SKILL v1.14.0
+- Final state: branch up to date with origin/main, working tree clean, remote == local verified byte-exact at 9f50f39 (+ the T6 docs follow-up)

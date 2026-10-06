@@ -163,7 +163,7 @@ The 15 canonical screenshots re-captured on the remediated build (the byte-ident
 
 ## 10. Push evidence (session 17)
 
-- Committed as one atomic commit to `main` (the ICS/confirmation fixes + the SEO layer + the pin specs + the docs alignment + the plan/session-log/worklog + the re-captured screenshots).
+- Committed as one atomic commit `9f50f39` to `main` (the ICS/confirmation fixes + the SEO layer + the pin specs + the docs alignment + the plan/session-log/worklog + the re-captured screenshots).
 - Key fingerprint verified before the push (the runbook's paramiko method — the sessions 1–16 operator key).
 - Change-set secret scan clean pre-commit: no `AUTH_SECRET="<hex32+>"` material in the staged diff or any tracked file; no tracked env/db/key files beyond `.env.example`; the operator key materialized outside the repo and shredded after the push.
-- Push verified remote == local byte-exact; the T6-executed follow-up docs commit pushed the same way.
+- Push verified remote == local byte-exact (`9f50f399c070445abc57d324f67589ce8058dc62`, independently re-confirmed via git ls-remote under the shim + key); the T6-executed follow-up docs commit pushed the same way.
