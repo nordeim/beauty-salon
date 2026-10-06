@@ -651,3 +651,22 @@ Stage Summary:
 - The capture-diff regression gate delivered + validated GREEN and RED; the canonical set re-captured
 - Gate: lint ✓ · typecheck ✓ · unit 84/84 ✓ · build 29/29 routes ✓ · e2e 158/158 ✓ (242 total; all pre-existing parity contracts untouched)
 - Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 23-FINAL
+Agent: main (Super Z)
+Task: Session 20 final push verification and wrap-up
+
+Work Log:
+- Final gate re-verified after all doc changes: lint (0 errors) + typecheck + unit 84/84 (the hygiene test scans the changed docs — clean) + build 29/29 routes + e2e 158/158 = 242 total green
+- Change-set secret scan clean pre-commit: no AUTH_SECRET hex32+ material in any tracked file or the staged diff; no tracked env/db/key files beyond .env.example; the "BEGIN OPENSSH" text hits are the worklog/runbook prose documentation of the scan status (the standing accepted convention)
+- Committed as one atomic commit 494b2d6 to main (24 files: the pill state-machine fix across hours.ts + StatusPill.tsx + SiteFooter.tsx + the unit contracts + the updated links-parity census + the new status-pill-parity spec + the new screenshot-diff gate + the 9 re-captured screenshots + the 6 doc alignments + the plan/session-log/worklog)
+- Pushed via docs/ssh_git_wrapper_v3.py with --remote git@github.com:nordeim/beauty-salon.git (the paramiko shim from the runbook's Appendix A at /home/z/my-project/bin/shim/ssh, outside the repo — redeployed from the prior sessions)
+- Key fingerprint verified pre-push (SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU — the sessions 1-19 operator key record, the same operator key) and shredded post-push (the wrapper's temp copy shreds itself on every exit; the operator copy at /tmp/ml-deploy-s20.key overwritten with random bytes then removed)
+- Dry-run clean (d228bd2..494b2d6 fast-forward); real push exit 0 with the wrapper's own remote verification + the tracking-ref sync
+- Independent re-confirmation via git ls-remote (shim + key): 494b2d60c7c41a72999ef6e7bd5ada399e221c7b refs/heads/main — byte-exact == local HEAD
+- Push evidence recorded in the plan's section 10; this final worklog entry
+
+Stage Summary:
+- Session 20 delivered and pushed: the deployed-site census (the live deployment verified functionally complete end-to-end — a production superset of the reference; the mobile navigation + Tailwind v4 watch zero-regression), the pin-revalidation sweep (every high-risk pin re-verified holding EXCEPT the pill), a REAL parity gap found and fixed (the time-aware four-state status-pill machine with live minute-granularity flips — statusForNow + the uSES minute-tick store + the footer's live island with the 80/70 pair), the capture-diff regression gate delivered + validated GREEN and RED, the canonical set re-captured, 13 new test contracts, docs aligned to SKILL v1.17.0
+- Final state: branch up to date with origin/main, working tree clean, remote == local verified byte-exact at 494b2d6

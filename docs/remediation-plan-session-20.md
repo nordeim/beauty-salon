@@ -169,4 +169,9 @@ The pill text appears in the committed captures (01-landing, 02-services, 07-con
 
 ## 10. Push evidence (session 20)
 
-*(Completed at T8 — see the commit record and the worklog's session-20-FINAL entry: the atomic commit to `main`, the wrapper push with the paramiko shim, the remote == local byte-exact verification, and the operator-key shred.)*
+- Committed as one atomic commit `494b2d6` to `main` (24 files: the three pill code surfaces + the two test files + the new spec + the new gate script + the 9 re-captured screenshots + the 6 doc alignments + the plan/session-log/worklog).
+- Key fingerprint verified before the push: `SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU` (the sessions 1–19 operator key record — the same operator key).
+- Change-set secret scan clean pre-commit: no `AUTH_SECRET="<hex32+>"` material in any tracked file or the staged diff; no tracked env/db/key files beyond `.env.example`; the "BEGIN OPENSSH" text hits are the runbook/prior-plan documentation of the method itself, not key material (the standing accepted convention).
+- Dry-run clean (`d228bd2..494b2d6` fast-forward); real push exit 0 with the wrapper's own remote verification (`refs/heads/main @ 494b2d6 == local HEAD`) + the tracking-ref sync.
+- Independent re-confirmation via `git ls-remote` (shim + key): `494b2d60c7c41a72999ef6e7bd5ada399e221c7b refs/heads/main` — byte-exact == local HEAD.
+- The wrapper's temp key copy shreds itself on every exit; the operator copy at `/tmp/ml-deploy-s20.key` overwritten with random bytes then removed.
