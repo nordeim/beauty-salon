@@ -114,7 +114,7 @@ The repo script (the executable convention): boots the standalone server on :320
 - [x] **T3.** Full gate: lint ✓ (0 errors) · typecheck ✓ · unit 80/80 ✓ · build 29/29 routes ✓ · e2e **150/150** (144 + 5 AS + 1 edge matrix) = **230 total** — every pre-existing contract untouched. *(Executed.)*
 - [x] **T4.** The screenshots — the standalone canonical set committed (the byte-determinism signal: 14/15 across passes and rebuilds; 07 the documented map-noise class). *(Executed.)*
 - [x] **T5.** Documentation aligned: README (the auth'd-state + capture-convention rows, the counts 230/150), AGENTS.md (the capture-screenshots command row, the auth'd-state invariant, the corrected 404 strip rule, the counts), CLAUDE.md (the counts, the spec list), PAD (the session-19 ledger + the testing table + the authed-state family), SKILL.md → v1.16.0, `docs/session_19.md` (proper record), this plan, the worklog. *(Executed.)*
-- [ ] **T6.** Secret scan → commit to `main` → push via `docs/ssh_git_wrapper_v3.py` → verify remote == local → shred the operator key.
+- [x] **T6.** Secret scan → commit to `main` → push via `docs/ssh_git_wrapper_v3.py` → verify remote == local → shred the operator key. *(Executed — see §10.)*
 
 ## 9. Shipped Artefacts (this remediation)
 
@@ -130,4 +130,9 @@ The repo script (the executable convention): boots the standalone server on :320
 
 ## 10. Push evidence (session 19)
 
-(to be filled at T6)
+- Committed as one atomic commit `079cb9f` to `main` (27 files: the 404 fix + the two new spec/script files + the corrected not-found pin + the 15 re-captured screenshots + the 6 doc alignments + the plan/session-log/worklog).
+- Key fingerprint verified before the push: `SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU` (the sessions 1–18 operator key record — the same operator key).
+- Change-set secret scan clean pre-commit: no `AUTH_SECRET="<hex32+>"` material in any tracked file or the staged diff; no tracked env/db/key files beyond `.env.example`; the "BEGIN OPENSSH" text hits are the worklog's own prose documentation of the scan status (the standing accepted convention), not key material.
+- Dry-run clean (`e3ba432..079cb9f` fast-forward); real push exit 0 with the wrapper's own remote verification (`refs/heads/main @ 079cb9f == local HEAD`) + the tracking-ref sync.
+- Independent re-confirmation via `git ls-remote` (shim + key): `079cb9f0211adee9c61e305e4c88b92934d8d084 refs/heads/main` — byte-exact == local HEAD.
+- The wrapper's temp key copy shreds itself on every exit; the operator copy at `/tmp/ml-deploy-s19.key` overwritten with random bytes then removed.
