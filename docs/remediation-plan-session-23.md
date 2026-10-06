@@ -105,7 +105,7 @@ The `login_shell` block with this session's live-measured constants (measured on
 - [x] **T2.** Full gate: `lint → typecheck → test → build → test:e2e` — lint 0 errors · tsc clean · unit 84/84 · build 29/29 routes · e2e 160/160 = **244 total**. *(Executed.)*
 - [x] **T3.** The canonical capture re-run + the diff gate — the set re-captured (07-contact re-captured as its noise-class output — an instrument/record-only change set) and the gate **GREEN** (14/14). *(Executed.)*
 - [x] **T4.** Documentation alignment: README (the feature row's fifth surface) · AGENTS.md (the command row) · CLAUDE.md (the commands row) · PAD (the instruments note + the session-23 ledger) · SKILL.md → v1.20.0 · `docs/session_23.md` (the proper record) · this plan (the executed results) · `worklog.md`. *(Executed.)*
-- [ ] **T5.** Secret scan → atomic commit to `main` → push via `docs/ssh_git_wrapper_v3.py` (`--remote git@github.com:nordeim/beauty-salon.git`) → verify remote == local → shred the operator key. *(The evidence follow-up commit marks this executed, per the session-21/22 convention.)*
+- [x] **T5.** Secret scan → atomic commit to `main` → push via `docs/ssh_git_wrapper_v3.py` (`--remote git@github.com:nordeim/beauty-salon.git`) → verify remote == local → shred the operator key. *(Executed — see §10.)*
 
 ## 9. Shipped Artefacts (this remediation)
 
@@ -118,4 +118,8 @@ The `login_shell` block with this session's live-measured constants (measured on
 
 ## 10. Push evidence (session 23)
 
-(to be filled after the push — the established two-commit convention)
+- Committed as one atomic commit `01ca300` to `main` (11 files: the P5 probe extension + the census record's `login_shell` block + the 4 doc alignments [README/AGENTS/CLAUDE/SKILL v1.20.0] + the PAD instruments-note/ledger update + the proper session-23 record + this plan + the re-captured 07-contact noise-class shot + the worklog).
+- Change-set secret scan clean pre-commit: no `AUTH_SECRET="<hex32+>"` material in any tracked file or the staged diff; no tracked env/db/key files beyond `.env.example` (the only tracked `.env*` file).
+- Key fingerprint verified before the push: `SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU` (the sessions 1–22 operator key record — the same operator key).
+- Dry-run clean (`e1bf686..01ca300` fast-forward); real push exit 0 with the wrapper's own remote verification (`refs/heads/main @ 01ca300 == local HEAD`) + the tracking-ref sync; independent re-confirmation via `git ls-remote` (shim + key): `01ca3001edf4a396375569d8a72ff452bbce08de refs/heads/main` — byte-exact == local HEAD; the operator key shredded post-push (the wrapper's temp copy shreds itself on every exit; the operator copy at `/tmp/ml-deploy-s23.key` overwritten with 399 random bytes then removed).
+- This evidence section itself follows the established two-commit convention (the plan/worklog records of the executed push land as the follow-up commit, as in sessions 19–22).

@@ -780,3 +780,22 @@ Stage Summary:
 - The deployment re-censused end-to-end: a production-ready superset of the reference with visual parity (the pill, the drawer, the innerText surfaces, the ICS, every functional surface green)
 - Gate: lint ✓ · typecheck ✓ · unit 84/84 ✓ · build 29/29 routes ✓ · e2e 160/160 ✓ (244 total; all pre-existing parity contracts untouched)
 - Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 26-FINAL
+Agent: main (Super Z)
+Task: Session 23 final push verification and wrap-up
+
+Work Log:
+- Final gate re-verified after all doc changes: lint (0 errors) + typecheck + unit 84/84 (the hygiene test scans the changed docs — clean) + build 29/29 routes + e2e 160/160 = 244 total green
+- Change-set secret scan clean pre-commit: no AUTH_SECRET hex32+ material in any tracked file or the staged diff; no tracked env/db/key files beyond .env.example; the "BEGIN OPENSSH" text hits are the runbook/prior-plan documentation of the method itself, not key material (the standing accepted convention)
+- Committed as one atomic commit 01ca300 to main (11 files: the P5 probe extension + the census record's login_shell block + the README/AGENTS/CLAUDE alignments + SKILL.md v1.20.0 + the PAD instruments-note/session-23-ledger updates + the proper session-23 record + the plan + the re-captured 07-contact noise-class shot + the worklog)
+- Pushed via docs/ssh_git_wrapper_v3.py with --remote git@github.com:nordeim/beauty-salon.git (the paramiko shim from the runbook's Appendix A at /home/z/my-project/bin/shim/ssh, outside the repo)
+- Key fingerprint verified pre-push (SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU — the sessions 1-22 operator key record, the same operator key) and shredded post-push (the wrapper's temp copy shreds itself on every exit; the operator copy at /tmp/ml-deploy-s23.key overwritten with 399 random bytes then removed)
+- Dry-run clean (e1bf686..01ca300 fast-forward); real push exit 0 with the wrapper's own remote verification (refs/heads/main @ 01ca300 == local HEAD) + the tracking-ref sync
+- Independent re-confirmation via git ls-remote (shim + key): 01ca3001edf4a396375569d8a72ff452bbce08de refs/heads/main — byte-exact == local HEAD
+- Push evidence recorded in the plan's section 10; this final worklog entry
+
+Stage Summary:
+- Session 23 delivered and pushed: the drift-watch P5 auth-shell probe (the fifth public parity surface — /login's six string-stable computed-style constants, validated GREEN 20/20 / RED / exit-2), the session-22 candidates executed (candidate 1 the cadence run GREEN 14/14; candidate 2 the auth'd-state re-census — all four session-19 pins re-walked GREEN), the deployed-site + reference re-census (a production-ready superset with visual parity at every probe)
+- Final state: branch up to date with origin/main, working tree clean, remote == local verified byte-exact at 01ca300
