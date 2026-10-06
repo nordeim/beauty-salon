@@ -92,6 +92,20 @@ bun run lint && bun run typecheck && bun run test
 bun run build && bun run test:e2e            # Playwright suite (local; build first)
 ```
 
+**HTTP headers at the edge (session-18 census note):** the live reference's
+serving chain (Cloudflare) adds the standard security headers —
+`strict-transport-security`, `x-content-type-options: nosniff`,
+`x-frame-options: DENY`, `referrer-policy: strict-origin-when-cross-origin` —
+and sends no cache-control/etag on any route. Those headers belong to the
+**deployment edge**, not the app: the clone's standalone server correctly
+emits none at the app level, so configure the equivalent at your own reverse
+proxy / CDN / edge (nginx `add_header`, Cloudflare, Caddy `header`…) when you
+deploy behind one. Do not add them to `next.config.ts` to "match the
+reference" — the live's headers come from its hosting chain, not its app
+code, and the layer boundary is the deliberate architecture (the live's
+everything-`text/html` SPA-fallback serving, including its sitemap/robots, is
+the platform artifact the clone's standard content-types deliberately replace).
+
 ## 7. Common production issues
 
 | Symptom | Cause | Fix |
