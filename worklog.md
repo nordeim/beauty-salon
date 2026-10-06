@@ -737,3 +737,22 @@ Stage Summary:
 - The deployment re-censused end-to-end: a production-ready superset of the reference with visual parity (the pill, the drawer, the innerText censuses, the ICS, every functional surface green)
 - Gate: lint ✓ · typecheck ✓ · unit 84/84 ✓ · build 29/29 routes ✓ · e2e 160/160 ✓ (244 total; all pre-existing parity contracts untouched)
 - Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 25-FINAL
+Agent: main (Super Z)
+Task: Session 22 final push verification and wrap-up
+
+Work Log:
+- Final gate re-verified after all doc changes: lint (0 errors) + typecheck + unit 84/84 (the hygiene test scans the changed docs + the new script references resolve) + build 29/29 routes + e2e 160/160 = 244 total green
+- Change-set secret scan clean pre-commit: no AUTH_SECRET hex32+ material in any tracked file or the staged diff; no tracked env/db/key files beyond .env.example; the "BEGIN OPENSSH" text hits are the runbook/prior-plan documentation of the method itself, not key material (the standing accepted convention)
+- Committed as one atomic commit bc18a42 to main (11 files: the reference-drift-watch instrument + the census record + the PAD §10 repair + the README/AGENTS/CLAUDE alignments + SKILL.md v1.19.0 + the proper session-22 record + the plan + the re-captured 07-contact noise-class shot + the worklog)
+- Pushed via docs/ssh_git_wrapper_v3.py with --remote git@github.com:nordeim/beauty-salon.git (the paramiko shim from the runbook's Appendix A at /home/z/my-project/bin/shim/ssh, outside the repo)
+- Key fingerprint verified pre-push (SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU — the sessions 1-21 operator key record, the same operator key) and shredded post-push (the wrapper's temp copy shreds itself on every exit; the operator copy at /tmp/ml-deploy-s22.key overwritten with 399 random bytes then removed)
+- Dry-run clean (535cc7b..bc18a42 fast-forward); real push exit 0 with the wrapper's own remote verification (refs/heads/main @ bc18a42 == local HEAD) + the tracking-ref sync
+- Independent re-confirmation via git ls-remote (shim + key): bc18a42e53d2741fc23dbcbcc4fb4a0d22dc4ba3 refs/heads/main — byte-exact == local HEAD
+- Push evidence recorded in the plan's section 10; this final worklog entry
+
+Stage Summary:
+- Session 22 delivered and pushed: the reference-drift watch (session-21 candidate 1 — the committed instrument + census record, validated GREEN/RED/instrument-failure, the reference-side drift tripwire), the reference-ICS re-verification (session-21 candidate 2 — byte-format identical, no platform drift), the deployed-site + reference re-census fully green (a production-ready superset with visual parity), the PAD §10 doc repair (F22-A), the canonical capture re-run + the diff gate GREEN, docs aligned to SKILL v1.19.0
+- Final state: branch up to date with origin/main, working tree clean, remote == local verified byte-exact at bc18a42

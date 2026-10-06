@@ -111,7 +111,7 @@ Replace the stale "Static-build status pill" bullet with the accurate state: the
 - [x] **T3.** Full gate: `lint → typecheck → test → build → test:e2e` — lint 0 errors · tsc clean · unit 84/84 · build 29/29 routes · e2e 160/160 = **244 total**. *(Executed.)*
 - [x] **T4.** The canonical capture re-run + the diff gate — the set re-captured (14/15 byte-identical; 07-contact re-captured as the documented noise class) and the gate **GREEN** (14/14). *(Executed.)*
 - [x] **T5.** Documentation alignment: README (the feature row + the instrument paragraph) · AGENTS.md (the command row) · CLAUDE.md (the commands row) · PAD (§10 repaired + the instruments note + the session-22 ledger) · SKILL.md → v1.19.0 · `docs/session_22.md` (the proper record) · this plan (the executed results) · `worklog.md`. *(Executed.)*
-- [ ] **T6.** Secret scan → atomic commit to `main` → push via `docs/ssh_git_wrapper_v3.py` (`--remote git@github.com:nordeim/beauty-salon.git`) → verify remote == local → shred the operator key.
+- [x] **T6.** Secret scan → atomic commit to `main` → push via `docs/ssh_git_wrapper_v3.py` (`--remote git@github.com:nordeim/beauty-salon.git`) → verify remote == local → shred the operator key. *(Executed — see §10.)*
 
 ## 9. Shipped Artefacts (this remediation)
 
@@ -121,3 +121,11 @@ Replace the stale "Static-build status pill" bullet with the accurate state: the
 | The PAD §10 repair | `Project_Architecture_Document.md` |
 | The census records + doc alignment | `README.md`, `AGENTS.md`, `CLAUDE.md`, `beauty-salon_SKILL.md` (v1.19.0) |
 | The session record + plan + worklog | `docs/session_22.md` (the proper record), `docs/remediation-plan-session-22.md`, `worklog.md` |
+
+## 10. Push evidence (session 22)
+
+- Committed as one atomic commit `bc18a42` to `main` (11 files: the drift-watch instrument + the census record + the PAD §10 repair + the 4 doc alignments [README/AGENTS/CLAUDE/SKILL v1.19.0] + the proper session-22 record + this plan + the re-captured 07-contact noise-class shot + the worklog).
+- Change-set secret scan clean pre-commit: no `AUTH_SECRET="<hex32+>"` material in any tracked file or the staged diff; no tracked env/db/key files beyond `.env.example` (the only tracked `.env*` file).
+- Key fingerprint verified before the push: `SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU` (the sessions 1-21 operator key record — the same operator key).
+- Dry-run clean (`535cc7b..bc18a42` fast-forward); real push exit 0 with the wrapper's own remote verification (`refs/heads/main @ bc18a42 == local HEAD`) + the tracking-ref sync; independent re-confirmation via `git ls-remote` (shim + key): `bc18a42e53d2741fc23dbcbcc4fb4a0d22dc4ba3 refs/heads/main` — byte-exact == local HEAD; the operator key shredded post-push (the wrapper's temp copy shreds itself on every exit; the operator copy at `/tmp/ml-deploy-s22.key` overwritten with 399 random bytes then removed).
+- This evidence section itself follows the established two-commit convention (the plan/worklog records of the executed push land as the follow-up commit, as in sessions 19-21).
