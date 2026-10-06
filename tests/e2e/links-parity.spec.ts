@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 
-// The day-aware status pill's model — the services innerText census
+// The time-aware status pill's model — the services innerText census
 // derives its expected length from the same unit-tested source the
-// StatusPill reads (see the day-adjusted test below).
-import { statusForDay } from "../../src/lib/hours";
+// StatusPill reads (see the time-aware test below).
+import { statusForNow } from "../../src/lib/hours";
 
 // Links parity — the first-ever both-sides href census + the routing edge
 // matrix (session 11). The census instrument: enumerate every <a href> on
@@ -65,20 +65,42 @@ test.describe("links parity (the services CTA + the article link)", () => {
     await expect(page.locator('a[href="/book"]')).toHaveCount(3);
   });
 
-  test("the services page innerText now matches the reference length (1942 closed-day @1280, day-adjusted)", async ({ page }) => {
+  test("the services page innerText matches the reference length (the time-aware pill census)", async ({ page }) => {
     await page.goto("/services");
-    // Session-11 census: live 1942 chars vs the pre-fix clone's 1922 — the
-    // delta was exactly the missing CTA ("BOOK AN APPOINTMENT\n" = 20).
-    // The census was measured on a CLOSED day: the page renders the
-    // day-aware StatusPill twice (header + footer), and "Closed today" is
-    // 2 chars longer than "Open today" — so an OPEN day measures 1942 - 4.
-    // (Sessions 1-16 all ran Sat/Sun/Mon — closed days; the first Tuesday
-    // run surfaced the day dependence. The expectation is derived from the
-    // same unit-tested hours model the pill itself reads.)
-    const pill = statusForDay(new Date().getDay());
-    const expected = pill === "Closed today" ? 1942 : 1942 - 4;
-    const len = await page.evaluate(() => document.body.innerText.length);
-    expect(len).toBe(expected);
+    // Session-20 re-census (F20-A): the reference's pill is a TIME-AWARE
+    // four-state machine — "Opens today at {open}" before opening, "Open ·
+    // closes {close}" during, "Closed for the day" after close, "Closed
+    // today" on closed days — so the body length is a function of the
+    // CURRENT TIME, not just the day. Live-measured basis (controlled
+    // clock, /services body innerText): closed-day 1942 · before-open 1958
+    // · during-open 1956 · after-close 1954 — i.e. 1918 + 2 × len(pill
+    // text): the pill renders TWICE (header + footer), and the four pill
+    // texts measure 12 / 20 / 19 / 18 chars.
+    //
+    // The expectation derives from the same unit-tested hours model the
+    // pill itself reads (the session-17 derivation pattern, extended from
+    // day to time-of-day). The pill text is converged POST-HYDRATION first
+    // (the static shell bakes the BUILD-time state — the retrying
+    // convention), and the pill + body length are read in ONE atomic
+    // evaluate so a boundary crossed mid-test still yields a self-consistent
+    // (pill, length) pair.
+    await expect
+      .poll(
+        async () =>
+          await page.evaluate(
+            () => document.querySelector("header [class*=breathe]")?.closest("div")?.textContent ?? "",
+          ),
+        // The model is re-evaluated per poll attempt so a boundary crossed
+        // between the Node read and the browser read converges on the next
+        // attempt.
+      )
+      .toBe(statusForNow(new Date()));
+
+    const snap = await page.evaluate(() => ({
+      pill: document.querySelector("header [class*=breathe]")?.closest("div")?.textContent ?? "",
+      len: document.body.innerText.length,
+    }));
+    expect(snap.len).toBe(1918 + 2 * snap.pill.length);
   });
 
   test("the accessibility article title is the reference's dead # link (F2)", async ({ page }) => {
@@ -170,12 +192,13 @@ test.describe("case-insensitive routing + trailing slashes (F4)", () => {
 });
 
 test.describe("links census regression guards", () => {
-  test("the landing page carries the reference's 33-link census sequence", async ({ page }) => {
+  test("the landing page carries the reference's 32-link census sequence", async ({ page }) => {
     await page.goto("/");
     const hrefs = await page.evaluate(() =>
       Array.from(document.querySelectorAll("a")).map((a) => a.getAttribute("href") ?? ""),
     );
-    // The live-measured sequence (session-11 census, identical both sides):
+    // The live-measured sequence (session-11 census, re-verified session 20;
+    // identical both sides — 32 hrefs):
     expect(hrefs).toEqual([
       "/",
       "/services",

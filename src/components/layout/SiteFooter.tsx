@@ -2,7 +2,8 @@
 // links, hours list, contact column, and the legal bottom bar.
 import Link from "next/link";
 import { Instagram, Mail, Phone } from "lucide-react";
-import { HOURS, formatDayHoursCompact, statusForDay } from "@/lib/hours";
+import { StatusPill } from "@/components/StatusPill";
+import { HOURS, formatDayHoursCompact } from "@/lib/hours";
 
 const VISIT_LINKS = [
   { label: "Services", href: "/services" },
@@ -32,15 +33,14 @@ export function SiteFooter() {
               transformation.
             </h3>
             <div className="mt-8">
-              <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-editorial text-background/70">
-                <span className="relative flex h-2 w-2" aria-hidden>
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60 breathe" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
-                </span>
-                <span suppressHydrationWarning>
-                  <FooterStatus />
-                </span>
-              </div>
+              {/* The live pill island (session 20, F20-B): the reference's
+                  footer pill is client-side and identical to its header pill
+                  at every measured probe — the server-side day-only
+                  computation this replaced baked the prerender-time state
+                  into static pages. The className carries the reference's own
+                  redundant text-background/80 + /70 pair — its /80 wins in
+                  both engines (F20-H; computed rgba(250, 248, 245, 0.8)). */}
+              <StatusPill className="text-background/80 text-background/70" />
             </div>
           </div>
 
@@ -121,12 +121,4 @@ export function SiteFooter() {
       </div>
     </footer>
   );
-}
-
-function FooterStatus() {
-  // Server component — computed at request time (dynamic render). The
-  // reference SPA computes the day in the browser; the header's StatusPill
-  // island covers the live behavior, and this request-time computation keeps
-  // the footer in sync for dynamic responses.
-  return <>{statusForDay(new Date().getDay())}</>;
 }
