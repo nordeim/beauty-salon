@@ -2,7 +2,7 @@
 IMPORTANT: File is read fresh for every conversation. Be brief and practical.
 project_type: nextjs-single-app
 version: 1.0.0
-last_updated: 2026-10-05
+last_updated: 2026-10-06
 ---
 
 # Maison Luminaire — Beauty Salon
@@ -72,9 +72,9 @@ bun run db:push && bun run db:seed
 |---|---|
 | `bun run dev` | Dev server :3000 |
 | `bun run lint` / `typecheck` | ESLint 9 flat / tsc |
-| `bun run test` | Vitest unit (66) |
+| `bun run test` | Vitest unit (80) |
 | `bun run build` | Standalone production build (27 routes) |
-| `bun run test:e2e` | Playwright Chromium (133 specs; needs build first) |
+| `bun run test:e2e` | Playwright Chromium (140 specs; needs build first) |
 | `bun run db:push` / `db:seed` | Schema + reference content |
 
 Clean-check order: `lint → typecheck → test → build → test:e2e`.
@@ -83,7 +83,7 @@ Clean-check order: `lint → typecheck → test → build → test:e2e`.
 
 | Level | Tool | Location | Notes |
 |---|---|---|---|
-| Unit | Vitest | `tests/*.test.ts` | db-path (anchors, dotenv parsing, dev-time env-file-first precedence), hours, ICS (the fixed 90-minute block + raw commas + the year-boundary rollover), auth (scrypt/HMAC), repo hygiene (no retired scaffold-model references; doc/package script references resolve; no live AUTH_SECRET in tracked files) — pure seams only |
+| Unit | Vitest | `tests/*.test.ts` | db-path (anchors, dotenv parsing, dev-time env-file-first precedence), hours, ICS (the fixed 90-minute block + raw commas + the year-boundary rollover + the session-17 no-params now-stamp fallback), auth (scrypt/HMAC), seo (the sitemap/robots builders’ byte format), repo hygiene (no retired scaffold-model references; doc/package script references resolve; no live AUTH_SECRET in tracked files) — pure seams only |
 | E2E | Playwright | `tests/e2e/*.spec.ts` | Production standalone server :3100, isolated `db/e2e.db`, `workers: 1` |
 
 - Import `describe/it/expect` from `vitest` explicitly.

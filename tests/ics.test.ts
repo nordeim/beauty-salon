@@ -123,3 +123,108 @@ describe("ICS generation", () => {
     ]);
   });
 });
+
+// The no/partial-params fallback census (session 17, F05c — live-measured
+// 2026-10-06 via five probes on the reference's /book/confirmation, the
+// route the owner's gap analysis reached "without submitting a booking"):
+//   - BOTH date AND time present → the chosen stamps (the contract above)
+//   - EITHER missing            → DTSTART = DTSTAMP = the generation
+//                                 moment, DTEND = +90 minutes (the fixed
+//                                 block still applies — measured
+//                                 23:38:29 → 01:08:29 next day)
+//   - no service → SUMMARY "Maison Luminaire — Appointment"
+//   - no name    → DESCRIPTION "Reservation for you. …"
+// The with-params regression stays pinned by the describe block above.
+describe("ICS generation — the no/partial-params fallback (session-17 census)", () => {
+  const base = {
+    date: "2026-10-21",
+    time: "11:30",
+    name: "Test Client",
+    service: "balayage",
+    uid: "1791152126744",
+  };
+
+  const parseFields = (ics: string): Record<string, string> => {
+    const fields: Record<string, string> = {};
+    for (const line of ics.split("\r\n")) {
+      const idx = line.indexOf(":");
+      if (idx > 0) fields[line.slice(0, idx)] = line.slice(idx + 1);
+    }
+    return fields;
+  };
+  const stampMs = (stamp: string) => {
+    const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(stamp);
+    expect(m, `a well-formed UTC stamp, got: ${stamp}`).not.toBeNull();
+    return Date.UTC(
+      Number(m![1]),
+      Number(m![2]) - 1,
+      Number(m![3]),
+      Number(m![4]),
+      Number(m![5]),
+      Number(m![6]),
+    );
+  };
+  const expectNowFallback = (fields: Record<string, string>) => {
+    expect(fields["DTSTART"]).toBe(fields["DTSTAMP"]);
+    expect(stampMs(fields["DTEND"]!) - stampMs(fields["DTSTART"]!)).toBe(90 * 60_000);
+  };
+
+  it("falls back to now-stamps with the Appointment/you texts when both are missing", () => {
+    const fields = parseFields(buildIcs({ date: "", time: "", name: "", service: "", uid: "u" }));
+    expectNowFallback(fields);
+    expect(fields["SUMMARY"]).toBe("Maison Luminaire — Appointment");
+    expect(fields["DESCRIPTION"]).toBe(
+      "Reservation for you. We will confirm within 2 business hours.",
+    );
+  });
+
+  it("falls back to now-stamps when only the date is present", () => {
+    // The page card still renders the date (page-layer contract) — but the
+    // ICS requires BOTH: date-only → now-stamps (live probe ?date=…:
+    // DTSTART = DTSTAMP = now on the reference).
+    const fields = parseFields(
+      buildIcs({ date: "2026-10-21", time: "", name: "", service: "", uid: "u" }),
+    );
+    expectNowFallback(fields);
+    expect(fields["SUMMARY"]).toBe("Maison Luminaire — Appointment");
+    expect(fields["DESCRIPTION"]).toBe(
+      "Reservation for you. We will confirm within 2 business hours.",
+    );
+  });
+
+  it("falls back to now-stamps when only the time is present", () => {
+    // Live probe ?time=14:30: no date → the now-stamp fallback.
+    const fields = parseFields(
+      buildIcs({ date: "", time: "14:30", name: "", service: "", uid: "u" }),
+    );
+    expectNowFallback(fields);
+  });
+
+  it("falls back to now-stamps on malformed date/time values (the regex guard)", () => {
+    const fields = parseFields(buildIcs({ ...base, date: "not-a-date", time: "25:99" }));
+    expectNowFallback(fields);
+  });
+
+  it("keeps the given name in the DESCRIPTION while the event falls back to now", () => {
+    // Live probe ?name=Test: DESC "Reservation for Test. …", SUMMARY still
+    // the Appointment fallback (no service on the probe), DTSTART = DTSTAMP.
+    const fields = parseFields(
+      buildIcs({ date: "", time: "", name: "Test", service: "", uid: "u" }),
+    );
+    expectNowFallback(fields);
+    expect(fields["SUMMARY"]).toBe("Maison Luminaire — Appointment");
+    expect(fields["DESCRIPTION"]).toBe(
+      "Reservation for Test. We will confirm within 2 business hours.",
+    );
+  });
+
+  it("uses the chosen stamps when both date and time are present (the regression guard)", () => {
+    const fields = parseFields(buildIcs(base));
+    expect(fields["DTSTART"]).toBe("20261021T113000Z");
+    expect(fields["DTEND"]).toBe("20261021T130000Z");
+    expect(fields["SUMMARY"]).toBe("Maison Luminaire — balayage");
+    expect(fields["DESCRIPTION"]).toBe(
+      "Reservation for Test Client. We will confirm within 2 business hours.",
+    );
+  });
+});

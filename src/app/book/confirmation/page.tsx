@@ -33,7 +33,9 @@ export default async function ConfirmationPage({
   // The receipt is a pure function of the query string — the reference does
   // NOT resolve the service for the ICS: its download carries a fixed
   // 90-minute event block regardless of the service's advertised duration
-  // (live-measured session 8), so no DB read is needed here.
+  // (live-measured session 8), so no DB read is needed here. The
+  // no/partial-params fallbacks (now-stamps + the "Appointment"/"you"
+  // texts) live in the lib — live-measured session 17 (F05c).
   const ics = buildIcs({
     date,
     time,
@@ -77,21 +79,34 @@ export default async function ConfirmationPage({
                 <span className="italic text-secondary">begins soon.</span>
               </h1>
               <p className="mt-8 text-foreground/70 leading-[1.7] max-w-md mx-auto">
-                Thank you, {firstName}. We&apos;ve received your request and a member of our
-                concierge will confirm within 2 business hours.
+                {/* The no-name branch renders "Thank you." — NO comma-period
+                    artifact (live-measured session 17, F05c: the bare
+                    /book/confirmation reads "Thank you. We've received your
+                    request…"). */}
+                {name ? `Thank you, ${firstName}.` : "Thank you."} We&apos;ve received your
+                request and a member of our concierge will confirm within 2 business hours.
               </p>
             </div>
 
-            <div className="mt-12 glass border border-foreground/10 rounded-sm p-8 max-w-md mx-auto text-left">
-              <div className="text-[10px] uppercase tracking-editorial text-foreground/50">
-                Reserved for
+            {/* The receipt card renders ONLY when a date is present — the
+                live omits the whole glass card on the bare/partial routes
+                (live-measured session 17; the card is not an empty-lines
+                shell). The time and service lines render iff their params
+                are present. */}
+            {date && (
+              <div className="mt-12 glass border border-foreground/10 rounded-sm p-8 max-w-md mx-auto text-left">
+                <div className="text-[10px] uppercase tracking-editorial text-foreground/50">
+                  Reserved for
+                </div>
+                <div className="mt-3 font-serif text-3xl">{formatLongDate(date)}</div>
+                {time && <div className="mt-1 text-foreground/70">{time}</div>}
+                {service && (
+                  <div className="mt-4 text-[11px] uppercase tracking-editorial text-secondary">
+                    {service}
+                  </div>
+                )}
               </div>
-              <div className="mt-3 font-serif text-3xl">{formatLongDate(date)}</div>
-              <div className="mt-1 text-foreground/70">{time}</div>
-              <div className="mt-4 text-[11px] uppercase tracking-editorial text-secondary">
-                {service}
-              </div>
-            </div>
+            )}
 
             <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
               <a

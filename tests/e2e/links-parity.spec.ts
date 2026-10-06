@@ -1,5 +1,10 @@
 import { expect, test } from "@playwright/test";
 
+// The day-aware status pill's model — the services innerText census
+// derives its expected length from the same unit-tested source the
+// StatusPill reads (see the day-adjusted test below).
+import { statusForDay } from "../../src/lib/hours";
+
 // Links parity — the first-ever both-sides href census + the routing edge
 // matrix (session 11). The census instrument: enumerate every <a href> on
 // every route on both sides (agent-browser), diff the sequences. 14/16
@@ -60,12 +65,20 @@ test.describe("links parity (the services CTA + the article link)", () => {
     await expect(page.locator('a[href="/book"]')).toHaveCount(3);
   });
 
-  test("the services page innerText now matches the reference length (1942 @1280)", async ({ page }) => {
+  test("the services page innerText now matches the reference length (1942 closed-day @1280, day-adjusted)", async ({ page }) => {
     await page.goto("/services");
     // Session-11 census: live 1942 chars vs the pre-fix clone's 1922 — the
     // delta was exactly the missing CTA ("BOOK AN APPOINTMENT\n" = 20).
+    // The census was measured on a CLOSED day: the page renders the
+    // day-aware StatusPill twice (header + footer), and "Closed today" is
+    // 2 chars longer than "Open today" — so an OPEN day measures 1942 - 4.
+    // (Sessions 1-16 all ran Sat/Sun/Mon — closed days; the first Tuesday
+    // run surfaced the day dependence. The expectation is derived from the
+    // same unit-tested hours model the pill itself reads.)
+    const pill = statusForDay(new Date().getDay());
+    const expected = pill === "Closed today" ? 1942 : 1942 - 4;
     const len = await page.evaluate(() => document.body.innerText.length);
-    expect(len).toBe(1942);
+    expect(len).toBe(expected);
   });
 
   test("the accessibility article title is the reference's dead # link (F2)", async ({ page }) => {
