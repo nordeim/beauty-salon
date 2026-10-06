@@ -129,6 +129,7 @@ The comment records the trap. The RED is already demonstrated (§1); the GREEN p
 
 ## 10. Push evidence (session 21)
 
-- Committed as one atomic commit to `main` (the two test-layer remediations + the census records + the doc alignments + the plan/session-log/worklog + the re-captured 07-contact noise-class shot).
+- Committed as one atomic commit `c9d0122` to `main` (11 files: the two test-layer remediations + the 5 doc alignments + the proper session-21 record + this plan + the re-captured 07-contact noise-class shot + the worklog).
 - Change-set secret scan clean pre-commit: no `AUTH_SECRET="<hex32+>"` material in any tracked file or the staged diff; no tracked env/db/key files beyond `.env.example`.
-- Pushed via `docs/ssh_git_wrapper_v3.py` with `--remote git@github.com:nordeim/beauty-salon.git` (the paramiko shim per the runbook) — the wrapper's own remote verification + the tracking-ref sync; independent re-confirmation via `git ls-remote` (remote == local, byte-exact); the operator key shredded post-push (the wrapper's temp copy shreds itself on every exit).
+- Key fingerprint verified before the push: `SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU` (the sessions 1-20 operator key record — the same operator key).
+- Dry-run clean (`8aa2203..c9d0122` fast-forward); real push exit 0 with the wrapper's own remote verification (`refs/heads/main @ c9d0122 == local HEAD`) + the tracking-ref sync; independent re-confirmation via `git ls-remote` (shim + key): `c9d012236fece15efaec2ed6cc5538148cafcecd refs/heads/main` — byte-exact == local HEAD; the operator key shredded post-push (the wrapper's temp copy shreds itself on every exit; the operator copy overwritten with random bytes then removed).

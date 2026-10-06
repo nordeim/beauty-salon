@@ -695,3 +695,21 @@ Stage Summary:
 - The deployment re-censused end-to-end: a production-ready superset of the reference with visual parity (the landing innerText 2088 == 2088, the drawer at its pinned styles both sides, every functional surface green)
 - Gate: lint ✓ · typecheck ✓ · unit 84/84 ✓ · build 29/29 routes ✓ · e2e 160/160 ✓ (244 total; all pre-existing parity contracts untouched)
 - Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 24-FINAL
+Agent: main (Super Z)
+Task: Session 21 final push verification and wrap-up
+
+Work Log:
+- Final gate re-verified after all doc changes: lint (0 errors) + typecheck + unit 84/84 (the hygiene test scans the changed docs — clean) + build 29/29 routes + e2e 160/160 = 244 total green
+- Change-set secret scan clean pre-commit: no AUTH_SECRET hex32+ material in any tracked file or the staged diff; no tracked env/db/key files beyond .env.example; the "BEGIN OPENSSH" text hits are the runbook/prior-plan documentation of the method itself, not key material (the standing accepted convention)
+- Committed as one atomic commit c9d0122 to main (11 files: the two test-layer remediations [SP9/SP10 in status-pill-parity.spec.ts + the DEMO_USER_PASSWORD pin in global-setup.ts] + the 5 doc alignments + the proper session-21 record + the new plan + the re-captured 07-contact noise-class shot + the worklog)
+- Pushed via docs/ssh_git_wrapper_v3.py with --remote git@github.com:nordeim/beauty-salon.git (the paramiko shim from the runbook's Appendix A at /home/z/my-project/bin/shim/ssh, outside the repo — redeployed for this session)
+- Key fingerprint verified pre-push (SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU — the sessions 1-20 operator key record, the same operator key) and shredded post-push (the wrapper's temp copy shreds itself on every exit; the operator copy at /tmp/ml-deploy-s21.key overwritten with random bytes then removed)
+- Dry-run clean (8aa2203..c9d0122 fast-forward); real push exit 0 with the wrapper's own remote verification (refs/heads/main @ c9d0122 == local HEAD) + the tracking-ref sync
+- Independent re-confirmation via git ls-remote (shim + key): c9d012236fece15efaec2ed6cc5538148cafcecd refs/heads/main — byte-exact == local HEAD
+
+Stage Summary:
+- Session 21 delivered and pushed: the boundary-timezone sweep (the local-clock stance CONFIRMED at 5/5 timezones on both the reference and the deployment, then PINNED — SP9/SP10, validated GREEN + sabotage-RED), the deployment-refresh verification (the session-20 build live on production with the pill's four states + the live minute-tick flip), a REAL latent bug fixed (the e2e-seed hermeticity — bun's .env auto-load into the global-setup seed, demonstrated RED then fixed GREEN), the deployed-site + reference re-census fully green (a production-ready superset with visual parity), the canonical capture re-run + the diff gate GREEN
+- Final state: branch up to date with origin/main, working tree clean, remote == local verified byte-exact at c9d0122
