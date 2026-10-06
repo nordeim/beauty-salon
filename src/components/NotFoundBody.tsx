@@ -26,7 +26,12 @@ import { useRouter } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
 const subscribeToNothing = () => () => {};
-const readAttemptedPath = () => window.location.pathname;
+// The reference's interpolation rule (live-measured session 19, five
+// probes: plain, nested /foo/bar, case-variant, trailing-slash,
+// query-string): strip ONLY the leading slash — nested paths, trailing
+// slashes, and letter case are preserved; the query string is excluded
+// (pathname only). "The page \"foo/bar\" could not be found…"
+const readAttemptedPath = () => window.location.pathname.replace(/^\//, "");
 const readServerPath = () => "";
 
 export function NotFoundBody() {

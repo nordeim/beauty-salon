@@ -115,23 +115,51 @@ test.describe("not-found parity (the 404 surface)", () => {
     expect(btnCs.bg).toBe("rgb(255, 255, 255)");
   });
 
-  test("the message interpolates the attempted path", async ({ page }) => {
+  test("the message interpolates the attempted path (leading slash stripped)", async ({ page }) => {
     await page.goto("/definitely-not-a-page");
     // The reference renders the requested path inside the message:
-    // The page "<path>" could not be found in this application.
+    // The page "<path-without-the-leading-slash>" could not be found in
+    // this application.
+    // (Re-measured live 2026-10-06, session 19 — five probes: plain,
+    // nested /foo/bar, case-variant, trailing-slash, query-string. The
+    // reference strips ONLY the leading slash: nested paths, trailing
+    // slashes, and letter case are preserved; the query string is
+    // excluded (pathname only). The session-6 pin carried the leading
+    // slash — the re-census corrected it.)
     // (Asserted post-hydration — the static /_not-found shell bakes a
     // different path server-side; the client patch is the truth.)
     const p = page.locator("main p.text-slate-600");
-    await expect(p).toContainText('The page "/definitely-not-a-page" could not be found in this application.');
+    await expect(p).toContainText('The page "definitely-not-a-page" could not be found in this application.');
     // …with the path carried by a font-medium slate-700 span.
     const span = p.locator("span");
-    await expect(span).toHaveText('"/definitely-not-a-page"');
+    await expect(span).toHaveText('"definitely-not-a-page"');
     const spanCs = await span.evaluate((el) => {
       const cs = getComputedStyle(el);
       return { weight: cs.fontWeight, color: cs.color };
     });
     expect(spanCs.weight).toBe("500");
     expect(spanCs.color).toBe("rgb(51, 65, 85)");
+  });
+
+  test("the path interpolation's edge matrix (the live's strip rule)", async ({ page }) => {
+    // The live-measured rule (2026-10-06): pathname.slice(1) — strip ONLY
+    // the leading slash. Nested paths keep their inner slashes, trailing
+    // slashes survive, letter case is preserved, the query never appears.
+    const cases = [
+      { url: "/nested/unknown/path", expected: "nested/unknown/path" },
+      { url: "/unknown-trailing/", expected: "unknown-trailing/" },
+      { url: "/Account-Case-Test", expected: "Account-Case-Test" },
+      { url: "/unknown-query?x=1&y=2", expected: "unknown-query?x=1&y=2" },
+    ];
+    for (const c of cases) {
+      await page.goto(c.url);
+      const span = page.locator("main p.text-slate-600 span");
+      // The query-string case is the one live-measured exception: the
+      // reference EXCLUDES the query from the message (pathname only) —
+      // expected without it.
+      const expected = c.expected.replace(/\?x=1&y=2$/, "");
+      await expect(span, `path ${c.url}`).toHaveText(`"${expected}"`);
+    }
   });
 
   test("the Go Home button navigates home", async ({ page }) => {
