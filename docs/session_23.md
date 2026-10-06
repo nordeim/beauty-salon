@@ -1,99 +1,57 @@
-I'll continue the task from where we left off. Let me start by checking the current workspace state, then refresh the repo and work through the multi-step plan.
-工作区中已包含前一会话的 beauty-salon 仓库以及大量的产出物（包含 tests、configs、截图和会话文档）。注意，目前尚不存在 `docs/session_22.md` —— 这很可能就是需要我在此次会话中生成的文档。让我检查一下工作日志和 git 状态。
-The repo is clean at `aabf69f` on main — Session 21 completed and pushed successfully. Now let me refresh with `git pull` as instructed.
-New commits pulled: `docs/session_22.md` and `docs/prompt-to-review-4.md` now exist. Let me read the new session doc and review prompt first to understand what this session requires, along with the core docs.
-`session_22.md` is the raw transcript of Session 21's run (to be replaced with a proper record per repo convention), and this session is "Session 22". Now let me review the core docs. Checking sizes first, then reading.
-AGENTS.md internalized. Now let me read README.md, session_21.md, and the session-21 remediation plan.
-Now the session-21 remediation plan and the repo worklog tail.
-Now the Project Architecture Document and SKILL.md — reading the key sections.
-这行内容非常长 —— 让我用 grep 提取一下 PAD 验证账本和关键部分。
-有意思 —— PAD §10 中仍包含一个关于“静态构建状态药丸”的已知问题条目，但 session 20 使页脚药丸变成了一个动态客户端 island。我来验证一下代码并进行 skills-catalog 检查。
-SiteFooter confirms the pill is a live client island — PAD §10's "Static-build status pill" entry is stale doc drift. Now let me check the environment state and read the audit skill.
-Environment survived intact from Session 21 (.env, db/, node_modules, build all present). Now let me read the repo's audit skill to follow the proper Mode C workflow.
-The audit convention (Mode C = full gate as baseline, `skills/` excluded) is clear. Now updating todos and running the baseline audit gate.
-Lint ✓ · tsc ✓ · unit 84/84 ✓. Now the production build, then the e2e suite.
-Build ✓ 29/29 routes. Now the full e2e suite (160 specs, workers:1 — this takes several minutes).
-**Baseline gate ALL GREEN: 244 total** (lint ✓ · tsc ✓ · unit 84/84 · build 29/29 · e2e 160/160) — zero drift from the documented session-21 state. Now auditing the commits since the session-21 baseline.
-Owner's commit is docs-only; the only code changes since the session-21 baseline are session-21's own two test-layer files, just re-validated green. Let me review them directly.
-Both session-21 files are clean and match their documented design. Let me check the repo-hygiene test constraints and the PAD §10 stale entry before the browser census.
-Hygiene guards understood (script references must resolve — no relic models). Now the live-site census. Let me load the agent-browser skill and check tool availability.
-agent-browser 0.38.1 available. Starting the deployed-site census — first the health check, landing raw HTML (pill pre-JS contract), and route matrix.
-Deployment live and running the session-20/21 build (empty pre-JS pill spans + footer /80/70 pair confirmed). Now the full route census.
-All 27 route probes green. Now verifying proxy no-redirect semantics, sitemap origin, and the 404 strip rule.
-Sitemap origin ✓, proxy no-redirect ✓. The 404 message renders client-side (NotFoundBody) — checking the rendered page directly.
-404 strip rule holds (`nope/deep/path` — leading slash stripped, inner slashes kept). Now the mobile navigation check (the standing emphasis) at 390×844.
-Drawer is open (snapshot shows the 5 nav links + CTA). Let me read the computed styles via the link text.
-That matched the header nav, not the drawer. Let me target the fixed overlay with the highest z-index / cream background.
-Drawer bg/z/font/size/tracking/color all match the pinned values. But the nav-parent gap reads `normal`/`block` — let me inspect the drawer's actual DOM structure to find the flex container.
-Drawer structure verified: nav container `flex gap=8px` ✓, CTA wrapper `mt=40px` ✓ — all pinned values hold. Now testing drawer navigation.
-Drawer navigation ✓ (→ /services, closed). Now the login flow on the deployment (deployed `DEMO_USER_PASSWORD="Abce1234"`).
-Login lands on `/` with auth-neutral chrome ✓ (the httpOnly cookie isn't JS-readable by design). Verifying the session via the API.
-Session verified via API (200 + demo user) ✓. Now the booking happy path + ICS contract.
-The date/time values took (11/10/2026, 2:00 PM). The button is "Request appointment" — submitting now.
-Booking → confirmation with the full query-string contract ✓. Now verifying the ICS download (fixed 90-min block, raw commas).
-ICS contract verified (13 lines, fixed 90-min block 14:00→15:30, raw commas, no STATUS/TRANSP) ✓. Now newsletter + gallery lightbox + login error card.
-Still showing the loading state — let me wait and re-read.
-Lightbox opens at z-70 ✓. The newsletter form unmounted (replaced by the success state, most likely) — let me verify both the newsletter success text and the lightbox Escape-close.
-Lightbox closes on Escape ✓. Retesting the newsletter with a stable section reference.
-Newsletter success state confirmed ✓. Now the login error card (wrong password → shadcn Alert contract).
-Login error card matches the pinned contract ✓. Quick check of the unknown-service state, then the reference-site re-verification.
-Unknown-service state ✓. **Deployed-site census: ALL GREEN.** Now the reference re-verification — logging into the base44 reference site.
-已登录参考站点 → 癋陆 `/` ✓。现在进行两侧的药丸状态对比 + 着陆页 `innerText` 长度一致性检查。
-Pills agree ("OPENS TODAY AT 10:00" both sides) but innerText lengths differ slightly: ref 2085 vs deployment 2088 (previously 2088==2088). Let me investigate — scroll to trigger reveals on the reference and diff the text.
-Reference innerText = **2088 == 2088** after full reveal (the 2085 was a transient mid-animation state). Parity holds. Now the reference's mobile drawer.
-**Reference drawer == deployment drawer at every pinned value** (bg, z-60, 48px Cormorant, −1.2px, gap 8px, CTA mt 40px) — mobile nav parity confirmed, zero Tailwind v4 regression. Now executing session-21's suggested candidate 2: re-verify the reference's ICS contract.
-**Session-21 suggested candidate 2 EXECUTED: the reference's ICS re-captured — byte-format IDENTICAL** (13 lines, fixed 90-min block 14:00→15:30, raw commas, no STATUS/TRANSP). The clone's pinned contract remains valid. Let me run a few more reference drift probes (services innerText census, newsletter, login error).
-Services census: **1958 == 1958** — the `1918 + 2×len(pill)` formula holds on both sides. Now re-validating the reference's newsletter success + login error texts (the pin-revalidation sweep).
-Reference newsletter success re-verified (CSS-uppercased "YOU'RE IN…") ✓. Now the reference's login error card.
-Reference login error card matches the deployment (identical text/border/radius; bg differs only in v3-rgba vs v4-oklab serialization — the trap-7 pixel-identical case) ✓. The pin-revalidation sweep is green. Now a doc-staleness check on DEPLOYMENT.md and a security spot-check of the API routes.
-API routes audited clean (validation, no enumeration, rate limiting, typed errors). The audit is complete. Now let me design the session-22 remediation. First, let me study the existing capture instrument to reuse its browser-launch pattern for the drift-watch.
-The instrument pattern is clear. Let me check package.json scripts and the PAD §10 entry text precisely before writing the remediation plan.
-All design inputs confirmed. Now writing the session-22 remediation plan (validated against the codebase before execution).
-Plan saved. Now executing **T1** — the census record first, then the instrument.
-Now the GREEN validation — running the watch against the live reference.
-The `^` anchor in the regex fails against the multi-line header text in `waitForFunction` (no `m` flag). Fixing the predicate to split lines like `readPillLine` does.
-Now replacing the three inline `waitForFunction` calls with the new helper.
-P1–P3 PASS. P4's wait is wrong — at 390px the desktop nav (which carries the header pill) is `display:none`, so the pill line never appears. The drawer probe should wait for the menu toggle instead.
-**GREEN: 14/14 probes PASS.** Now the RED validation — a corrupted record copy must trip the watch (exit 1, drifted probes named).
-The drift detection works — but `EXIT=0` is the pipe's `tail` exit code, not the script's. Re-checking the actual exit code.
-RED validated: exit 1. Verifying the GREEN exit code explicitly too.
-T1 nearly complete. One more validation — the instrument-failure path (exit 2, unreachable URL).
-All three exit paths validated (0 GREEN / 1 DRIFT / 2 instrument-failure). **T1 complete.** Now **T2** — the PAD §10 repair.
-**T2 done.** Now **T3** — the full gate (lint covers the new `.mjs` script too).
-**T3 gate GREEN: 244 total.** Now **T4** — the canonical screenshot capture + the diff gate.
-**T4 GREEN** — 14/14 byte-identical (07-contact the documented noise class). Checking the change set so far.
-Now **T5** — documentation alignment. Starting with AGENTS.md's command table.
-Now CLAUDE.md's build-commands table.
-Now README.md — the reference-drift-watch feature row.
-Adding a brief mention in the README's testing-conventions paragraph.
-Now the PAD's verification ledger — adding the session-22 entry.
-Now SKILL.md → v1.19.0. Checking the frontmatter and appendices.
-正在更新 SKILL.md 至 v1.19.0 —— frontmatter、附录 B、附录 C。
-Now writing the proper session-22 record (replacing the owner's raw transcript file, per the sessions-4–21 convention).
-Now marking the remediation plan's ToDo list with executed results.
-I need to revert T6's checkbox — the push hasn't happened yet (the evidence follow-up commit will mark it executed, per the session-21 convention).
-Now the repo worklog's session-22 entry.
-All docs aligned. Final gate re-verification after the doc changes (the hygiene test scans them).
-Final gate green. Now **T6 — the push sequence**. Reading the SSH wrapper runbook first.
-Runbook internalized. Executing the T6 sequence — secret scan first.
-Key fingerprint matches the sessions 1–21 operator key record (`SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU`). Now the atomic commit.
-Commit `bc18a42` created. Now the dry-run, then the real push via the wrapper.
-Push verified (remote @ bc18a42 == local HEAD). Independent re-confirmation, then key shred.
-Remote re-confirmed byte-exact; key shredded. Now the evidence follow-up — marking T6 executed in the plan with §10 push evidence.
-Evidence commit `b4cb653` created. Pushing it — re-materializing the key for this final push.
-Both pushes verified byte-exact, key shredded, tree clean. Updating my outer worklog and closing the browser session.
-Session 22 is complete and pushed. Here's the wrap-up:
+# Session 23 — Audit: The Drift-Watch P5 Auth-Shell Probe + The Session-22 Candidates Executed (2026-10-06)
 
-## What was done
+**Baseline:** remote `main` @ `e1bf686` (the session-22 deliverable `bc18a42` + the evidence follow-up `b4cb653` + the owner's docs-only commit bringing `docs/session_23.md` — the raw session-22 transcript).
 
-**Audit (all green):** Workspace refreshed, baseline gate re-validated at **244 total (zero drift)**. The **live deployment was walked end-to-end** with agent-browser — 27 route probes, the mobile drawer at every pinned computed style with working navigation, login → `/` auth-neutral, the booking → ICS 90-minute block, newsletter, lightbox, and the login error card. **A production-ready superset with visual parity** — confirmed against the reference at every probe (pill, landing 2088 == 2088, services 1958 == 1958, drawer, error card).
+**Method:** Mode C audit (`skills/code-review-and-audit` — the full gate as the baseline; `skills/` excluded) + the deployed-site census on `https://beauty-salon.jesspete.shop/` and the reference re-verification on `https://luminous-sanctuary-copy-copy-c-d44ac1b2.base44.app/` with `skills/agent-browser` + the instrument-validation discipline per `skills/tdd` and `skills/evidence-driven-testing` (the GREEN/RED/exit-2 validation the drift-watch received in session 22, applied to its P5 extension).
 
-**Both session-21 suggested candidates executed:**
-1. **The reference ICS re-booked live** — byte-format identical, no platform drift
-2. **The reference-drift watch delivered** — `scripts/reference-drift-watch.mjs` + a committed census record: a read-only, clock-and-timezone-pinned probe validated **GREEN (14/14)**, **RED** (a corrupted record trips it), and on the instrument-failure path — the reference-side drift tripwire every prior census lacked
+> Note: this file previously held the raw process transcript of session 22 (committed by the owner). It has been replaced by this proper session-23 record — the same convention sessions 4–22 applied to their own transcript files.
 
-**One real defect found and fixed:** the PAD §10 "Static-build status pill" entry — stale doc drift contradicting the session-20 fix.
+## What this session set out to do
 
-**Delivered:** full gate 244 green, canonical screenshots re-captured (diff gate 14/14 byte-identical), docs aligned to SKILL v1.19.0, and both commits (`bc18a42` + the evidence follow-up `b4cb653`) pushed to **main** via the SSH wrapper with byte-exact remote verification and the key shredded.
+Refresh the workspace (`git pull` brought the owner's transcript commit only — no code changes), re-validate the documented architecture against the codebase, re-run the full audit gate, execute **session-22's two suggested candidates** — (1) the drift-watch cadence run and (2) the auth'd-state re-census on the reference — plus the standing emphases (the deployed-site census against the reference, the mobile navigation menu + the Tailwind v4 watch, the environment checklist), with the task brief's standing goal (the live deployment as a production-ready superset with visual parity) as the acceptance frame.
 
-**Suggested next:** run `bun scripts/reference-drift-watch.mjs` periodically (or before each session's audit) — it's now a one-command reference-drift check; the plan also suggests an auth'd-state re-census after any reference-side platform update.
+## Audit results (all phases)
+
+- **Phase 1 (lint + typecheck):** clean — ESLint 0 errors, `tsc --noEmit` clean.
+- **Phase 4 (tests):** baseline fully green — unit 84/84, build 29/29 routes, e2e 160/160 (**244 total**) — exactly the documented session-22 state, **zero drift**. The only commit since the session-22 push audited: the owner's docs-only transcript commit — **no application code changes**, so no deployment refresh was required (verified live below).
+- **Environment verified:** the local `.env` (`DATABASE_URL="file:../db/custom.db"`, the localhost canonical origin, a locally-generated `AUTH_SECRET`), `db/` at the repo root (`custom.db` + `e2e.db`), `.env.example` truthful and the only tracked `.env*` file, vitest + playwright configured and green — the task brief's checklist all holding.
+
+## The deployed-site census — all green, the deployment verified as a production-ready superset
+
+The live deployment at `https://beauty-salon.jesspete.shop/` still runs the current build (the raw HTML carries the pill's pre-JS EMPTY static shell + the footer `/80+/70` pair — the session-20/21 build contract; no app code has changed since, so no refresh was due):
+
+- **27 route probes green:** the 21 public routes, the 404 (`/nope/deep/path` → 404 with the client-rendered message), the proxy rewrites (`/SERVICES` and `/services/` → 200 with `redirect: "manual"` returning no `Location` header — the URL bar stays as typed), the unknown-service soft-404 (`/services/unknown-xyz` → 200 "Service not found" inside the site chrome), `sitemap.xml` (200 `application/xml`, 12 locs, the production origin first) and `robots.txt` (200 `text/plain`).
+- **The mobile drawer (the standing emphasis) at its pinned computed styles at 390×844:** cream `rgb(250, 248, 245)` bg, z-60 fixed, the 48px Cormorant Garamond links (line-height 48px, tracking −1.2px, ink `rgb(26, 26, 26)`), the links column `gap: 8px`, the CTA wrapper `margin-top: 40px` — every pinned value holding, and the drawer navigates (Treatments → `/services`, drawer closed). **Zero Tailwind v4 regression.**
+- **The login flow:** the deployed `DEMO_USER_PASSWORD` honored → lands on `/` (the pinned post-login contract), auth-neutral chrome, the session verified server-side via `/api/auth/me` → 200 + the demo user. The deliberate wrong-email attempt re-verified **the login error card** ("Invalid email or password" — the shadcn Alert contract).
+- **The booking happy path:** the full form (native React setters for the selects/date/time) → `/book/confirmation?name=…&date=2026-11-10&time=14%3A00&service=balayage` with the receipt, and the **ICS download**: the 13-line census, the fixed 90-minute block (`DTSTART 20261110T140000Z` → `DTEND 20261110T153000Z`), raw commas in the LOCATION line, no STATUS/TRANSP.
+- **The newsletter success state** ("YOU'RE IN. CHECK YOUR INBOX FOR YOUR 15% CODE." — the CSS-uppercased rendering), **the gallery lightbox** (opens z-70, closes on Escape), and **the same-instant pill parity** ("Opens today at 10:00" both sides at the same minute — the reference and the deployment probed back-to-back).
+
+## The reference re-verification + both session-22 suggested candidates — executed
+
+Logged into the reference (`sepnetflix2023@outlook.com`): post-login lands on `/` (the "dashboard" = the marketing landing, the pinned session-19 contract).
+
+1. **Candidate 1 (the drift-watch cadence run) — EXECUTED, GREEN:** `bun scripts/reference-drift-watch.mjs` run as this session's pre-audit step — **14/14 probes PASS, exit 0** (the pill text, the landing 2088 / services 1958 censuses, the drawer's nine pinned styles — no reference-side drift). The `last_verified` convention applied (the record's date is this session's re-confirmation).
+2. **Candidate 2 (the auth'd-state re-census on the reference) — EXECUTED, all four pins GREEN:** the session-19 authed-state pins re-walked live — post-login lands on `/` ✓; `/login` re-renders the sign-in card when auth'd (the URL stays, the h1 + form present — NO redirect) ✓; the auth-neutral chrome (no logout/account affordance in the header or footer, no account chip) ✓; the no-prefill book form (all 8 controls empty) ✓; the auth'd 404 (the standard slate card with `nope-session23` interpolated, the standard chrome) ✓.
+3. **The login-shell computed-style parity measured BOTH sides this session** (the P5 design input): the h1's default-sans font stack, the slate-900 h1 color + Sign-in bg, the white button text, the slate-200 input border, the `you@example.com` placeholder — **identical at every probed value on both sites** (the input BACKGROUND differing only in the v3-`rgba` vs v4-`oklab` STRING — pixels identical, the trap-7 class).
+
+## The remediation (per `docs/remediation-plan-session-23.md`)
+
+- **T1 — the drift-watch P5 auth-shell probe (the headline, F23-A):** `scripts/reference-drift-watch.mjs` extended with P5 — the fifth public parity surface (the reference's `/login`) now has its reference-side tripwire: six string-stable computed-style constants (the default-sans font context, the slate-900 h1 + Sign-in pair, the white button text, the slate-200 input border, the placeholder) committed as the `login_shell` block in `docs/reference-census.json` and probed read-only (GET navigation only; the POST-bearing error-card contract stays a session-census activity; the input background deliberately excluded — the trap-7 string-unstable class, a string probe would false-DRIFT on engine differences). **Validated all three paths: GREEN** (exit 0, **20/20 probes** against the live reference — P1–P4's 14 + P5's six), **RED** (a corrupted record copy — exit 1, both seeded corruptions [the h1 color + the input border color] named with expected/actual), and **instrument-failure** (an unreachable URL → exit 2 — re-validated).
+- **T2 — full gate green:** lint ✓ (0 errors) · tsc ✓ · unit **84/84** · build **29/29 routes** · e2e **160/160** = **244 total** — every pre-existing contract untouched.
+- **T3 — the canonical capture + the diff gate:** the set re-captured (07-contact re-captured as its noise-class output — an instrument/record-only change set) and the gate **GREEN** (14/14 byte-identical).
+- **T4 — documentation aligned:** README (the feature row's fifth surface), AGENTS.md (the command row), CLAUDE.md (the commands row), PAD (the instruments note + the session-23 verification ledger), SKILL.md → **v1.20.0**, this session log, the plan's executed results, the worklog.
+- **T5 — push:** secret scan → atomic commit to `main` → push via `docs/ssh_git_wrapper_v3.py` (the paramiko shim per the runbook) → remote == local verified → key shredded.
+
+## Carried / accepted (unchanged)
+
+- The two dev-only `bun audit` advisories (`braces`, `deepmerge-ts`) — the accepted-risk stance.
+- The a11y-addition family (drawer Escape-close, aria-labels, the RM-visible stance) — unchanged, still pinned.
+- The og/twitter/PWA + JSON-LD + canonical rejection (sessions 10/18) — unchanged, still negatively pinned.
+- The 07-contact screenshot's external-map noise class — the single documented exception to the byte-determinism signal.
+- The residual e2e-BUILD coupling (documented, not a defect): `seo-parity.spec.ts` expects the localhost origin baked at build time.
+- The read-only scope of the drift-watch (the POST-bearing contracts — the login-error card, the newsletter success, the ICS byte format — stay session-census activities): the login-error card + newsletter were re-verified on the deployment this session, and the ICS was re-verified on the reference in session 22 (F22-C).
+
+## Suggested next-session candidates
+
+1. **The remaining public-surface probes:** the drift-watch now covers the landing (P1/P2), services (P3), the drawer (P4), and the login shell (P5). The natural extension candidates are the per-route head layer (the favicon + the dead manifest link — read-only computed `<head>` reads) and the gallery/team/about/contact innerText censuses (the same full-reveal convention as P2/P3) — each a read-only, deterministic addition of the same class.
+2. **The operator-side cron for the watch:** the cadence is now the documented pre-audit convention; the next step is an operator-controlled schedule (e.g. a weekly cron running `bun scripts/reference-drift-watch.mjs` with the exit codes wired to a notification), plus recording each GREEN run's date in `last_verified` per the session-22 convention.

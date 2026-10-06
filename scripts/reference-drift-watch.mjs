@@ -1,5 +1,6 @@
 // reference-drift-watch — the reference-side drift tripwire (session-21's
-// suggested candidate 1, delivered session 22).
+// suggested candidate 1, delivered session 22; the P5 auth-shell probe
+// added session 23).
 //
 // Every parity census in this repo's history is a point-in-time measurement
 // of the live reference, and the 244-test gate pins the CLONE against
@@ -28,7 +29,16 @@
 //       (services_base + 2 x len[pill text] — the pill renders twice,
 //       header + footer);
 //   P4  the mobile drawer's pinned computed styles at 390x844 (bg, z,
-//       the 48px Cormorant link set, the nav gap, the CTA margin).
+//       the 48px Cormorant link set, the nav gap, the CTA margin);
+//   P5  the auth shell's public computed-style surface on /login — the
+//       fifth public parity surface (session 23): the shell's default-sans
+//       font context, the slate-900 h1 + Sign-in button, the white button
+//       text, the slate-200 input border, the email placeholder. The input
+//       BACKGROUND is deliberately NOT probed — bg-slate-50/50 serializes
+//       as rgba() under the reference's Tailwind v3 but oklab() under the
+//       clone's v4 (the trap-7 class: pixels identical, strings
+//       engine-unstable — a string probe would false-DRIFT). No clock
+//       dependence: the route renders the card with or without auth.
 //
 // Exit codes (the screenshot-diff convention):
 //   0  GREEN — every probe matches the record;
@@ -220,6 +230,45 @@ async function main() {
       const pins = record.drawer;
       for (const key of Object.keys(pins)) {
         report(`P4 drawer ${key.replace(/_/g, " ")}`, pins[key], drawer[key]);
+      }
+    }
+
+    // --- P5: the auth shell's public computed-style surface (session 23) ---
+    // Desktop viewport (the login card is viewport-independent); the fresh
+    // context carries no auth cookies, and the route renders the same card
+    // when auth'd (the session-19 pin) — so the probe is auth-state-
+    // independent. The selectors: h1 (the "Welcome to Beauty Salon" heading),
+    // button[type=submit] (the Sign in button — the Google button is NOT
+    // type=submit), form input (the email input).
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto(`${BASE}/login`, { waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.waitForSelector('button[type="submit"]', { timeout: 30000 });
+    const shell = await page.evaluate(() => {
+      const h1 = document.querySelector("h1");
+      const btn = document.querySelector('button[type="submit"]');
+      const input = document.querySelector("form input");
+      if (!h1 || !btn || !input) return null;
+      return {
+        h1_font_family: getComputedStyle(h1).fontFamily.split(",")[0].replace(/"/g, "").trim(),
+        h1_color: getComputedStyle(h1).color,
+        sign_in_background: getComputedStyle(btn).backgroundColor,
+        sign_in_color: getComputedStyle(btn).color,
+        input_border_color: getComputedStyle(input).borderColor,
+        input_placeholder: input.placeholder,
+      };
+    });
+    if (shell === null) {
+      console.error("  FAIL  P5 login shell: the h1 / submit button / form input could not be found");
+      process.exitCode = 2;
+    } else {
+      const pins = record.login_shell;
+      if (!pins) {
+        console.error("  FAIL  P5 login shell: the record carries no login_shell block");
+        process.exitCode = 2;
+      } else {
+        for (const key of Object.keys(pins)) {
+          report(`P5 login shell ${key.replace(/_/g, " ")}`, pins[key], shell[key]);
+        }
       }
     }
   } catch (e) {

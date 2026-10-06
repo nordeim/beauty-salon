@@ -3,7 +3,12 @@
     "The reference-drift-watch census record — the last known-good live census",
     "of the base44 reference app's PUBLIC parity surfaces, measured with",
     "agent-browser on 2026-10-06 (session 22) and re-verified by the instrument",
-    "run in the same session (GREEN).",
+    "run in the same session (GREEN). Session 23 re-verified P1-P4 GREEN",
+    "(14/14, the pre-audit cadence run), re-walked the four session-19",
+    "auth'd-state pins on the reference (login-renders-when-auth'd, the",
+    "auth-neutral chrome, the no-prefill book form, the auth'd 404), and",
+    "added the P5 login_shell block — the fifth public surface, measured",
+    "live with agent-browser the same session.",
     "",
     "The instrument (scripts/reference-drift-watch.mjs) pins the browser clock",
     "to `census_instant` and the context timezone to `timezone` before loading",
@@ -12,6 +17,14 @@
     "the drawer's computed styles. Do not compare these values against an",
     "unpinned clock — the pill reads the visitor's local time (the SP9/SP10",
     "stance) and the innerText censuses include the pill text twice.",
+    "",
+    "The login_shell block (P5) is NOT time-derived — the /login route renders",
+    "the sign-in card identically with or without auth (the session-19 pin) —",
+    "so its constants are plain computed-style reads. The input BACKGROUND is",
+    "deliberately excluded: bg-slate-50/50 serializes as rgba() under the",
+    "reference's Tailwind v3 but oklab() under the clone's v4 (the trap-7",
+    "class — pixels identical, strings engine-unstable); a string probe would",
+    "false-DRIFT on engine differences.",
     "",
     "REMEDIATION PATH for intentional reference changes (a real platform",
     "update): re-census the changed surface manually (agent-browser, the same",
@@ -35,6 +48,14 @@
     "link_color": "rgb(26, 26, 26)",
     "nav_gap": "8px",
     "cta_margin_top": "40px"
+  },
+  "login_shell": {
+    "h1_font_family": "ui-sans-serif",
+    "h1_color": "rgb(15, 23, 42)",
+    "sign_in_background": "rgb(15, 23, 42)",
+    "sign_in_color": "rgb(255, 255, 255)",
+    "input_border_color": "rgb(226, 232, 240)",
+    "input_placeholder": "you@example.com"
   },
   "last_verified": "2026-10-06"
 }

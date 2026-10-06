@@ -756,3 +756,27 @@ Work Log:
 Stage Summary:
 - Session 22 delivered and pushed: the reference-drift watch (session-21 candidate 1 — the committed instrument + census record, validated GREEN/RED/instrument-failure, the reference-side drift tripwire), the reference-ICS re-verification (session-21 candidate 2 — byte-format identical, no platform drift), the deployed-site + reference re-census fully green (a production-ready superset with visual parity), the PAD §10 doc repair (F22-A), the canonical capture re-run + the diff gate GREEN, docs aligned to SKILL v1.19.0
 - Final state: branch up to date with origin/main, working tree clean, remote == local verified byte-exact at bc18a42
+
+---
+Task ID: 26
+Agent: main (Super Z)
+Task: Session 23 — the drift-watch P5 auth-shell probe (the headline) + the two session-22 suggested candidates executed (the cadence run + the auth'd-state re-census) + the deployed-site/reference re-census, docs alignment, push
+
+Work Log:
+- Workspace refreshed via git pull (the owner's docs-only commit e1bf686 bringing docs/session_23.md — the raw session-22 transcript); core docs re-internalized (AGENTS/CLAUDE/README/PAD/SKILL v1.19.0) + the status docs (session_22 proper record, remediation-plan-session-22 all-executed, worklog Task 25/25-FINAL, session_23 the raw transcript)
+- BASELINE GATE ALL GREEN: lint ✓ · typecheck ✓ · unit 84/84 · build 29/29 routes · e2e 160/160 = 244 total — exactly the documented session-22 state, zero drift; the only commit since the session-22 push audited clean (the owner's docs-only transcript commit — no app-code changes, so no deployment refresh due)
+- THE DEPLOYED-SITE CENSUS (agent-browser on https://beauty-salon.jesspete.shop/): 27 route probes green; the mobile drawer at every pinned computed style at 390x844 (cream bg, z-60, 48px Cormorant -1.2px, gap 8px, CTA mt 40px) + navigation — the standing Tailwind v4 watch: zero regression; the login (the deployment's DEMO_USER_PASSWORD honored → lands on /, auth-neutral, /api/auth/me 200) + the login error card (the wrong-email attempt); the booking happy path + the ICS fixed 90-minute block (13 lines, DTSTART 20261110T140000Z → DTEND 20261110T153000Z, raw commas, no STATUS/TRANSP); the newsletter success state; the gallery lightbox (z-70 + Escape close); the same-instant pill parity ("Opens today at 10:00" both sides)
+- SESSION-22 CANDIDATE 1 EXECUTED: the drift-watch cadence run (bun scripts/reference-drift-watch.mjs as the pre-audit step) — GREEN, 14/14 probes, exit 0; the last_verified convention applied
+- SESSION-22 CANDIDATE 2 EXECUTED: the auth'd-state re-census on the reference — all four session-19 pins re-walked GREEN (login-renders-when-auth'd with no redirect, the auth-neutral chrome, the no-prefill book form, the auth'd 404)
+- THE LOGIN-SHELL PARITY MEASURED BOTH SIDES (the P5 design input): the h1's default-sans stack, the slate-900 h1/Sign-in pair, the white button text, the slate-200 input border, the placeholder — identical at every probed value (the input bg the trap-7 v3-rgba vs v4-oklab string class only)
+- T1 THE P5 AUTH-SHELL PROBE DELIVERED (F23-A, the headline): scripts/reference-drift-watch.mjs extended with P5 (the fifth public parity surface — /login's six string-stable computed-style constants, read-only, the input background deliberately excluded as the trap-7 string-unstable class) + the login_shell block in docs/reference-census.json — validated GREEN (exit 0, 20/20 probes against the live reference), RED (exit 1, both seeded corruptions named), instrument-failure (exit 2, re-validated)
+- T2 FULL GATE GREEN: lint (0 errors) · typecheck ✓ · unit 84/84 · build 29/29 routes · e2e 160/160 = 244 total — every pre-existing contract untouched
+- T3 CANONICAL CAPTURE + DIFF GATE: the set re-captured (07-contact re-captured as its noise-class output — an instrument/record-only change set); the gate GREEN (14/14)
+- T4 DOCS ALIGNED: README (the feature row's fifth surface), AGENTS.md (the command row), CLAUDE.md (the commands row), PAD (the instruments note + the session-23 verification ledger), SKILL.md → v1.20.0 (the project_state, Appendix B instrument note, Appendix C session-23 row), docs/session_23.md (the proper record replacing the raw transcript), the plan with executed results, this worklog entry
+
+Stage Summary:
+- Both session-22 suggested candidates executed: candidate 1 the drift-watch cadence run (GREEN 14/14 pre-audit) and candidate 2 the auth'd-state re-census on the reference (all four pins re-walked GREEN)
+- The headline remediation: the drift-watch P5 auth-shell probe — the fifth public parity surface (/login) gets its reference-side tripwire (six string-stable constants, the input-bg exclusion for trap-7 string instability, validated GREEN 20/20 / RED / exit-2)
+- The deployment re-censused end-to-end: a production-ready superset of the reference with visual parity (the pill, the drawer, the innerText surfaces, the ICS, every functional surface green)
+- Gate: lint ✓ · typecheck ✓ · unit 84/84 ✓ · build 29/29 routes ✓ · e2e 160/160 ✓ (244 total; all pre-existing parity contracts untouched)
+- Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
