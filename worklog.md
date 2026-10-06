@@ -567,3 +567,22 @@ Stage Summary:
 - The mobile navigation menu verified working on BOTH sides with zero Tailwind v4 regression (live re-measurement + the pinned computed-style contract green)
 - Gate: lint ✓ · typecheck ✓ · unit 80/80 ✓ · build 29/29 routes ✓ · e2e 144/144 ✓ (224 total; all pre-existing parity contracts untouched)
 - Next: secret scan -> commit to main -> SSH-wrapper push -> verify remote == local
+
+---
+Task ID: 21-FINAL
+Agent: main (Super Z)
+Task: Session 18 final push verification and wrap-up
+
+Work Log:
+- Final gate re-verified after all doc changes: lint (0 errors) + typecheck + unit 80/80 + build 29/29 routes (rebuilt after the .next clear during the screenshot-raster investigation) + e2e 144/144 = 224 total green (the hygiene test scans the changed docs — clean)
+- Change-set secret scan clean pre-commit: no AUTH_SECRET hex32+ material in any tracked file or the staged diff; no tracked env/db/key files beyond .env.example; the "BEGIN OPENSSH" text hits are the runbook/prior-plan documentation of the method itself, not key material
+- Committed as one atomic commit 7a45c93 to main (24 files: the head-boilerplate pin spec + the doc alignments + the refreshed screenshots + the plan/session-log/worklog)
+- Pushed via docs/ssh_git_wrapper_v3.py with --remote git@github.com:nordeim/beauty-salon.git (the paramiko shim from the runbook's Appendix A at /home/z/my-project/bin/shim/ssh, outside the repo)
+- Key fingerprint verified pre-push (SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU — the sessions 1-17 operator key record, the same operator key) and shredded post-push (the wrapper's temp copy shreds itself on every exit; the operator copy at /tmp/ml-deploy-s18.key overwritten with random bytes then removed)
+- Dry-run clean (7488276..7a45c93 fast-forward); real push exit 0 with the wrapper's own remote verification + the tracking-ref sync
+- Independent re-confirmation via git ls-remote (shim + key): 7a45c9336b1155f10bd39c3c0585d0f0145b7ce5 refs/heads/main — byte-exact == local HEAD
+- Push evidence recorded in the plan's section 10; this final worklog entry; the T6-executed follow-up commit
+
+Stage Summary:
+- Session 18 delivered and pushed: the two session-17 suggested candidates executed as live censuses (the structured-data/head layer MEASURED + classified + NEGATIVELY PINNED via HB1-HB4; the HTTP-header layer censused + documented in DEPLOYMENT.md section 6), the mobile navigation menu verified working on both sides with zero Tailwind v4 regression, the environment checklist verified (.env DB path, db/ at root, vitest + playwright, .env.example), 4 new e2e pins, docs aligned to SKILL v1.15.0
+- Final state: branch up to date with origin/main, working tree clean, remote == local verified byte-exact at 7a45c93 (+ the T6 docs follow-up)

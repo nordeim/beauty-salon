@@ -120,4 +120,9 @@ The 15 canonical captures re-taken on the current dev build (the standing conven
 
 ## 10. Push evidence (session 18)
 
-- Committed to `main` and pushed via `docs/ssh_git_wrapper_v3.py` with `--remote git@github.com:nordeim/beauty-salon.git` (the paramiko shim per the runbook's Appendix A); key fingerprint verified pre-push; key materialized outside the repo and shredded after; remote == local verified byte-exact post-push. *(Executed — recorded in the worklog's final entry.)*
+- Committed as one atomic commit `7a45c93` to `main` (24 files: the new head-boilerplate pin spec + the 10 doc alignments + the 14 refreshed screenshots + the plan/session-log/worklog).
+- Key fingerprint verified before the push: `SHA256:3ddaNlFhMz1JXiGEDgVEaRsUzI4Ev0IpGEEB7NnU4PU` (the sessions 1–17 operator key record — the same operator key).
+- Change-set secret scan clean pre-commit: no `AUTH_SECRET="<hex32+>"` material in any tracked file or the staged diff; no tracked env/db/key files beyond `.env.example`; the "BEGIN OPENSSH" text hits are the runbook/prior-plan documentation of the method itself, not key material.
+- Dry-run clean (`7488276..7a45c93` fast-forward); real push exit 0 with the wrapper's own remote verification + the tracking-ref sync.
+- Independent re-confirmation via `git ls-remote` (shim + key): `7a45c9336b1155f10bd39c3c0585d0f0145b7ce5 refs/heads/main` — byte-exact == local HEAD.
+- The wrapper's temp key copy shreds itself on every exit; the operator copy at `/tmp/ml-deploy-s18.key` overwritten with random bytes then removed.
