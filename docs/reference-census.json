@@ -1,0 +1,40 @@
+{
+  "$comment": [
+    "The reference-drift-watch census record — the last known-good live census",
+    "of the base44 reference app's PUBLIC parity surfaces, measured with",
+    "agent-browser on 2026-10-06 (session 22) and re-verified by the instrument",
+    "run in the same session (GREEN).",
+    "",
+    "The instrument (scripts/reference-drift-watch.mjs) pins the browser clock",
+    "to `census_instant` and the context timezone to `timezone` before loading",
+    "each page, so every time-derived probe below is a DETERMINISTIC constant:",
+    "the pill's four-state text, the landing/services innerText lengths, and",
+    "the drawer's computed styles. Do not compare these values against an",
+    "unpinned clock — the pill reads the visitor's local time (the SP9/SP10",
+    "stance) and the innerText censuses include the pill text twice.",
+    "",
+    "REMEDIATION PATH for intentional reference changes (a real platform",
+    "update): re-census the changed surface manually (agent-browser, the same",
+    "pins), update this record, review the diff, and commit — the same",
+    "convention docs/screenshots/ applies to an intentional pixel change."
+  ],
+  "reference_url": "https://luminous-sanctuary-copy-copy-c-d44ac1b2.base44.app",
+  "census_instant": "2026-10-06T05:00:00Z",
+  "timezone": "UTC",
+  "pill_text_header": "OPENS TODAY AT 10:00",
+  "landing_inner_text_length": 2088,
+  "services_inner_text_length": 1958,
+  "services_base": 1918,
+  "drawer": {
+    "background_color": "rgb(250, 248, 245)",
+    "z_index": "60",
+    "link_font_family": "Cormorant Garamond",
+    "link_font_size": "48px",
+    "link_line_height": "48px",
+    "link_letter_spacing": "-1.2px",
+    "link_color": "rgb(26, 26, 26)",
+    "nav_gap": "8px",
+    "cta_margin_top": "40px"
+  },
+  "last_verified": "2026-10-06"
+}

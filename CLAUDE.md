@@ -76,6 +76,7 @@ bun run db:push && bun run db:seed
 | `bun run build` | Standalone production build (29 routes) |
 | `bun run test:e2e` | Playwright Chromium (160 specs; needs build first — the seed is hermetic against the repo `.env`: `DEMO_USER_PASSWORD` pinned in global-setup) |
 | `bun scripts/capture-screenshots.mjs` | The canonical screenshot set — standalone server on :3200, fresh contexts, `animations: "disabled"` (the byte-deterministic convention, session 19) |
+| `bun scripts/reference-drift-watch.mjs` | The reference-drift watch — probes the LIVE reference's public parity surfaces (clock+TZ pinned) against the committed census record `docs/reference-census.json`; exit 1 on drift (the reference-side tripwire, session 22 — an ad-hoc network instrument, NOT part of the automated gate) |
 | `bun run db:push` / `db:seed` | Schema + reference content |
 
 Clean-check order: `lint → typecheck → test → build → test:e2e`.
