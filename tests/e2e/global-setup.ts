@@ -14,6 +14,14 @@ export default function globalSetup(): void {
   const env = {
     ...process.env,
     DATABASE_URL: "file:../db/e2e.db",
+    // The e2e seed must be hermetic against the repo .env (session 21,
+    // F21-B): bun auto-loads .env into the seed child, and a
+    // production-shaped .env (DEMO_USER_PASSWORD="Abce1234" — the task
+    // brief's deployed configuration) leaks into a FRESH db/e2e.db and
+    // breaks auth.spec's documented demo credential. The explicit pin
+    // defends the seed the same way ADR-002b's wrapper defends the dev
+    // scripts — process-env beats .env only for values we set ourselves.
+    DEMO_USER_PASSWORD: "$Abcd1234",
   } as NodeJS.ProcessEnv;
 
   // Prefer bun (the documented runtime); fall back to npx tsx for npm users.

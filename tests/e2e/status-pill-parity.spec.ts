@@ -143,3 +143,50 @@ test.describe("status-pill parity (the time-aware four-state machine)", () => {
     }
   });
 });
+
+// The LOCAL-CLOCK timezone stance (session 21 — the boundary-timezone sweep,
+// session-20's suggested candidate 1). The pill reads the VISITOR'S browser
+// clock: a 5-probe Playwright timezoneId sweep (UTC · Pacific/Auckland ·
+// America/Los_Angeles · Asia/Tokyo · Australia/Sydney) measured the reference
+// and the deployed clone at the same instant and they AGREE at every
+// timezone — UTC renders Tuesday's before-open "Opens today at 10:00",
+// Auckland/Tokyo/Sydney render Tuesday's during-open "Open · closes 19:00",
+// and Los Angeles renders its LOCAL Monday "Closed today" (the
+// day-boundary crossing: the salon's closed Monday, while a UTC visitor
+// sees Tuesday's before-open state).
+//
+// The stance was UNPINNED until this block: every spec above runs in the
+// default context where local == UTC, so a regression that switched
+// statusForNow to UTC methods (or to a fixed salon timezone) was invisible
+// to the suite. Validated both directions in session 21: GREEN against the
+// current code, and RED under a UTC-methods sabotage (rebuilt standalone
+// bundle) — the pin guards the local-clock stance.
+test.describe("status-pill parity (the local-clock timezone stance — session 21)", () => {
+  test.describe("America/Los_Angeles — the day-boundary crossing", () => {
+    test.use({ timezoneId: "America/Los_Angeles" });
+
+    test("SP9: the pill reads the visitor's LOCAL clock — LA is on its closed Monday while UTC is on Tuesday", async ({ page }) => {
+      // 2026-10-06T05:00:00Z is Monday 22:00 in America/Los_Angeles (UTC-7)
+      // and Tuesday 05:00 in UTC — the same instant renders a different DAY.
+      // The pill must show the VISITOR's local day's state: LA's Monday
+      // ("Closed today"), live-measured on both the reference and the
+      // deployment at this instant.
+      await page.clock.install({ time: new Date("2026-10-06T05:00:00Z") });
+      await page.goto("/");
+      await expect.poll(() => readPills(page)).toEqual(["Closed today", "Closed today"]);
+    });
+  });
+
+  test.describe("Pacific/Auckland — the during-open offset", () => {
+    test.use({ timezoneId: "Pacific/Auckland" });
+
+    test("SP10: the during-open state under a +13 offset — the same instant, the local window", async ({ page }) => {
+      // 2026-10-06T05:00:00Z is Tuesday 18:00 in Pacific/Auckland (UTC+13) —
+      // within Tuesday's 10:00–19:00 window → the during-open state with the
+      // day's own close time (live-measured on both sides at this instant).
+      await page.clock.install({ time: new Date("2026-10-06T05:00:00Z") });
+      await page.goto("/");
+      await expect.poll(() => readPills(page)).toEqual(["Open · closes 19:00", "Open · closes 19:00"]);
+    });
+  });
+});
